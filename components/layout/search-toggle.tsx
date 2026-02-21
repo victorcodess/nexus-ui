@@ -6,14 +6,14 @@ import { useI18n } from 'fumadocs-ui/contexts/i18n';
 import { cn } from '../../lib/cn';
 import { type ButtonProps, buttonVariants } from '../ui/button';
 
-interface SearchToggleProps extends Omit<ComponentProps<'button'>, 'color'>, ButtonProps {
+interface SearchToggleProps extends Omit<ComponentProps<'button'>, 'variant'>, ButtonProps {
   hideIfDisabled?: boolean;
 }
 
 export function SearchToggle({
   hideIfDisabled,
   size = 'icon-sm',
-  color = 'ghost',
+  variant = 'ghost',
   ...props
 }: SearchToggleProps) {
   const { setOpenSearch, enabled } = useSearchContext();
@@ -25,7 +25,7 @@ export function SearchToggle({
       className={cn(
         buttonVariants({
           size,
-          color,
+          variant,
         }),
         props.className,
       )}

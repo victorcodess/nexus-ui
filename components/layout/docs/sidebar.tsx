@@ -89,7 +89,7 @@ export function SidebarContent({
             <Base.SidebarCollapseTrigger
               className={cn(
                 buttonVariants({
-                  color: 'ghost',
+                  variant: 'ghost',
                   size: 'icon-sm',
                   className: 'rounded-lg',
                 }),
