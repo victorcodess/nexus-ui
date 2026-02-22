@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ChatgptIcon from "@/components/layout/svgs/chatgpt";
 import ClaudeIcon from "@/components/layout/svgs/claude";
 import GeminiIcon from "@/components/layout/svgs/gemini";
+import PromptInput from "@/components/nexus-ui/prompt-input";
+import { Check, Copy } from "lucide-react";
+
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { useState } from "react";
 
 const lightStripes = {
   background:
@@ -30,9 +37,31 @@ function StripedPanel({
   borderSide: "left" | "right";
   children?: React.ReactNode;
 }) {
-  const borderClass = borderSide === "right" ? "border-r" : "border-l";
+  const borderClass = borderSide === "right" ? "border-r" : "lg:border-l";
+  const showTopBorderLine = borderSide === "left";
   return (
     <div className={`relative ${className}`}>
+      {/* Dedicated top border (mobile only) – gradient dashes with wider spacing */}
+      {showTopBorderLine && (
+        <>
+          <div
+            className="absolute top-0 right-0 left-0 z-10 h-[1.5px] lg:hidden! dark:hidden"
+            style={{
+              background:
+                "repeating-linear-gradient(to right, #e5e5e5 0px, #e5e5e5 14px, transparent 14px, transparent 24px)",
+            }}
+            aria-hidden
+          />
+          <div
+            className="absolute top-0 right-0 left-0 z-10 hidden h-[1.5px] lg:hidden! dark:block"
+            style={{
+              background:
+                "repeating-linear-gradient(to right, #404040 0px, #404040 14px, transparent 14px, transparent 24px)",
+            }}
+            aria-hidden
+          />
+        </>
+      )}
       {/* Light mode – dashed border only on inner layer */}
       <div
         className={`absolute inset-0 dark:hidden ${borderClass} border-transparent`}
@@ -52,18 +81,52 @@ function StripedPanel({
 }
 
 export default function HomePage() {
-  return (
-    <main className="flex h-screen w-full">
-      <StripedPanel className="h-full w-20 2xl:w-40 shrink-0" borderSide="right" />
+  const code = `import {
+  PromptInput,
+  PromptInputTextarea,
+  PromptInputAction,
+} from '@/components/ui/prompt-input';
 
-      <div className="flex h-full w-full">
-        <div className="flex hid den h-full w-1/2 flex-col items-start justify-end">
-          <div className="flex w-fit flex-col gap-4 p-10">
-            <div className="flex flex-col gap-1">
-              <h1 className="text-[32px] leading-[38px] font-medium tracking-[-0.8px]">
+function PromptInputBasic() {
+  return (
+    <PromptInput>
+      <PromptInputTextarea placeholder='Ask prompt-kit' />
+      <PromptInputActions>
+        <PromptInputAction tooltip='Upload File'>
+          <Button>Upload File</Button>
+        </PromptInputAction>
+        <PromptInputAction tooltip='Send'>
+          <Button>Send</Button>
+        </PromptInputAction>
+      </PromptInputActions>
+    </PromptInput>
+  );
+}`;
+
+  const [checked, setChecked] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setChecked(true);
+    setTimeout(() => {
+      setChecked(false);
+    }, 2000);
+  };
+  return (
+    <main className="flex h-full min-h-screen w-full overflow-auto pt-12 lg:h-screen lg:pt-0">
+      <StripedPanel
+        className="hidden h-full w-20 shrink-0 lg:block 2xl:w-40"
+        borderSide="right"
+      />
+
+      <div className="flex w-full flex-col lg:h-full lg:flex-row">
+        <div className="flex h-auto w-full flex-col items-center justify-center lg:h-full lg:w-1/2 lg:items-start lg:justify-end">
+          <div className="px-auto flex w-fit flex-col items-center gap-4 py-15 lg:items-start lg:p-10">
+            <div className="flex flex-col items-center gap-1 lg:items-start">
+              <h1 className="text-2xl leading-[38px] font-medium tracking-[-0.8px] lg:text-[32px]">
                 Build Better AI Interfaces
               </h1>
-              <p className="w-[317px] text-base leading-6 font-normal text-[#737373]">
+              <p className="w-[272px] text-center text-sm leading-6 font-normal text-[#737373] lg:w-[317px] lg:text-left lg:text-base">
                 Flexible, customizable components engineered for modern AI
                 experiences.
               </p>
@@ -77,26 +140,44 @@ export default function HomePage() {
           </div>
         </div>
 
-        <StripedPanel className="1/2 h-full w-1/2 full px-6" borderSide="left">
-          <div className="flex px-6 h-full w-full flex-col items-center justify-between">
-            <div className="flex h-14/51 w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-[#E5E5E5] dark:bg-background dark:border-white/10 bg-white p-7"></div>
+        <StripedPanel
+          className="h-full min-h-[500px] w-full flex-1 lg:h-full lg:w-1/2"
+          borderSide="left"
+        >
+          <div className="flex h-full w-full flex-col items-center px-4 lg:justify-between lg:px-6">
+            <div className="flex w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-[#E5E5E5] bg-white p-3 pt-21.5 lg:h-16/51 lg:p-7 dark:border-white/10 dark:bg-background">
+              <PromptInput />
+            </div>
 
-            <div className="flex h-4/51 w-full items-center justify-center gap-2">
-              <Button className="w-fit cursor-pointer rounded-full bg-[#E5E5E5] dark:bg-[#404040] text-sm leading-6 font-normal text-[#171717] dark:text-white hover:bg-[#E5E5E5] gap-1">
+            <div className="flex w-full items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
+              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
                 <ChatgptIcon className="size-4" />
                 ChatGPT
               </Button>
-              <Button className="w-fit cursor-pointer rounded-full bg-transparent dark:text-white text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] gap-1">
+              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
                 <GeminiIcon className="size-4" />
                 Gemini
               </Button>
-              <Button className="w-fit cursor-pointer rounded-full bg-transparent dark:text-white text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] gap-1">
+              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
                 <ClaudeIcon className="size-4" />
                 Claude
               </Button>
             </div>
 
-            <div className="h-33/51 w-full rounded-t-[40px] border-x border-t border-[#E5E5E5] dark:bg-background dark:border-white/10 bg-white"></div>
+            <div className="[300px] relative w-full rounded-t-[40px] border-x border-t border-[#E5E5E5] bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! [&_.lucide-clipboard]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:px-7 [&>figure]:py-3.5 [&>figure]:shadow-none">
+              <DynamicCodeBlock lang="ts" code={code} />
+
+              <button
+                className="bor der absolute top-5 right-5 flex size-7 cursor-pointer items-center justify-center text-[#737373]"
+                onClick={handleCopy}
+              >
+                {checked ? (
+                  <Check className="size-4.5" />
+                ) : (
+                  <Copy className="size-4.5" />
+                )}
+              </button>
+            </div>
           </div>
         </StripedPanel>
       </div>

@@ -6,6 +6,9 @@ import { cn } from "@/lib/cn";
 import { ThemeToggle } from "./layout/theme-toggle";
 import { SearchToggle } from "./layout/search-toggle";
 
+import { Menu } from "lucide-react";
+import { buttonVariants } from "./ui/button";
+
 /**
  * Custom navbar – edit this file to change the navbar UI.
  * Used when nav.component is set in lib/layout.shared.tsx.
@@ -19,16 +22,16 @@ export function Navbar() {
     <header
       id="nd-nav"
       className={cn(
-        "fixed top-0 z-40 h-14 w-full px-20 2xl:px-40",
-        "bg-transparent",
+        "fixed top-0 z-40 h-14 w-full lg:px-20 2xl:px-40",
+        "bg-white/90 dark:bg-background backdrop-blur-sm lg:backdrop-blur-none lg:bg-transparent dark:lg:bg-transparent",
         "*:mx-au to *:max-w-(--fd-layout-width)",
       )}
     >
-      <nav className="flex h-14 w-[calc(50%+40px)] 2xl:w-[calc(50%+80px)] items-center justify-between gap-6 px-6">
+      <nav className="flex h-14 w-full items-center justify-between gap-6 px-4 lg:px-6 lg:w-[calc(50%+40px)] 2xl:w-[calc(50%+80px)]">
         {/* Logo / title */}
         <Link
           href="/"
-          className="inline-flex items-center gap-1 text-base font-semibold"
+          className="inline-flex shrink-0 items-center gap-1 text-base font-semibold"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +56,7 @@ export function Navbar() {
           <Link
             href="/docs"
             className={cn(
-              "rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
+              "cursor-pointer rounded-md px-3 py-2 text-sm transition-colors",
               isDocs
                 ? "font-medium text-fd-primary"
                 : "text-fd-muted-foreground hover:text-fd-accent-foreground",
@@ -64,7 +67,7 @@ export function Navbar() {
           <Link
             href="/docs/test"
             className={cn(
-              "rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
+              "cursor-pointer rounded-md px-3 py-2 text-sm transition-colors",
               isComponents
                 ? "font-medium text-fd-primary"
                 : "text-fd-muted-foreground hover:text-fd-accent-foreground",
@@ -87,10 +90,22 @@ export function Navbar() {
             </svg>
           </a>
 
-          <SearchToggle className="bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground cursor-pointer rounded-full" />
+          <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
 
           <ThemeToggle className="cursor-pointer rounded-full" />
         </div>
+
+        <button
+          type="button"
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon" }),
+            "lg:hidden",
+          )}
+          aria-label="Toggle Menu"
+          // onClick={() => setOpenMenu(true)}
+        >
+          <Menu className="size-5" />
+        </button>
       </nav>
     </header>
   );
