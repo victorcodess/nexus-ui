@@ -12,6 +12,7 @@ import { Check, Copy } from "lucide-react";
 
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { useState } from "react";
+import GeminiInput from "@/components/nexus-ui/examples/gemini-input";
 
 const lightStripes = {
   background:
@@ -164,7 +165,7 @@ export default NexusInput;
         >
           <div className="flex h-full w-full flex-col items-center px-4 lg:justify-between lg:px-6">
             <div className="flex w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-[#E5E5E5] bg-white p-3 pt-21.5 lg:h-16/51 lg:p-7 dark:border-white/10 dark:bg-background">
-              <NexusInput />
+              <GeminiInput />
             </div>
 
             <div className="flex w-full flex-wrap items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
