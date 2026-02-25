@@ -11,9 +11,9 @@ import { AudioLines, Globe, Paperclip } from "lucide-react";
 
 const ChatgptInput = () => {
   return (
-    <PromptInput>
-      <PromptInputTextarea placeholder="Ask anything" />
-      <PromptInputActions>
+    <PromptInput className="rounded-[28px]">
+      <PromptInputTextarea placeholder="Ask anything" className="min-h-16 px-6" />
+      <PromptInputActions className="px-3 py-2.5">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import NexusIcon from "@/components/layout/svgs/nexus";
 import ChatgptIcon from "@/components/layout/svgs/chatgpt";
 import ClaudeIcon from "@/components/layout/svgs/claude";
 import GeminiIcon from "@/components/layout/svgs/gemini";
 import ChatgptInput from "@/components/nexus-ui/examples/chatgpt-input";
+import NexusInput from "@/components/nexus-ui/examples/nexus-input";
 import { Check, Copy } from "lucide-react";
 
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
@@ -89,32 +91,25 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { AudioLines, Globe, Paperclip } from "lucide-react";
+import { ArrowUp, Paperclip } from "lucide-react";
 
-const ChatgptInput = () => {
+const NexusInput = () => {
   return (
     <PromptInput>
-      <PromptInputTextarea placeholder="Ask anything" />
+      <PromptInputTextarea />
       <PromptInputActions>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-              <Paperclip className="size-4 text-[#5D5D5D]" />
-              <span className="hidden sm:inline">Attach</span>
-            </Button>
-          </PromptInputAction>
-          <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-              <Globe className="size-4 text-[#5D5D5D]" />
-              <span className="hidden sm:inline">Search</span>
+            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+              <Paperclip />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
+
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-              <AudioLines className="size-4" />
-              <span className="hidden sm:inline">Voice</span>
+            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-[#404040] text-[13px] leading-6 font-normal text-white hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+              <ArrowUp />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
@@ -123,7 +118,8 @@ const ChatgptInput = () => {
   );
 };
 
-export default ChatgptInput;`;
+export default NexusInput;
+`;
 
   const [checked, setChecked] = useState(false);
 
@@ -168,17 +164,22 @@ export default ChatgptInput;`;
         >
           <div className="flex h-full w-full flex-col items-center px-4 lg:justify-between lg:px-6">
             <div className="flex w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-[#E5E5E5] bg-white p-3 pt-21.5 lg:h-16/51 lg:p-7 dark:border-white/10 dark:bg-background">
-              <ChatgptInput />
+              <NexusInput />
             </div>
 
-            <div className="flex w-full items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
+            <div className="flex w-full flex-wrap items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
               <Button className="w-fit cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-                <ChatgptIcon className="size-4" />
-                ChatGPT
+                <NexusIcon className="size-4" />
+                Nexus
               </Button>
+
               <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
                 <GeminiIcon className="size-4" />
                 Gemini
+              </Button>
+              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
+                <ChatgptIcon className="size-4" />
+                ChatGPT
               </Button>
               <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
                 <ClaudeIcon className="size-4" />
@@ -186,7 +187,7 @@ export default ChatgptInput;`;
               </Button>
             </div>
 
-            <div className="relative w-full rounded-t-[40px] border-x border-t border-[#E5E5E5] bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! lg:[&_.fd-scroll-container]:max-h-full [&_.lucide-clipboard]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:py-3.5 [&>figure]:pr-3.5 [&>figure]:pl-7 [&>figure]:shadow-none">
+            <div className="relative w-full rounded-t-[40px] border-x border-t border-[#E5E5E5] bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:py-3.5 [&>figure]:pr-3.5 [&>figure]:pl-7 [&>figure]:shadow-none">
               <DynamicCodeBlock lang="ts" code={code} />
 
               <button

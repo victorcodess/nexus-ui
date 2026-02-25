@@ -14,7 +14,7 @@ const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
     <div
       ref={ref}
       className={cn(
-        "flex h-auto w-full flex-col gap-0 rounded-[28px] border border-border-primary bg-surface-elevated shadow-sm",
+        "flex h-auto w-full flex-col gap-0 rounded-[24px] border border-border-primary bg-surface-elevated shadow-sm",
         className,
       )}
       {...props}
@@ -30,12 +30,13 @@ const PromptInputTextarea = React.forwardRef<
   HTMLTextAreaElement,
   PromptInputTextareaProps
 >(({ className, ...props }, ref) => (
-  <ScrollArea className="max-h-40 rounded-t-[28px]">
+  <ScrollArea className="max-h-40">
     <ScrollViewport>
       <Textarea
         ref={ref}
+        placeholder="How can I help you today?"
         className={cn(
-          "min-h-16 w-full resize-none rounded-t-[28px] rounded-b-none border-0 bg-transparent! px-6 py-4 text-base leading-6 font-normal text-[#171717] shadow-none outline-none placeholder:text-[#737373] focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white",
+          "min-h-14 w-full resize-none border-0 bg-transparent dark:bg-transparent px-4 py-4 text-base leading-6 font-normal text-[#171717] shadow-none outline-none placeholder:text-[#737373] focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white",
           className,
         )}
         {...props}
@@ -55,7 +56,7 @@ const PromptInputActions = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex w-full shrink-0 items-center justify-between rounded-t-none rounded-b-[28px] px-3 py-2.5",
+      "flex w-full shrink-0 items-center justify-between px-2 py-2",
       className,
     )}
     {...props}
