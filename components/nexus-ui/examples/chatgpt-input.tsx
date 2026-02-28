@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,
@@ -11,18 +9,21 @@ import { AudioLines, Globe, Paperclip } from "lucide-react";
 
 const ChatgptInput = () => {
   return (
-    <PromptInput className="rounded-[28px]">
-      <PromptInputTextarea placeholder="Ask anything" className="min-h-16 px-6" />
+    <PromptInput className="rounded-[28px] shadow-none">
+      <PromptInputTextarea
+        placeholder="Ask anything"
+        className="min-h-16 px-6"
+      />
       <PromptInputActions className="px-3 py-2.5">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] sm:w-fit dark:bg-[#404040] dark:text-white">
               <Paperclip className="size-4 text-[#5D5D5D]" />
               <span className="hidden sm:inline">Attach</span>
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] sm:w-fit dark:bg-[#404040] dark:text-white">
               <Globe className="size-4 text-[#5D5D5D]" />
               <span className="hidden sm:inline">Search</span>
             </Button>
@@ -30,7 +31,7 @@ const ChatgptInput = () => {
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 sm:w-fit cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+            <Button className="w-9 cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] sm:w-fit dark:bg-[#404040] dark:text-white">
               <AudioLines className="size-4" />
               <span className="hidden sm:inline">Voice</span>
             </Button>

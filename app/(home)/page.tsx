@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import NexusIcon from "@/components/layout/svgs/nexus";
-import ChatgptIcon from "@/components/layout/svgs/chatgpt";
-import ClaudeIcon from "@/components/layout/svgs/claude";
-import GeminiIcon from "@/components/layout/svgs/gemini";
-import ChatgptInput from "@/components/nexus-ui/examples/chatgpt-input";
-import NexusInput from "@/components/nexus-ui/examples/nexus-input";
 import { Check, Copy } from "lucide-react";
-
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { useState } from "react";
-import GeminiInput from "@/components/nexus-ui/examples/gemini-input";
+import {
+  tabs,
+  inputComponents,
+  codeSnippets,
+  type TabKey,
+} from "../../components/demo-tabs";
 
 const lightStripes = {
   background:
@@ -83,46 +81,10 @@ function StripedPanel({
 }
 
 export default function HomePage() {
-  const code = `import * as React from "react";
-
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip } from "lucide-react";
-
-const NexusInput = () => {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-              <Paperclip />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-[#404040] text-[13px] leading-6 font-normal text-white hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-};
-
-export default NexusInput;
-`;
-
+  const [activeTab, setActiveTab] = useState<TabKey>("nexus");
   const [checked, setChecked] = useState(false);
+
+  const code = codeSnippets[activeTab];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -165,27 +127,28 @@ export default NexusInput;
         >
           <div className="flex h-full w-full flex-col items-center px-4 lg:justify-between lg:px-6">
             <div className="flex w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-[#E5E5E5] bg-white p-3 pt-21.5 lg:h-16/51 lg:p-7 dark:border-white/10 dark:bg-background">
-              <GeminiInput />
+              {inputComponents[activeTab]}
             </div>
 
             <div className="flex w-full flex-wrap items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
-              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-[#E5E5E5] text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
-                <NexusIcon className="size-4" />
-                Nexus
-              </Button>
-
-              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
-                <GeminiIcon className="size-4" />
-                Gemini
-              </Button>
-              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
-                <ChatgptIcon className="size-4" />
-                ChatGPT
-              </Button>
-              <Button className="w-fit cursor-pointer gap-1 rounded-full bg-transparent text-sm leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
-                <ClaudeIcon className="size-4" />
-                Claude
-              </Button>
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.key;
+                return (
+                  <Button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`w-fit cursor-pointer gap-1 rounded-full text-sm leading-6 font-normal ${
+                      isActive
+                        ? "bg-[#E5E5E5] text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white"
+                        : "bg-transparent text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]"
+                    }`}
+                  >
+                    <Icon className="size-4" />
+                    {tab.label}
+                  </Button>
+                );
+              })}
             </div>
 
             <div className="relative w-full rounded-t-[40px] border-x border-t border-[#E5E5E5] bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:py-3.5 [&>figure]:pr-3.5 [&>figure]:pl-7 [&>figure]:shadow-none">

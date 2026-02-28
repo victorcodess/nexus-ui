@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,
@@ -7,10 +5,12 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import GeminiAdd from "@/components/layout/svgs/gemini-add";
-import GeminiPageInfo from "@/components/layout/svgs/gemini-pageinfo";
-import GeminiMic from "@/components/layout/svgs/gemini-mic";
-import GeminiCaret from "@/components/layout/svgs/gemini-caret";
+import {
+  GeminiAdd,
+  GeminiPageInfo,
+  GeminiMic,
+  GeminiCaret,
+} from "@/components/layout/svgs/gemini-icons";
 
 const GeminiInput = () => {
   return (
@@ -22,25 +22,25 @@ const GeminiInput = () => {
       <PromptInputActions className="px-0 pt-2 pb-0">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
+            <Button className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
               <GeminiAdd className="size-5 text-[#5D5D5D]" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
+            <Button className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
               <GeminiPageInfo className="size-5 text-[#5D5D5D]" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
-             <span>Fast</span>
-             <GeminiCaret className="size-5 text-[#5D5D5D] -mb-0.5" />
+            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
+              <span>Fast</span>
+              <GeminiCaret className="-mb-0.5 size-5 text-[#5D5D5D]" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
+            <Button className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
               <GeminiMic className="size-5 text-[#5D5D5D]" />
             </Button>
           </PromptInputAction>
