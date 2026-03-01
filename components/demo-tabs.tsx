@@ -44,7 +44,7 @@ const NexusInput = () => {
       <PromptInputActions>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
               <Paperclip />
             </Button>
           </PromptInputAction>
@@ -52,7 +52,7 @@ const NexusInput = () => {
 
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-[#404040] text-[13px] leading-6 font-normal text-white hover:bg-[#E5E5E5] dark:bg-[#404040] dark:text-white">
+            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-[#404040] text-[13px] leading-6 font-normal text-white hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
               <ArrowUp />
             </Button>
           </PromptInputAction>
@@ -76,7 +76,7 @@ import {
   GeminiPageInfo,
   GeminiMic,
   GeminiCaret,
-} from "@/components/layout/svgs/gemini-icons";
+} from "@/components/svgs/gemini-icons";
 
 const GeminiInput = () => {
   return (
@@ -129,7 +129,7 @@ import { AudioLines, Globe, Paperclip } from "lucide-react";
 
 const ChatgptInput = () => {
   return (
-    <PromptInput className="rounded-[28px]">
+    <PromptInput className="rounded-[28px] shadow-none">
       <PromptInputTextarea
         placeholder="Ask anything"
         className="min-h-16 px-6"
@@ -164,88 +164,104 @@ const ChatgptInput = () => {
 
 export default ChatgptInput;`,
 
-  claude: `import * as React from "react";
+  claude: `import { Button } from "@/components/ui/button";
+import PromptInput, {
+  PromptInputActions,
+  PromptInputAction,
+  PromptInputActionGroup,
+  PromptInputTextarea,
+} from "@/components/nexus-ui/prompt-input";
+import { ArrowUp, AudioLines, Paperclip } from "lucide-react";
+import {
+  ClaudeAdd,
+  ClaudeAudioLines,
+  ClaudeCaret,
+} from "@/components/svgs/claude-icons";
 
-  import { Button } from "@/components/ui/button";
-  import PromptInput, {
-    PromptInputActions,
-    PromptInputAction,
-    PromptInputActionGroup,
-    PromptInputTextarea,
-  } from "@/components/nexus-ui/prompt-input";
-  import { ArrowUp, Paperclip } from "lucide-react";
+const ClaudeInput = () => {
+  return (
+    <PromptInput className="gap-3 rounded-[20px] p-3.5 shadow-none">
+      <PromptInputTextarea
+        placeholder="How can I help you today?"
+        className="min-h-12 px-1.5 py-1.5 placeholder:text-base"
+      />
+      <PromptInputActions className="px-1 py-0">
+        <PromptInputActionGroup>
+          <PromptInputAction asChild>
+            <Button className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
+              <ClaudeAdd className="size-5" />
+            </Button>
+          </PromptInputAction>
+        </PromptInputActionGroup>
 
-  const ClaudeInput = () => {
-    return (
-      <PromptInput className="rounded-[24px] shadow-none">
-        <PromptInputTextarea
-          placeholder="Reply to Claude..."
-          className="min-h-12 px-5 py-3"
-        />
-        <PromptInputActions className="px-3 py-2">
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 cursor-pointer gap-1 rounded-xl border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
-                <Paperclip className="size-4" />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
+        <PromptInputActionGroup>
+          <PromptInputAction asChild>
+            <Button className="h-8 cursor-pointer gap-1 rounded-md bg-transparent pr-2! text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
+              <span>Sonnet 4.6</span>
+              <ClaudeCaret className="size-4" />
+            </Button>
+          </PromptInputAction>
+          <PromptInputAction asChild>
+            <Button className="size-8 cursor-pointer gap-1 rounded-md bg-transparent text-[13px] leading-6 font-normal text-[#171717] hover:bg-[#E5E5E5] dark:text-white dark:hover:bg-[#404040]">
+              <ClaudeAudioLines className="size-5" />
+            </Button>
+          </PromptInputAction>
+        </PromptInputActionGroup>
+      </PromptInputActions>
+    </PromptInput>
+  );
+};
 
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 cursor-pointer gap-1 rounded-xl bg-[#da7756] text-[13px] leading-6 font-normal text-white hover:bg-[#c46a4d]">
-                <ArrowUp className="size-4" />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
-        </PromptInputActions>
-      </PromptInput>
-    );
-  };
+export default ClaudeInput;`,
 
-  export default ClaudeInput;
-  `,
+  v0: `import { Button } from "@/components/ui/button";
+import PromptInput, {
+  PromptInputActions,
+  PromptInputAction,
+  PromptInputActionGroup,
+  PromptInputTextarea,
+} from "@/components/nexus-ui/prompt-input";
+import {
+  V0Plus,
+  V0Model,
+  V0ArrowUp,
+  V0Caret,
+} from "@/components/svgs/v0-icons";
 
-  v0: `import * as React from "react";
+const V0Input = () => {
+  return (
+    <PromptInput className="gap-2 rounded-xl p-3 shadow-none">
+      <PromptInputTextarea
+        placeholder="Ask v0 to build..."
+        className="min-h-13.5 px-0 pt-0 pb-2"
+      />
+      <PromptInputActions className="px-0 py-0">
+        <PromptInputActionGroup className="gap-1">
+          <PromptInputAction asChild>
+            <Button className="-none size-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#f5f5f5] dark:text-white dark:hover:bg-[#404040]">
+              <V0Plus className="size-4" />
+            </Button>
+          </PromptInputAction>
+          <PromptInputAction asChild>
+            <Button className="h-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#f5f5f5] dark:text-white dark:hover:bg-[#404040]">
+              <V0Model className="mr-0.5 size-4" />
+              <span>v0 Max</span>
+              <V0Caret className="size-4" />
+            </Button>
+          </PromptInputAction>
+        </PromptInputActionGroup>
 
-  import { Button } from "@/components/ui/button";
-  import PromptInput, {
-    PromptInputActions,
-    PromptInputAction,
-    PromptInputActionGroup,
-    PromptInputTextarea,
-  } from "@/components/nexus-ui/prompt-input";
-  import { ArrowUp, Paperclip } from "lucide-react";
-  import V0Icon from "@/components/layout/svgs/v0";
+        <PromptInputActionGroup className="">
+          <PromptInputAction asChild>
+            <Button className="size-7 cursor-pointer gap-1 rounded-sm border border-[#e5e5e5] bg-[#f5f5f5]/50 text-[13px] leading-6 font-normal text-[#e5e5e5] dark:border-border-primary dark:bg-[#404040] dark:text-border-primary">
+              <V0ArrowUp className="size-4" />
+            </Button>
+          </PromptInputAction>
+        </PromptInputActionGroup>
+      </PromptInputActions>
+    </PromptInput>
+  );
+};
 
-  const V0Input = () => {
-    return (
-      <PromptInput className="rounded-[24px] shadow-none">
-        <PromptInputTextarea
-          placeholder="Reply to V0..."
-          className="min-h-12 px-5 py-3"
-        />
-        <PromptInputActions className="px-3 py-2">
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 cursor-pointer gap-1 rounded-xl border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-[#E5E5E5] dark:hover:bg-[#404040] dark:text-white">
-                <Paperclip className="size-4" />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
-
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 cursor-pointer gap-1 rounded-xl bg-[#da7756] text-[13px] leading-6 font-normal text-white hover:bg-[#c46a4d]">
-                <ArrowUp className="size-4" />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
-        </PromptInputActions>
-      </PromptInput>
-    );
-  };
-
-  export default V0Input;
-  `,
+export default V0Input;`,
 };
