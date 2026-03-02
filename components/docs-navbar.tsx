@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { ThemeToggle } from "./layout/theme-toggle";
-import { LargeSearchToggle, SearchToggle } from "./layout/search-toggle";
+import { SearchToggle } from "./layout/search-toggle";
 
 import { Menu } from "lucide-react";
 import { buttonVariants } from "./ui/button";
@@ -13,7 +13,7 @@ import { buttonVariants } from "./ui/button";
  * Custom navbar – edit this file to change the navbar UI.
  * Used when nav.component is set in lib/layout.shared.tsx.
  */
-export function Navbar() {
+export function DocsNavbar() {
   const pathname = usePathname();
   const isDocs = pathname?.startsWith("/docs");
   const isComponents = pathname?.startsWith("/components");
@@ -23,18 +23,11 @@ export function Navbar() {
       id="nd-nav"
       className={cn(
         "fixed top-0 z-40 h-14 w-full lg:px-20 2xl:px-40",
-        "bg-white/90 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none dark:bg-background dark:lg:bg-transparent",
-        isDocs
-          ? "bg-background! px-0 lg:px-0 2xl:px-0 dark:bg-fd-background!"
-          : "",
+        "bg-white/90 dark:bg-background backdrop-blur-sm lg:backdrop-blur-none lg:bg-transparent dark:lg:bg-transparent",
+        "*:mx-au to *:max-w-(--fd-layout-width)",
       )}
     >
-      <nav
-        className={cn(
-          "flex h-14 w-full items-center justify-between gap-6 px-4 lg:w-[calc(50%+40px)] lg:px-6 2xl:w-[calc(50%+80px)]",
-          isDocs ? "w-full lg:w-full 2xl:w-full lg:px-5 py-3" : "",
-        )}
-      >
+      <nav className="flex h-14 w-full items-center justify-between gap-6 px-4 lg:px-6 lg:w-[calc(50%+40px)] 2xl:w-[calc(50%+80px)]">
         {/* Logo / title */}
         <Link
           href="/"
@@ -60,7 +53,6 @@ export function Navbar() {
 
         {/* Main links */}
         <div className="flex flex-row items-center gap-2 max-sm:hidden">
-          {isDocs && <LargeSearchToggle />}
           <Link
             href="/docs"
             className={cn(
@@ -98,9 +90,7 @@ export function Navbar() {
             </svg>
           </a>
 
-          {!isDocs && (
-            <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
-          )}
+          <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
 
           <ThemeToggle className="cursor-pointer rounded-full" />
         </div>

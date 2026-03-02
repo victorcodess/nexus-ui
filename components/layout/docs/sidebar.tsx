@@ -11,24 +11,16 @@ import { Sidebar as SidebarIcon } from 'lucide-react';
 import { mergeRefs } from '../../../lib/merge-refs';
 
 const itemVariants = cva(
-  'relative flex flex-row items-center gap-2 rounded-lg p-2 text-start text-fd-muted-foreground wrap-anywhere [&_svg]:size-4 [&_svg]:shrink-0',
+  'relative flex flex-row items-center gap-2 rounded-full w-fit h-8 px-3 py-2 text-start text-[#A3A3A3] font-normal leading-6 wrap-anywhere [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        link: 'transition-colors hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none data-[active=true]:bg-fd-primary/10 data-[active=true]:text-fd-primary data-[active=true]:hover:transition-colors',
-        button:
-          'transition-colors hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none',
-      },
-      highlight: {
-        true: "data-[active=true]:before:content-[''] data-[active=true]:before:bg-fd-primary data-[active=true]:before:absolute data-[active=true]:before:w-px data-[active=true]:before:inset-y-2.5 data-[active=true]:before:start-2.5",
+        link: 'transition-colors hover:text-fd-foreground data-[active=true]:bg-fd-background data-[active=true]:text-fd-foreground font-normal text-sm leading-6 data-[active=true]:hover:transition-colors',
+        button: 'transition-colors hover:text-fd-foreground',
       },
     },
   },
 );
-
-function getItemOffset(depth: number) {
-  return `calc(${2 + 3 * depth} * var(--spacing))`;
-}
 
 export {
   SidebarProvider as Sidebar,
@@ -126,16 +118,10 @@ export function SidebarDrawer({
   );
 }
 
-export function SidebarSeparator({ className, style, children, ...props }: ComponentProps<'p'>) {
-  const depth = Base.useFolderDepth();
-
+export function SidebarSeparator({ className, children, ...props }: ComponentProps<'p'>) {
   return (
     <Base.SidebarSeparator
-      className={cn('[&_svg]:size-4 [&_svg]:shrink-0', className)}
-      style={{
-        paddingInlineStart: getItemOffset(depth),
-        ...style,
-      }}
+      className={cn('text-xs leading-4 font-normal text-[#A3A3A3] px-0', className)}
       {...props}
     >
       {children}
@@ -145,19 +131,12 @@ export function SidebarSeparator({ className, style, children, ...props }: Compo
 
 export function SidebarItem({
   className,
-  style,
   children,
   ...props
 }: ComponentProps<typeof Base.SidebarItem>) {
-  const depth = Base.useFolderDepth();
-
   return (
     <Base.SidebarItem
-      className={cn(itemVariants({ variant: 'link', highlight: depth >= 1 }), className)}
-      style={{
-        paddingInlineStart: getItemOffset(depth),
-        ...style,
-      }}
+      className={cn(itemVariants({ variant: 'link' }), className, "")}
       {...props}
     >
       {children}
@@ -167,18 +146,13 @@ export function SidebarItem({
 
 export function SidebarFolderTrigger({
   className,
-  style,
   ...props
 }: ComponentProps<typeof Base.SidebarFolderTrigger>) {
-  const { depth, collapsible } = Base.useFolder()!;
+  const { collapsible } = Base.useFolder()!;
 
   return (
     <Base.SidebarFolderTrigger
       className={cn(itemVariants({ variant: collapsible ? 'button' : null }), 'w-full', className)}
-      style={{
-        paddingInlineStart: getItemOffset(depth - 1),
-        ...style,
-      }}
       {...props}
     >
       {props.children}
@@ -188,18 +162,11 @@ export function SidebarFolderTrigger({
 
 export function SidebarFolderLink({
   className,
-  style,
   ...props
 }: ComponentProps<typeof Base.SidebarFolderLink>) {
-  const depth = Base.useFolderDepth();
-
   return (
     <Base.SidebarFolderLink
-      className={cn(itemVariants({ variant: 'link', highlight: depth > 1 }), 'w-full', className)}
-      style={{
-        paddingInlineStart: getItemOffset(depth - 1),
-        ...style,
-      }}
+      className={cn(itemVariants({ variant: 'link' }), 'w-full', className)}
       {...props}
     >
       {props.children}
@@ -212,16 +179,9 @@ export function SidebarFolderContent({
   children,
   ...props
 }: ComponentProps<typeof Base.SidebarFolderContent>) {
-  const depth = Base.useFolderDepth();
-
   return (
     <Base.SidebarFolderContent
-      className={cn(
-        'relative',
-        depth === 1 &&
-          "before:content-[''] before:absolute before:w-px before:inset-y-1 before:bg-fd-border before:start-2.5",
-        className,
-      )}
+      className={className}
       {...props}
     >
       {children}

@@ -1,3 +1,5 @@
+'use client';
+
 import type * as PageTree from 'fumadocs-core/page-tree';
 import { type ComponentProps, type HTMLAttributes, type ReactNode, useMemo } from 'react';
 import { Languages, Sidebar as SidebarIcon } from 'lucide-react';
@@ -110,8 +112,8 @@ export function DocsLayout({
 
     return (
       <>
-        <SidebarContent {...rest}>
-          <div className="flex flex-col gap-3 p-4 pb-2">
+        <SidebarContent {...rest} className='bg-transparent border-none max-w-fit px-0'>
+          {/* <div className="flex flex-col gap-3 p-4 pb-2 border-2 border-black">
             <div className="flex">
               {renderTitleNav(nav, {
                 className: 'inline-flex text-[0.9375rem] items-center gap-2.5 font-medium me-auto',
@@ -135,9 +137,9 @@ export function DocsLayout({
               (searchToggle.components?.lg ?? <LargeSearchToggle hideIfDisabled />)}
             {tabs.length > 0 && tabMode === 'auto' && <SidebarTabsDropdown options={tabs} />}
             {banner}
-          </div>
+          </div> */}
           {viewport}
-          {(i18n || iconLinks.length > 0 || themeSwitch?.enabled !== false || footer) && (
+          {/* {(i18n || iconLinks.length > 0 || themeSwitch?.enabled !== false || footer) && (
             <div className="flex flex-col border-t p-4 pt-2 empty:hidden">
               <div className="flex text-fd-muted-foreground items-center empty:hidden">
                 {i18n && (
@@ -162,7 +164,7 @@ export function DocsLayout({
               </div>
               {footer}
             </div>
-          )}
+          )} */}
         </SidebarContent>
         <SidebarDrawer>
           <div className="flex flex-col gap-3 p-4 pb-2">

@@ -37,7 +37,33 @@ export function createPageTreeRenderer({
   SidebarItem,
 }: InternalComponents) {
   function renderList(nodes: PageTree.Node[]) {
-    return nodes.map((node, i) => <PageTreeNode key={i} node={node} />);
+    const groups: { separator: PageTree.Node | null; items: PageTree.Node[] }[] = [];
+    let current: { separator: PageTree.Node | null; items: PageTree.Node[] } = { separator: null, items: [] };
+
+    for (const node of nodes) {
+      if (node.type === 'separator') {
+        if (current.separator || current.items.length > 0) {
+          groups.push(current);
+        }
+        current = { separator: node, items: [] };
+      } else {
+        current.items.push(node);
+      }
+    }
+    if (current.separator || current.items.length > 0) {
+      groups.push(current);
+    }
+
+    return groups.map((group, gi) => (
+      <Fragment key={gi}>
+        {group.separator && <PageTreeNode node={group.separator} />}
+        <div className="flex flex-col gap-1">
+          {group.items.map((node, i) => (
+            <PageTreeNode key={i} node={node} />
+          ))}
+        </div>
+      </Fragment>
+    ));
   }
 
   function PageTreeNode({ node }: { node: PageTree.Node }) {

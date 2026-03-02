@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "---Getting Started---",
+    "index",
+    "installation",
+    "---Components---",
+    "message",
+    "message-content",
+    "chat-input",
+    "chat-container",
+    "streaming-text",
+    "file",
+    "image"
+  ]
+}

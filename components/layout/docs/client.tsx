@@ -54,7 +54,7 @@ export function LayoutBody({ className, style, children, ...props }: ComponentPr
     <div
       id="nd-docs-layout"
       className={cn(
-        'grid transition-[grid-template-columns] overflow-x-clip min-h-(--fd-docs-height) [--fd-docs-height:100dvh] [--fd-header-height:0px] [--fd-toc-popover-height:0px] [--fd-sidebar-width:0px] [--fd-toc-width:0px]',
+        'grid transition-[grid-template-columns] overflow-x-clip min-h-(--fd-docs-height) [--fd-docs-height:calc(100dvh-56px)] mt-14 [--fd-header-height:0px] [--fd-toc-popover-height:0px] [--fd-sidebar-width:0px] [--fd-toc-width:0px]',
         className,
       )}
       data-sidebar-collapsed={collapsed}

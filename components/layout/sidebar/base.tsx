@@ -217,7 +217,7 @@ export function SidebarViewport(props: ScrollAreaProps) {
   return (
     <ScrollArea {...props} className={cn('min-h-0 flex-1', props.className)}>
       <ScrollViewport
-        className="p-4 overscroll-contain"
+        className="p-5 overscroll-contain"
         style={
           {
             maskImage:
@@ -237,7 +237,7 @@ export function SidebarSeparator(props: ComponentProps<'p'>) {
     <p
       {...props}
       className={cn(
-        'inline-flex items-center gap-2 mb-1.5 px-2 mt-6 empty:mb-0',
+        'inline-flex items-center gap-2 mb-3 px-2 mt-5 empty:mb-0',
         depth === 0 && 'first:mt-0',
         props.className,
       )}
