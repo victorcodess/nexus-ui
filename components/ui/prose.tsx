@@ -33,7 +33,7 @@ export function Prose({
         'prose-code:text-gray-900 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:border-none prose-code:rounded-md prose-code:font-[450]',
         '',
         // lists
-        'prose-li:my-[-0.5px]',
+        'prose-li:my-[-0.5px] prose-li:marker:text-gray-200',
         className,
       )}
       {...props}
