@@ -24,13 +24,13 @@ export function Prose({
         // lead
         'prose-lead:text-gray-900 ',
         // links
-        'prose-a:text-gray-900',
+        'prose-a:text-gray-900 prose-a:font-normal',
         // link underline
         'prose-a:underline prose-a:underline-offset-3',
         // strong
-        'prose-strong:text-gray-900 prose-strong:font-[450]',
-        // strong links
-        '',
+        'prose-strong:text-gray-900 prose-strong:font-normal',
+        // code
+        'prose-code:text-gray-900 prose-code:bg-gray-100 prose-code:px-1.5 prose-code:border-none prose-code:rounded-md prose-code:font-[450]',
         '',
         // lists
         'prose-li:my-[-0.5px]',
