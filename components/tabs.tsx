@@ -57,7 +57,7 @@ export const TabsList = React.forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      'flex gap-2 text-fd-secondary-foreground overflow-x-auto px-4 not-prose dark:border-white/10',
+      'flex gap-2 text-fd-secondary-foreground overflow-x-auto px-4 not-prose dark:border-white/10 h-9',
       props.className,
     )}
   />
