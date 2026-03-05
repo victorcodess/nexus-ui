@@ -25,7 +25,13 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const { previous, next } = findNeighbour(source.pageTree, page.url);
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} className="gap-1">
+    <DocsPage
+      toc={page.data.toc}
+      full={page.data.full}
+      editUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/edit/${gitConfig.branch}/content/docs/${page.path}`}
+      markdownUrl={`/llms.mdx/docs/${page.slugs.join("/")}`}
+      className="gap-1"
+    >
       <div className="flex items-center justify-between">
         <DocsTitle>{page.data.title}</DocsTitle>
 

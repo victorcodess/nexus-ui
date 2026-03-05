@@ -1,12 +1,12 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../../../../lib/cn";
-import { Button, buttonVariants } from "../../../ui/button";
-import { Copy, Edit, FileText, Sparkles, SquarePen, Text } from "lucide-react";
-import { I18nLabel } from "fumadocs-ui/contexts/i18n";
+import { FileText, Sparkles, SquarePen, Text } from "lucide-react";
+import { ViewOptions } from "../../../ai/page-actions";
 import { Prose } from "../../../ui/prose";
 import {
   type BreadcrumbProps,
   type FooterProps,
+  CopyPageMarkdown,
   PageBreadcrumb,
   PageFooter,
   PageTOCPopover,
@@ -17,6 +17,8 @@ import type { AnchorProviderProps, TOCItemType } from "fumadocs-core/toc";
 import * as TocDefault from "../../../toc/default";
 import * as TocClerk from "../../../toc/clerk";
 import { TOCProvider, TOCScrollArea } from "../../../toc";
+import Link from "next/link";
+import { gitConfig } from "@/lib/layout.shared";
 
 interface BreadcrumbOptions extends BreadcrumbProps {
   enabled: boolean;
@@ -53,6 +55,16 @@ export interface DocsPageProps {
   footer?: Partial<FooterOptions>;
 
   children?: ReactNode;
+
+  /**
+   * GitHub edit URL for the current page.
+   */
+  editUrl?: string;
+
+  /**
+   * URL to the raw markdown content of the current page.
+   */
+  markdownUrl?: string;
 
   /**
    * Apply class names to the `#nd-page` container.
@@ -106,6 +118,8 @@ export function DocsPage({
   } = {},
   toc = [],
   children,
+  editUrl,
+  markdownUrl,
   className,
 }: DocsPageProps) {
   // disable TOC on full mode, you can still enable it with `enabled` option.
@@ -192,48 +206,41 @@ export function DocsPage({
 
             <div className="mx-auto h-px w-[calc(100%-40px)] bg-gray-100"></div>
 
-            <div className="flex flex-col gap-2 pl-5">
-              <Button className="h-4 w-fit gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400">
-                Copy this page <Copy className="size-3 font-normal" />
-              </Button>
-              <Button className="h-4 w-fit gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400">
-                View as markdown <FileText className="size-3 font-normal" />
-              </Button>
-              <Button className="h-4 w-fit gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400">
+            <div className="flex flex-col gap-2 pl-5 transition-colors duration-200">
+              {markdownUrl && <CopyPageMarkdown markdownUrl={markdownUrl} />}
+              {markdownUrl && (
+                <Link
+                  href={markdownUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600"
+                >
+                  View as markdown <FileText className="size-3 font-normal" />
+                </Link>
+              )}
+              <Link
+                href={editUrl ?? "#"}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600"
+              >
                 Edit on GitHub <SquarePen className="size-3 font-normal" />
-              </Button>
-              <Button className="h-4 w-fit gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400">
-               Ask AI <Sparkles className="size-3 font-normal" />
-              </Button>
+              </Link>
+              {markdownUrl && (
+                <ViewOptions
+                  markdownUrl={markdownUrl}
+                  githubUrl={editUrl ?? "#"}
+                  trigger={
+                    <span className="flex h-4 w-full items-center gap-1 text-xs leading-4 font-[450]">
+                      Ask AI <Sparkles className="size-3 font-normal" />
+                    </span>
+                  }
+                />
+              )}
             </div>
           </div>
         ))}
     </>,
-  );
-}
-
-export function EditOnGitHub(props: ComponentProps<"a">) {
-  return (
-    <a
-      target="_blank"
-      rel="noreferrer noopener"
-      {...props}
-      className={cn(
-        buttonVariants({
-          variant: "secondary",
-          size: "sm",
-          className: "not-prose gap-1.5",
-        }),
-        props.className,
-      )}
-    >
-      {props.children ?? (
-        <>
-          <Edit className="size-3.5" />
-          <I18nLabel label="editOnGithub" />
-        </>
-      )}
-    </a>
   );
 }
 

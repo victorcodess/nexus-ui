@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import Link from 'fumadocs-core/link';
 import { cn } from '../../../../lib/cn';
 import { useI18n } from 'fumadocs-ui/contexts/i18n';
@@ -292,6 +292,44 @@ function FooterItem({ item, index }: { item: Item; index: 0 | 1 }) {
         {item.description ?? (index === 0 ? text.previousPage : text.nextPage)}
       </p>
     </Link>
+  );
+}
+
+const copyCache = new Map<string, string>();
+
+export function CopyPageMarkdown({ markdownUrl }: { markdownUrl: string }) {
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      setLoading(true);
+      const cached = copyCache.get(markdownUrl);
+      if (cached) {
+        await navigator.clipboard.writeText(cached);
+      } else {
+        const res = await fetch(markdownUrl);
+        const text = await res.text();
+        copyCache.set(markdownUrl, text);
+        await navigator.clipboard.writeText(text);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      disabled={loading}
+      onClick={handleCopy}
+      className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600 disabled:opacity-50"
+    >
+      {copied ? 'Copied!' : 'Copy this page'}
+      <Copy className="size-3 font-normal" />
+    </button>
   );
 }
 
