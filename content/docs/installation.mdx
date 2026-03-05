@@ -15,9 +15,28 @@ Make sure your project has the following:
 
 Nexus UI also depends on shared utilities from [shadcn/ui](https://ui.shadcn.com). If you don't have shadcn set up yet, initialize it first:
 
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
 ```bash
 npx shadcn@latest init
 ```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest init
+```
+</Tab>
+<Tab value="yarn">
+```bash
+npx shadcn@latest init
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest init
+```
+</Tab>
+</Tabs>
 
 ## Add the registry
 
@@ -35,9 +54,28 @@ Add the Nexus UI registry to your `components.json`:
 
 Use the shadcn CLI to add Nexus UI components:
 
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
 ```bash
 npx shadcn@latest add @nexus-ui/prompt-input
 ```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/prompt-input
+```
+</Tab>
+<Tab value="yarn">
+```bash
+npx shadcn@latest add @nexus-ui/prompt-input
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/prompt-input
+```
+</Tab>
+</Tabs>
 
 This installs the component along with any required dependencies (like `textarea` and `scroll-area`) automatically.
 
@@ -45,9 +83,28 @@ This installs the component along with any required dependencies (like `textarea
 
 You can also install directly via URL without configuring the registry:
 
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
 ```bash
 npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+```
+</Tab>
+<Tab value="yarn">
+```bash
+npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+```
+</Tab>
+</Tabs>
 
 ## Manual installation
 
@@ -55,9 +112,28 @@ If you prefer to install manually, copy the component source from the docs page 
 
 Each component page includes the full source code. Copy it into your `components/nexus-ui` directory and install the required dependencies:
 
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
 ```bash
 npm install @radix-ui/react-slot
 ```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @radix-ui/react-slot
+```
+</Tab>
+</Tabs>
 
 ## Project structure
 
