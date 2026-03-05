@@ -325,7 +325,7 @@ export function CopyPageMarkdown({ markdownUrl }: { markdownUrl: string }) {
       type="button"
       disabled={loading}
       onClick={handleCopy}
-      className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600 disabled:opacity-50"
+      className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600 disabled:opacity-50"
     >
       {copied ? 'Copied!' : 'Copy this page'}
       <Copy className="size-3 font-normal" />

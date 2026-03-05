@@ -132,7 +132,7 @@ export function SidebarSeparator({ className, children, ...props }: ComponentPro
 export function SidebarItem({
   className,
   children,
-  ...props
+...props
 }: ComponentProps<typeof Base.SidebarItem>) {
   return (
     <Base.SidebarItem

@@ -112,7 +112,7 @@ export function DocsLayout({
 
     return (
       <>
-        <SidebarContent {...rest} className='bg-transparent border-none max-w-fit px-0'>
+        <SidebarContent {...rest} className='bg-transparent border-none max-w-fit pr-0 pl-5'>
           {/* <div className="flex flex-col gap-3 p-4 pb-2 border-2 border-black">
             <div className="flex">
               {renderTitleNav(nav, {

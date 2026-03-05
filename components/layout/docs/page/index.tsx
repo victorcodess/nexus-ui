@@ -206,14 +206,14 @@ export function DocsPage({
 
             <div className="mx-auto h-px w-[calc(100%-40px)] bg-gray-100"></div>
 
-            <div className="flex flex-col gap-2 pl-5 transition-colors duration-200">
+            <div className="flex flex-col gap-3 pl-5 transition-colors duration-200 pt-2">
               {markdownUrl && <CopyPageMarkdown markdownUrl={markdownUrl} />}
               {markdownUrl && (
                 <Link
                   href={markdownUrl.replace(/^\/llms\.mdx\/docs\//, "/docs/") + ".md"}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600"
+                  className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600"
                 >
                   View as markdown <FileText className="size-3 font-normal" />
                 </Link>
@@ -222,7 +222,7 @@ export function DocsPage({
                 href={editUrl ?? "#"}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-xs leading-4 font-[450] text-gray-400 hover:bg-transparent hover:text-gray-600"
+                className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600"
               >
                 Edit on GitHub <SquarePen className="size-3 font-normal" />
               </Link>
@@ -231,7 +231,7 @@ export function DocsPage({
                   markdownUrl={markdownUrl}
                   githubUrl={editUrl ?? "#"}
                   trigger={
-                    <span className="flex h-4 w-full items-center gap-1 text-xs leading-4 font-[450]">
+                    <span className="flex h-4 w-full items-center gap-1 text-[13px] leading-5 font-normal">
                       Ask AI <Sparkles className="size-3 font-normal" />
                     </span>
                   }
