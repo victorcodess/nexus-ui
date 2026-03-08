@@ -1,5 +1,5 @@
 "use client";
-import { Check, Copy } from "lucide-react";
+import { Check, ChevronDown, Copy } from "lucide-react";
 import {
   type ComponentProps,
   createContext,
@@ -7,14 +7,17 @@ import {
   type ReactNode,
   type RefObject,
   use,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { cn } from "../lib/cn";
 import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { mergeRefs } from "../lib/merge-refs";
+import { Button } from "./ui/button";
 
 export interface CodeBlockProps extends ComponentProps<"figure"> {
   /**
@@ -84,6 +87,16 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const inTab = use(TabsContext) !== null;
   const areaRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+
+  const collapsedHeight = 16 * 24 + 28; // 16 lines × 24px line-height + 28px padding
+
+  useEffect(() => {
+    const el = areaRef.current;
+    if (!el) return;
+    setOverflows(el.scrollHeight > collapsedHeight);
+  }, [children, collapsedHeight]);
 
   return (
     <figure
@@ -94,10 +107,11 @@ export function CodeBlock({
       className={cn(
         inTab
           ? "-mx-px -mb-px bg-fd-secondary last:rounded-b-xl"
-          : "my-4 rounded-xl bg-gray-100 dark:bg-background",
+          : "my-4 rounded-xl dark:bg-background",
         keepBackground && "bg-(--shiki-light-bg) dark:bg-(--shiki-dark-bg)",
         "shiki not-prose relative overflow-hidden border border-gray-200 text-[13px] font-[450] dark:border-white/10",
         props.className,
+        title && "bg-gray-100",
       )}
     >
       {title ? (
@@ -125,27 +139,42 @@ export function CodeBlock({
           children: allowCopy && <CopyButton containerRef={areaRef} showGlow />,
         })
       )}
-      <div
-        ref={areaRef}
-        {...viewportProps}
-        role="region"
-        tabIndex={0}
-        className={cn(
-          "fd-scroll-container max-h-[600px] overflow-auto rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
-          viewportProps.className,
+      <div className="relative">
+        <div
+          ref={areaRef}
+          {...viewportProps}
+          role="region"
+          tabIndex={0}
+          className={cn(
+            "fd-scroll-container no-scrollbar overflow-hidden rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            viewportProps.className,
+            overflows && expanded && "overflow-auto",
+          )}
+          style={
+            {
+              maxHeight: expanded ? 500 : collapsedHeight,
+              "--padding-right": !title
+                ? "calc(var(--spacing) * 8)"
+                : undefined,
+              counterSet: props["data-line-numbers"]
+                ? `line ${Number(props["data-line-numbers-start"] ?? 1) - 1}`
+                : undefined,
+              ...viewportProps.style,
+            } as object
+          }
+        >
+          {children}
+        </div>
+        {overflows && !expanded && (
+          <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999]/95 via-[#999999]/20 to-transparent dark:from-background dark:via-background/90">
+            <Button
+              onClick={() => setExpanded(true)}
+              className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-background dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Show more
+            </Button>
+          </div>
         )}
-        style={
-          {
-            // space for toolbar
-            "--padding-right": !title ? "calc(var(--spacing) * 8)" : undefined,
-            counterSet: props["data-line-numbers"]
-              ? `line ${Number(props["data-line-numbers-start"] ?? 1) - 1}`
-              : undefined,
-            ...viewportProps.style,
-          } as object
-        }
-      >
-        {children}
       </div>
     </figure>
   );
@@ -174,23 +203,21 @@ function CopyButton({
 
   return (
     <div className="relative">
-      {showGlow && <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-radial from-white from-20% via-white/85 to-white/0 to-70% size-14 rounded-l-full z-0"></div>}
+      {showGlow && (
+        <div className="absolute top-1/2 left-1/2 z-0 size-14 -translate-x-1/2 -translate-y-1/2 rounded-l-full bg-radial from-white from-20% via-white/85 to-white/0 to-70%"></div>
+      )}
       <button
         type="button"
         data-checked={checked || undefined}
         className={cn(
-          "flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600 relative",
+          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600",
           className,
         )}
         aria-label={checked ? "Copied Text" : "Copy Text"}
         onClick={onClick}
         {...props}
       >
-        {checked ? (
-          <Check className="size-4" />
-        ) : (
-          <Copy className="size-3.5" />
-        )}
+        {checked ? <Check className="size-4" /> : <Copy className="size-3.5" />}
       </button>
     </div>
   );
