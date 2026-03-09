@@ -3,57 +3,198 @@ title: Prompt Input
 description: A flexible input component for composing chat messages
 ---
 
-import NexusInput from '@/components/nexus-ui/examples/nexus-input';
-import ReviewContainer from '@/components/preview-container';
-
-## Prompt Input
+import NexusInput from "@/components/nexus-ui/examples/nexus-input";
+import ReviewContainer from "@/components/preview-container";
 
 The Prompt Input component provides a text input area for composing messages.
 
 <Tabs items={["Preview", "Code"]} className="my-10">
-<Tab value="Preview">
- <ReviewContainer>
-  <NexusInput />    
-</ReviewContainer>
-</Tab>
-    <Tab value="Code">
-```jsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip } from "lucide-react";
+  <Tab value="Preview">
+    <ReviewContainer>
+      <NexusInput />
+    </ReviewContainer>
+  </Tab>
+  <Tab value="Code">
+    ```jsx
+    import { Button } from "@/components/ui/button";
+    import PromptInput, {
+      PromptInputActions,
+      PromptInputAction,
+      PromptInputActionGroup,
+      PromptInputTextarea,
+    } from "@/components/nexus-ui/prompt-input";
+    import { ArrowUp, Paperclip } from "lucide-react";
 
-const NexusInput = () => {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <Paperclip />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
+    const NexusInput = () => {
+      return (
+        <PromptInput>
+          <PromptInputTextarea />
+          <PromptInputActions>
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+                  <Paperclip />
+                </Button>
+              </PromptInputAction>
+            </PromptInputActionGroup>
 
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-gray-700 text-[13px] leading-6 font-normal text-white hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-};
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <Button className="size-8 cursor-pointer gap-1 rounded-full bg-gray-700 text-[13px] leading-6 font-normal text-white hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+                  <ArrowUp />
+                </Button>
+              </PromptInputAction>
+            </PromptInputActionGroup>
+          </PromptInputActions>
+        </PromptInput>
+      );
+    };
 
-export default NexusInput;
+    export default NexusInput;
+    ```
+  </Tab>
+</Tabs>
 
-```
-</Tab>
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+  <Tab value="CLI">
+    <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+      <Tab value="npm">
+        ```bash
+        npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+        ```
+      </Tab>
+      <Tab value="pnpm">
+        ```bash
+        pnpm dlx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+        ```
+      </Tab>
+      <Tab value="yarn">
+        ```bash
+        npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+        ```
+      </Tab>
+      <Tab value="bun">
+        ```bash
+        bunx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+        ```
+      </Tab>
+    </Tabs>
+  </Tab>
+  <Tab value="Manual">
+    <Steps>
+      <Step>
+        <h3>Copy and paste the following code into your project.</h3>
+
+        ```tsx title="components/nexus-ui/prompt-input.tsx"
+        "use client";
+
+        import * as React from "react";
+        import { Slot } from "radix-ui";
+
+        import { cn } from "@/lib/utils";
+        import { Textarea } from "@/components/ui/textarea";
+        import { ScrollArea, ScrollViewport } from "@/components/ui/scroll-area";
+
+        type PromptInputProps = React.HTMLAttributes<HTMLDivElement>;
+
+        const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
+          ({ className, ...props }, ref) => (
+            <div
+              ref={ref}
+              className={cn(
+                "flex h-auto w-full flex-col gap-0 rounded-[24px] border border-border-primary bg-surface-elevated",
+                className,
+              )}
+              {...props}
+            />
+          ),
+        );
+
+        PromptInput.displayName = "PromptInput";
+
+        type PromptInputTextareaProps = React.ComponentProps<typeof Textarea>;
+
+        const PromptInputTextarea = React.forwardRef<
+          HTMLTextAreaElement,
+          PromptInputTextareaProps
+        >(({ className, ...props }, ref) => (
+          <ScrollArea className="max-h-40">
+            <ScrollViewport>
+              <Textarea
+                ref={ref}
+                placeholder="How can I help you today?"
+                className={cn(
+                  "min-h-14 w-full resize-none border-0 bg-transparent px-4 py-4 text-sm leading-6 font-normal text-gray-900 shadow-none outline-none placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent dark:text-white",
+                  className,
+                )}
+                {...props}
+              />
+            </ScrollViewport>
+          </ScrollArea>
+        ));
+
+        PromptInputTextarea.displayName = "PromptInputTextarea";
+
+        type PromptInputActionsProps = React.HTMLAttributes<HTMLDivElement>;
+
+        const PromptInputActions = React.forwardRef<
+          HTMLDivElement,
+          PromptInputActionsProps
+        >(({ className, ...props }, ref) => (
+          <div
+            ref={ref}
+            className={cn(
+              "flex w-full shrink-0 items-center justify-between px-2 py-2",
+              className,
+            )}
+            {...props}
+          />
+        ));
+
+        PromptInputActions.displayName = "PromptInputActions";
+
+        type PromptInputActionGroupProps = React.HTMLAttributes<HTMLDivElement>;
+
+        const PromptInputActionGroup = React.forwardRef<
+          HTMLDivElement,
+          PromptInputActionGroupProps
+        >(({ className, ...props }, ref) => (
+          <div ref={ref} className={cn("flex gap-2", className)} {...props} />
+        ));
+
+        PromptInputActionGroup.displayName = "PromptInputActionGroup";
+
+        type PromptInputActionProps = React.HTMLAttributes<HTMLDivElement> & {
+          asChild?: boolean;
+        };
+
+        const PromptInputAction = React.forwardRef<
+          HTMLDivElement,
+          PromptInputActionProps
+        >(({ asChild = false, ...props }, ref) => {
+          const Comp = asChild ? Slot.Root : "div";
+
+          return <Comp ref={ref} {...props} />;
+        });
+
+        PromptInputAction.displayName = "PromptInputAction";
+
+        export {
+          PromptInput,
+          PromptInputTextarea,
+          PromptInputActions,
+          PromptInputActionGroup,
+          PromptInputAction,
+        };
+
+        export default PromptInput;
+        ```
+      </Step>
+      <Step>
+        <h3>Update the import paths to match your project setup.</h3>
+      </Step>
+    </Steps>
+  </Tab>
 </Tabs>

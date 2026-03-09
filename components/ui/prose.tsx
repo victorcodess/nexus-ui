@@ -16,7 +16,7 @@ export function Prose({
       className={cn(
         'prose prose-invert max-w-none text-gray-500 font-[350] text-[15px] leading-7',
         // headings
-        'prose-headings:scroll-mt-28 lg:prose-headings:scroll-mt-24 prose-headings:text-gray-900 prose-headings:font-[450] prose-headings:leading-5.5 prose-headings:tracking-[-0.45px] prose-headings:mb-4 prose-headings:mt-8 prose-h1:text-2xl prose-h2:text-lg prose-h3:text-base prose-h4:text-sm prose-h5:text-xs prose-h6:text-xs',
+        'prose-headings:scroll-mt-28 lg:prose-headings:scroll-mt-24 prose-headings:text-gray-900 prose-headings:font-[450] prose-headings:leading-5.5 prose-h2:tracking-[-0.45px] prose-headings:mb-4 prose-headings:mt-8 prose-h1:text-2xl prose-h2:text-lg prose-h3:text-base prose-h3:leading-4.5 prose-h3:tracking-[-0.4px] prose-h4:text-sm prose-h5:text-xs prose-h6:text-xs',
         // heading links
         'prose-headings:[&_a]:no-underline prose-headings:[&_a]:shadow-none prose-headings:[&_a]:text-inherit',
         // body text
