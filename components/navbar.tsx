@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { ThemeToggle } from "./layout/theme-toggle";
+import { SmallThemeToggle } from "./layout/theme-toggle";
 import { LargeSearchToggle, SearchToggle } from "./layout/search-toggle";
 import type { NavItem } from "@/lib/source";
 import { Menu, X } from "lucide-react";
@@ -27,18 +27,23 @@ export function Navbar({ navItems = [] }: NavbarProps) {
   }, [pathname, closeSidebar]);
 
   useEffect(() => {
+    const nav = document.getElementById("nd-nav");
     if (sidebarOpen) {
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
+      const px = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.paddingRight = px;
+      if (nav) nav.style.paddingRight = px;
     } else {
       document.body.style.overflow = "";
       document.body.style.paddingRight = "";
+      if (nav) nav.style.paddingRight = "";
     }
     return () => {
       document.body.style.overflow = "";
       document.body.style.paddingRight = "";
+      if (nav) nav.style.paddingRight = "";
     };
   }, [sidebarOpen]);
 
@@ -104,7 +109,10 @@ function Logo() {
           fill="currentColor"
         />
       </svg>
-      Nexus UI <span className="text-xs font-[350] text-gray-400 -mb-0.75 ml-0.5">v1.0</span>
+      Nexus UI{" "}
+      <span className="-mb-0.75 ml-0.5 text-xs font-[350] text-gray-400">
+        v1.0
+      </span>
     </Link>
   );
 }
@@ -149,7 +157,7 @@ function DesktopNav({
         rel="noreferrer noopener"
         target="_blank"
         aria-label="GitHub"
-        className="inline-flex items-center justify-center rounded-full p-2 text-sm font-medium text-fd-muted-foreground transition-colors duration-100 hover:bg-fd-accent hover:text-fd-accent-foreground focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5"
+        className="inline-flex items-center justify-center rounded-full p-2 text-sm font-medium text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5"
       >
         <GithubIcon />
       </a>
@@ -158,7 +166,7 @@ function DesktopNav({
         <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
       )}
 
-      <ThemeToggle className="cursor-pointer rounded-full" />
+      <SmallThemeToggle className="cursor-pointer rounded-full" />
     </div>
   );
 }
@@ -227,27 +235,27 @@ function MobileSidebar({
               rel="noreferrer noopener"
               target="_blank"
               aria-label="GitHub"
-              className="inline-flex items-center justify-center rounded-full p-2 text-fd-muted-foreground hover:text-fd-foreground"
+              className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
             >
-              <GithubIcon className="size-5" />
+              <GithubIcon className="size-4.5" />
             </a>
             <a
               href="https://x.com/victorwilliams_"
               rel="noreferrer noopener"
               target="_blank"
               aria-label="X / Twitter"
-              className="inline-flex items-center justify-center rounded-full p-2 text-fd-muted-foreground hover:text-fd-foreground"
+              className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
             >
-              <XIcon className="size-5" />
+              <XIcon className="size-4.5" />
             </a>
           </div>
           <div className="flex items-center gap-1">
-            <ThemeToggle className="cursor-pointer rounded-full" />
+            <SmallThemeToggle className="cursor-pointer rounded-full" />
             <button
               type="button"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                "cursor-pointer rounded-full",
+                "size-8 cursor-pointer rounded-full",
               )}
               aria-label="Close Menu"
               onClick={onClose}
@@ -259,7 +267,7 @@ function MobileSidebar({
 
         <hr className="border-dashed border-gray-200 dark:border-white/10" />
 
-        <nav className="flex-1 overflow-y-auto px-4 py-6">
+        <nav className="flex-1 overflow-y-auto px-4 py-5">
           <div className="flex flex-col items-end gap-1">
             {navItems.map((item, i) =>
               item.type === "separator" ? (
@@ -305,12 +313,20 @@ function isNavActive(url: string, pathname: string | null): boolean {
 function GithubIcon({ className }: { className?: string }) {
   return (
     <svg
-      role="img"
-      viewBox="0 0 24 24"
-      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
       className={className}
     >
-      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+      <path
+        d="M11.2539 16.5039V13.5039C11.3582 12.5644 11.0889 11.6215 10.5039 10.8789C12.7539 10.8789 15.0039 9.37891 15.0039 6.75391C15.0639 5.81641 14.8014 4.89391 14.2539 4.12891C14.4639 3.26641 14.4639 2.36641 14.2539 1.50391C14.2539 1.50391 13.5039 1.50391 12.0039 2.62891C10.0239 2.25391 7.98391 2.25391 6.00391 2.62891C4.50391 1.50391 3.75391 1.50391 3.75391 1.50391C3.52891 2.36641 3.52891 3.26641 3.75391 4.12891C3.20781 4.89082 2.94276 5.8185 3.00391 6.75391C3.00391 9.37891 5.25391 10.8789 7.50391 10.8789C7.21141 11.2464 6.99391 11.6664 6.86641 12.1164C6.73891 12.5664 6.70141 13.0389 6.75391 13.5039M6.75391 13.5039V16.5039M6.75391 13.5039C3.37141 15.0039 3.00391 12.0039 1.50391 12.0039"
+        stroke="currentColor"
+        stroke-width="1.25"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   );
 }
@@ -318,12 +334,20 @@ function GithubIcon({ className }: { className?: string }) {
 function XIcon({ className }: { className?: string }) {
   return (
     <svg
-      role="img"
-      viewBox="0 0 24 24"
-      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
       className={className}
     >
-      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+      <path
+        d="M2.25 15.75L7.9113 10.0887M7.9113 10.0887L2.25 2.25H6L10.0887 7.9113M7.9113 10.0887L12 15.75H15.75L10.0887 7.9113M15.75 2.25L10.0887 7.9113"
+        stroke="currentColor"
+        stroke-width="1.25"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   );
 }
