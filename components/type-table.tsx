@@ -58,18 +58,20 @@ export function TypeTable({
     <div
       id={id}
       className={cn(
-        '@container flex flex-col p-1 bg-fd-card text-fd-card-foreground rounded-2xl border my-6 text-sm overflow-hidden',
+        '@container flex flex-col bg-gray-100 text-gray-900 rounded-xl border border-gray-200 my-6 text-sm overflow-hidden dark:border-white/10 dark:bg-white/5',
         className,
       )}
       {...props}
     >
-      <div className="flex font-medium items-center px-3 py-1 not-prose text-fd-muted-foreground">
+      <div className="flex font-normal items-center px-6 py-2.5 not-prose text-gray-400">
         <p className="w-1/4">Prop</p>
         <p className="@max-xl:hidden">Type</p>
       </div>
-      {Object.entries(type).map(([key, value]) => (
-        <Item key={key} parentId={id} name={key} item={value} />
-      ))}
+      <div className="flex flex-col bg-white rounded-xl dark:bg-background">
+        {Object.entries(type).map(([key, value]) => (
+          <Item key={key} parentId={id} name={key} item={value} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -113,15 +115,15 @@ function Item({
         setOpen(v);
       }}
       className={cn(
-        'rounded-xl border overflow-hidden scroll-m-20 transition-all',
-        open ? 'shadow-sm bg-fd-background not-last:mb-2' : 'border-transparent',
+        'overflow-hidden scroll-m-20 transition-all border-0 border-t border-gray-100 first:border-t-0 first:rounded-t-xl last:rounded-b-xl dark:border-white/10',
+        open && 'bg-gray-50 dark:bg-white/5',
       )}
     >
-      <CollapsibleTrigger className="relative flex flex-row items-center w-full group text-start px-3 py-2 not-prose hover:bg-fd-accent">
+      <CollapsibleTrigger className="relative flex flex-row items-center w-full group text-start px-6 py-3.5 not-prose hover:bg-gray-50 dark:hover:bg-white/5">
         <code
           className={cn(
-            'text-fd-primary min-w-fit w-1/4 font-mono font-medium pe-2',
-            deprecated && 'line-through text-fd-primary/50',
+            'text-gray-900 min-w-fit w-1/4 font-mono font-medium pe-2',
+            deprecated && 'line-through text-gray-400',
           )}
         >
           {name}
@@ -134,10 +136,10 @@ function Item({
         ) : (
           <span className="@max-xl:hidden">{type}</span>
         )}
-        <ChevronDown className="absolute end-2 size-4 text-fd-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+        <ChevronDown className="absolute end-2 size-4 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="grid grid-cols-[1fr_3fr] gap-y-4 text-sm p-3 overflow-auto fd-scroll-container border-t">
+        <div className="grid grid-cols-[1fr_3fr] gap-y-4 text-sm py-3 px-6 overflow-auto fd-scroll-container border-t">
           <div className="text-sm prose col-span-full prose-no-margin empty:hidden">
             {description}
           </div>
