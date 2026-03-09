@@ -55,16 +55,60 @@ export function Navbar({ navItems = [] }: NavbarProps) {
           "fixed top-0 z-40 h-14 w-full lg:px-20 2xl:px-40",
           "bg-white/90 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none dark:bg-background dark:lg:bg-transparent",
           isDocs &&
-            "border-b border-dashed border-gray-200 bg-white! px-0 lg:px-0 2xl:px-0 dark:border-white/10 dark:bg-fd-background!",
+            "overflow-hidden border-b border-dashed border-gray-200 px-0 lg:px-0 2xl:px-0 dark:border-white/10",
         )}
       >
+        {isDocs && (
+          <>
+            <div
+              className="absolute inset-0 dark:hidden"
+              style={{
+                background:
+                  "repeating-linear-gradient(-45deg, #ffffff, #ffffff 14px, #D4D4D429 14px, #D4D4D429 16px)",
+              }}
+              aria-hidden
+            />
+            <div
+              className="absolute inset-0 hidden dark:block"
+              style={{
+                background:
+                  "repeating-linear-gradient(-45deg, #0A0A0A, #0A0A0A 14px, #171717 14px, #171717 16px)",
+              }}
+              aria-hidden
+            />
+            {/* <div
+              className="absolute right-0 bottom-0 left-0 h-[1.5px] dark:hidden"
+              style={{
+                background:
+                  "repeating-linear-gradient(to right, #e5e5e5 0px, #e5e5e5 14px, transparent 14px, transparent 24px)",
+              }}
+              aria-hidden
+            /> */}
+            {/* <div
+              className="absolute right-0 bottom-0 left-0 hidden h-[1.5px] dark:block"
+              style={{
+                background:
+                  "repeating-linear-gradient(to right, #404040 0px, #404040 14px, transparent 14px, transparent 24px)",
+              }}
+              aria-hidden
+            /> */}
+          </>
+        )}
         <nav
           className={cn(
-            "flex h-14 w-full items-center justify-between gap-6 px-4 lg:w-[calc(50%+40px)] lg:px-6 2xl:w-[calc(50%+80px)]",
+            "relative flex h-14 w-full items-center justify-between gap-6 px-4 lg:w-[calc(50%+40px)] lg:px-6 2xl:w-[calc(50%+80px)]",
             isDocs && "w-full py-3 lg:w-full lg:px-5 2xl:w-full",
           )}
         >
           <Logo />
+
+          {isDocs && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center max-md:hidden">
+              <div className="pointer-events-auto">
+                <LargeSearchToggle />
+              </div>
+            </div>
+          )}
 
           <DesktopNav isDocs={isDocs} isComponents={isComponents} />
 
@@ -128,7 +172,6 @@ function DesktopNav({
 }) {
   return (
     <div className="flex flex-row items-center gap-2 max-sm:hidden">
-      {isDocs && <LargeSearchToggle />}
       <Link
         href="/docs"
         className={cn(
@@ -157,16 +200,26 @@ function DesktopNav({
         rel="noreferrer noopener"
         target="_blank"
         aria-label="GitHub"
-        className="inline-flex items-center justify-center rounded-full p-2 text-sm font-medium text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-5"
+        className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
       >
         <GithubIcon />
+      </a>
+
+      <a
+        href="https://x.com/victorwilliams_"
+        rel="noreferrer noopener"
+        target="_blank"
+        aria-label="X / Twitter"
+        className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+      >
+        <XIcon className="size-4.5" />
       </a>
 
       {!isDocs && (
         <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
       )}
 
-      <SmallThemeToggle className="cursor-pointer rounded-full" />
+      <SmallThemeToggle className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900" />
     </div>
   );
 }
