@@ -114,8 +114,8 @@ export function CodeBlock({
         inTab
           ? "-mx-px -mb-px bg-fd-secondary last:rounded-b-xl"
           : "my-4 rounded-xl dark:bg-background",
-        keepBackground && "bg-(--shiki-light-bg) dark:bg-(--shiki-dark-bg)",
-        "shiki not-prose relative overflow-hidden border border-gray-200 text-[13px] font-[450] dark:border-white/10",
+        keepBackground ? "" : "border border-gray-200 dark:border-white/10",
+        "shiki not-prose relative overflow-hidden text-[13px] font-[450]",
         props.className,
         title && "bg-gray-100",
       )}
@@ -142,17 +142,18 @@ export function CodeBlock({
         Actions({
           className:
             "absolute top-3 right-3 z-2 rounded-lg text-gray-400 hover:text-gray-600",
-          children: allowCopy && <CopyButton containerRef={areaRef} showGlow />,
+          children: allowCopy && <CopyButton containerRef={areaRef} showGlow keepBackground={keepBackground} />,
         })
       )}
-      <div className="relative rounded-xl bg-white overflow-hidden">
+      <div className="relative overflow-hidden rounded-xl bg-white">
         <div
           ref={areaRef}
           {...viewportProps}
           role="region"
           tabIndex={0}
           className={cn(
-            "fd-scroll-container no-scrollbar overscroll-x-none rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            "fd-scroll-container no-scrollbar overscroll-x-none  overflow-auto rounded-t-xl px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            keepBackground ? "bg-gray-100! dark:bg-white/5!" : "bg-white",
             viewportProps.className,
             overflows && expanded && "overflow-auto",
           )}
@@ -190,10 +191,12 @@ function CopyButton({
   className,
   containerRef,
   showGlow = false,
+  keepBackground,
   ...props
 }: ComponentProps<"button"> & {
   containerRef: RefObject<HTMLElement | null>;
   showGlow?: boolean;
+  keepBackground?: boolean;
 }) {
   const [checked, onClick] = useCopyButton(() => {
     const pre = containerRef.current?.getElementsByTagName("pre").item(0);
@@ -210,7 +213,12 @@ function CopyButton({
   return (
     <div className="relative">
       {showGlow && (
-        <div className="absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l from-white from-70% to-white/0"></div>
+        <div
+          className={cn(
+            "absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l from-white from-70% to-white/0",
+            keepBackground ? "from-gray-100 from-70% to-gray-100/0" : "from-white from-70% to-white/0"
+          )}
+        ></div>
       )}
       <button
         type="button"
