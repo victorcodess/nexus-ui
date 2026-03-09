@@ -14,7 +14,7 @@ const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
     <div
       ref={ref}
       className={cn(
-        "flex h-auto w-full flex-col gap-0 rounded-[24px] border border-border-primary bg-surface-elevated shadow-sm",
+        "flex h-auto w-full flex-col gap-0 rounded-[24px] border border-border-primary bg-surface-elevated",
         className,
       )}
       {...props}
@@ -36,7 +36,7 @@ const PromptInputTextarea = React.forwardRef<
         ref={ref}
         placeholder="How can I help you today?"
         className={cn(
-          "min-h-14 w-full resize-none border-0 bg-transparent px-4 py-4 text-base leading-6 font-normal text-gray-900 shadow-none outline-none placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent dark:text-white",
+          "min-h-14 w-full resize-none border-0 bg-transparent px-4 py-4 text-sm leading-6 font-normal text-gray-900 shadow-none outline-none placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent dark:text-white",
           className,
         )}
         {...props}
