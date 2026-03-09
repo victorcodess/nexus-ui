@@ -152,7 +152,7 @@ export function CodeBlock({
           role="region"
           tabIndex={0}
           className={cn(
-            "fd-scroll-container no-scrollbar rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            "fd-scroll-container no-scrollbar overscroll-x-none rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
             viewportProps.className,
             overflows && expanded && "overflow-auto",
           )}
@@ -172,7 +172,7 @@ export function CodeBlock({
           {children}
         </div>
         {overflows && !expanded && (
-          <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999]/95 via-[#999999]/20 to-transparent dark:from-background dark:via-background/90">
+          <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999] from-3% via-[#999999]/20 to-transparent dark:from-background dark:via-background/90">
             <Button
               onClick={() => setExpanded(true)}
               className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-background dark:text-gray-400 dark:hover:text-gray-200"
