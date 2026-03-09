@@ -95,7 +95,13 @@ export function CodeBlock({
   useEffect(() => {
     const el = areaRef.current;
     if (!el) return;
-    setOverflows(el.scrollHeight > collapsedHeight);
+
+    const check = () => setOverflows(el.scrollHeight > collapsedHeight);
+    check();
+
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [children, collapsedHeight]);
 
   return (
@@ -139,14 +145,14 @@ export function CodeBlock({
           children: allowCopy && <CopyButton containerRef={areaRef} showGlow />,
         })
       )}
-      <div className="relative">
+      <div className="relative rounded-xl bg-white overflow-hidden">
         <div
           ref={areaRef}
           {...viewportProps}
           role="region"
           tabIndex={0}
           className={cn(
-            "fd-scroll-container no-scrollbar overflow-hidden rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            "fd-scroll-container no-scrollbar rounded-t-xl bg-white px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
             viewportProps.className,
             overflows && expanded && "overflow-auto",
           )}
@@ -204,7 +210,7 @@ function CopyButton({
   return (
     <div className="relative">
       {showGlow && (
-        <div className="absolute top-1/2 left-1/2 z-0 size-14 -translate-x-1/2 -translate-y-1/2 rounded-l-full bg-radial from-white from-20% via-white/85 to-white/0 to-70%"></div>
+        <div className="absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l from-white from-70% to-white/0"></div>
       )}
       <button
         type="button"

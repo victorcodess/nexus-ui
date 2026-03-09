@@ -151,7 +151,7 @@ export default function HomePage() {
               })}
             </div>
 
-            <div className="relative w-full rounded-t-[40px] border-x border-t border-gray-200 bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:py-3.5 [&>figure]:pr-3.5 [&>figure]:pl-7 [&>figure]:shadow-none">
+            <div className="relative w-full overflow-hidden rounded-t-[40px] border-x border-t border-gray-200 bg-white lg:h-31/51 dark:border-white/10 dark:bg-background [&_.fd-scroll-container]:max-h-none! lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:border-none [&>figure]:bg-transparent [&_.fd-scroll-container]:py-7 [&_.fd-scroll-container]:pr-3.5 [&>figure]:rounded-t-[40px] [&>figure]:shadow-none [&_.fd-scroll-container]:no-scrollbar [&_.fd-scroll-container]:pl-7">
               <DynamicCodeBlock lang="ts" code={code} />
 
               <button
