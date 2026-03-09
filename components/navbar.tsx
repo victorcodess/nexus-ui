@@ -17,7 +17,7 @@ interface NavbarProps {
 export function Navbar({ navItems = [] }: NavbarProps) {
   const pathname = usePathname();
   const isDocs = pathname?.startsWith("/docs");
-  const isComponents = pathname?.startsWith("/components");
+  const isComponents = pathname?.startsWith("/docs/components");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
@@ -76,22 +76,6 @@ export function Navbar({ navItems = [] }: NavbarProps) {
               }}
               aria-hidden
             />
-            {/* <div
-              className="absolute right-0 bottom-0 left-0 h-[1.5px] dark:hidden"
-              style={{
-                background:
-                  "repeating-linear-gradient(to right, #e5e5e5 0px, #e5e5e5 14px, transparent 14px, transparent 24px)",
-              }}
-              aria-hidden
-            /> */}
-            {/* <div
-              className="absolute right-0 bottom-0 left-0 hidden h-[1.5px] dark:block"
-              style={{
-                background:
-                  "repeating-linear-gradient(to right, #404040 0px, #404040 14px, transparent 14px, transparent 24px)",
-              }}
-              aria-hidden
-            /> */}
           </>
         )}
         <nav
@@ -205,19 +189,21 @@ function DesktopNav({
         <GithubIcon />
       </a>
 
-      <a
-        href="https://x.com/victorwilliams_"
-        rel="noreferrer noopener"
-        target="_blank"
-        aria-label="X / Twitter"
-        className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
-      >
-        <XIcon className="size-4.5" />
-      </a>
-
-      {!isDocs && (
-        <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground" />
+      {isDocs && (
+        <a
+          href="https://x.com/victorwilliams_"
+          rel="noreferrer noopener"
+          target="_blank"
+          aria-label="X / Twitter"
+          className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+        >
+          <XIcon className="size-4.5" />
+        </a>
       )}
+
+      {/* {!isDocs && (
+        <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900" />
+      )} */}
 
       <SmallThemeToggle className="inline-flex size-8 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900" />
     </div>
