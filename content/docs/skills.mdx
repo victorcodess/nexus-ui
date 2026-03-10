@@ -1,0 +1,112 @@
+---
+title: Skills
+description: Give your AI assistant knowledge of Nexus UI components and patterns
+---
+
+Skills give AI coding agents like Cursor, Claude Code, and Windsurf project-aware context about Nexus UI. When installed, your assistant knows how to find, install, compose, and customize components using the correct APIs and patterns.
+
+For example, you can ask your assistant to:
+
+- _"Add a chat input with send and attach buttons."_
+- _"Build a streaming chat interface with messages and a prompt input."_
+- _"Show me all available Nexus UI components."_
+
+The skill provides your assistant with component APIs, composition patterns, installation commands, and AI SDK integration — so it generates correct code on the first try.
+
+## Install
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx skills add victorcodess/nexus-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx skills add victorcodess/nexus-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash
+npx skills add victorcodess/nexus-ui
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx skills add victorcodess/nexus-ui
+```
+</Tab>
+</Tabs>
+
+Once installed, your AI assistant automatically loads it when working with Nexus UI components. Learn more at [skills.sh](https://skills.sh).
+
+## What's included
+
+The skill provides your AI assistant with:
+
+### Component APIs
+
+Full reference for all Nexus UI components — sub-components, props, import paths, and composition patterns. The assistant knows the correct way to combine `PromptInput`, `PromptInputTextarea`, `PromptInputActions`, and other primitives.
+
+### Installation & CLI
+
+How to add the `@nexus-ui` registry to `components.json`, install components via the shadcn CLI, and manage dependencies.
+
+### AI SDK integration
+
+Patterns for using Nexus UI with the [Vercel AI SDK](https://sdk.vercel.ai) — connecting `useChat` to `PromptInputTextarea`, handling form submission, and wiring up streaming.
+
+### Styling & customization
+
+How to override styles via `className`, use Tailwind CSS v4 design tokens, and customize components after installation.
+
+## MCP Server
+
+The [Model Context Protocol](https://modelcontextprotocol.io) lets AI tools access Nexus UI components directly from your editor.
+
+### Cursor
+
+Create a `.cursor/mcp.json` file in your project root:
+
+```json title=".cursor/mcp.json"
+{
+  "mcpServers": {
+    "nexus-ui": {
+      "description": "Nexus UI registry",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "shadcn@canary", "mcp"],
+      "env": {
+        "REGISTRY_URL": "https://nexus-ui.dev/r/registry.json"
+      }
+    }
+  }
+}
+```
+
+Restart Cursor after adding the configuration.
+
+### Other AI tools
+
+For other tools that support MCP (Claude Code, Windsurf, etc.), use the same server configuration above and follow your tool's MCP setup docs.
+
+### Usage
+
+Once configured, you can interact with the registry directly in chat:
+
+```
+Show me all available Nexus UI components
+```
+
+```
+Add the PromptInput component from Nexus UI
+```
+
+## LLM resources
+
+Machine-readable documentation for LLMs:
+
+| Resource | URL |
+|----------|-----|
+| llms.txt | [nexus-ui.dev/llms.txt](https://nexus-ui.dev/llms.txt) |
+| llms-full.txt | [nexus-ui.dev/llms-full.txt](https://nexus-ui.dev/llms-full.txt) |
