@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "suggestions",
+  "title": "Suggestions",
+  "description": "Composable prompt suggestion chips for guiding user input.",
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/suggestions/suggestions.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { Button } from \"@/components/ui/button\";\n\ntype SuggestionsContextValue = {\n  onSelect?: (value: string) => void;\n};\n\nconst SuggestionsContext = React.createContext<SuggestionsContextValue>({});\n\ntype SuggestionsProps = Omit<\n  React.HTMLAttributes<HTMLDivElement>,\n  \"onSelect\"\n> & {\n  onSelect?: (value: string) => void;\n};\n\nconst Suggestions = React.forwardRef<HTMLDivElement, SuggestionsProps>(\n  ({ className, onSelect, ...props }, ref) => (\n    <SuggestionsContext value={{ onSelect }}>\n      <div\n        ref={ref}\n        className={cn(\"flex flex-col gap-2\", className)}\n        {...props}\n      />\n    </SuggestionsContext>\n  ),\n);\n\nSuggestions.displayName = \"Suggestions\";\n\ntype SuggestionListProps = React.HTMLAttributes<HTMLDivElement> & {\n  orientation?: \"horizontal\" | \"vertical\";\n};\n\nconst SuggestionList = React.forwardRef<HTMLDivElement, SuggestionListProps>(\n  ({ className, orientation = \"horizontal\", ...props }, ref) => (\n    <div\n      ref={ref}\n      className={cn(\n        \"flex gap-2\",\n        orientation === \"horizontal\"\n          ? \"flex-row flex-wrap items-center\"\n          : \"flex-col items-start\",\n        className,\n      )}\n      role=\"group\"\n      {...props}\n    />\n  ),\n);\n\nSuggestionList.displayName = \"SuggestionList\";\n\nconst suggestionVariants = {\n  default:\n    \"h-8 rounded-full border-none bg-gray-100 px-4 text-sm font-normal text-gray-900 shadow-none outline-none hover:bg-gray-200 focus-visible:ring-0 dark:bg-white/10 dark:text-gray-100 dark:hover:bg-white/15\",\n  outline:\n    \"h-8 rounded-full border border-gray-200 bg-transparent px-4 text-sm font-normal text-gray-900 shadow-none outline-none hover:bg-gray-100 focus-visible:ring-0 dark:border-white/10 dark:text-gray-100 dark:hover:bg-white/10\",\n  ghost:\n    \"h-8 rounded-full border-none bg-transparent px-4 text-sm font-normal text-gray-500 shadow-none outline-none hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-0 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100\",\n};\n\ntype SuggestionVariant = keyof typeof suggestionVariants;\n\ntype SuggestionProps = Omit<React.ComponentProps<typeof Button>, \"variant\"> & {\n  value?: string;\n  variant?: SuggestionVariant;\n};\n\nconst Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(\n  (\n    { className, value, variant = \"default\", onClick, children, ...props },\n    ref,\n  ) => {\n    const { onSelect } = React.useContext(SuggestionsContext);\n\n    return (\n      <Button\n        ref={ref}\n        className={cn(suggestionVariants[variant], className)}\n        onClick={(e) => {\n          onClick?.(e);\n          const text = value ?? (typeof children === \"string\" ? children : \"\");\n          if (text && onSelect) onSelect(text);\n        }}\n        {...props}\n      >\n        {children}\n      </Button>\n    );\n  },\n);\n\nSuggestion.displayName = \"Suggestion\";\n\nexport { Suggestions, SuggestionList, Suggestion };\n\nexport default Suggestions;\n",
+      "type": "registry:file",
+      "target": "~/components/nexus-ui/suggestions.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

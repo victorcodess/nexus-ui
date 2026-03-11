@@ -17,6 +17,20 @@
           "target": "~/components/nexus-ui/prompt-input.tsx"
         }
       ]
+    },
+    {
+      "name": "suggestions",
+      "type": "registry:ui",
+      "title": "Suggestions",
+      "description": "Composable prompt suggestion chips for guiding user input.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/new-york/suggestions/suggestions.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/suggestions.tsx"
+        }
+      ]
     }
   ]
 }
