@@ -36,7 +36,7 @@ const SuggestionList = React.forwardRef<HTMLDivElement, SuggestionListProps>(
       className={cn(
         "flex gap-2",
         orientation === "horizontal"
-          ? "flex-row flex-wrap items-center"
+          ? "flex-row flex-wrap items-center justify-center"
           : "flex-col items-start",
         className,
       )}
@@ -48,21 +48,30 @@ const SuggestionList = React.forwardRef<HTMLDivElement, SuggestionListProps>(
 
 SuggestionList.displayName = "SuggestionList";
 
-type SuggestionProps = React.ComponentProps<typeof Button> & {
+const suggestionVariants = {
+  default:
+    "h-8 rounded-full border-none bg-gray-100 px-4 text-sm font-normal text-gray-900 shadow-none outline-none hover:bg-gray-200 focus-visible:ring-0 dark:bg-white/10 dark:text-gray-100 dark:hover:bg-white/15",
+  outline:
+    "h-8 rounded-full border border-gray-200 bg-transparent px-4 text-sm font-normal text-gray-900 shadow-none outline-none hover:bg-gray-100 focus-visible:ring-0 dark:border-white/10 dark:text-gray-100 dark:hover:bg-white/10",
+  ghost:
+    "h-8 rounded-full border-none bg-transparent px-4 text-sm font-normal text-gray-500 shadow-none outline-none hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-0 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-100",
+};
+
+type SuggestionVariant = keyof typeof suggestionVariants;
+
+type SuggestionProps = Omit<React.ComponentProps<typeof Button>, "variant"> & {
   value?: string;
+  variant?: SuggestionVariant;
 };
 
 const Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(
-  ({ className, value, onClick, children, ...props }, ref) => {
+  ({ className, value, variant = "default", onClick, children, ...props }, ref) => {
     const { onSelect } = React.useContext(SuggestionsContext);
 
     return (
       <Button
         ref={ref}
-        className={cn(
-          "h-8 rounded-full border-none bg-gray-100 px-4 text-sm font-normal text-gray-900 shadow-none outline-none hover:bg-gray-200 focus-visible:ring-0 dark:bg-white/10 dark:text-gray-100 dark:hover:bg-white/15",
-          className,
-        )}
+        className={cn(suggestionVariants[variant], className)}
         onClick={(e) => {
           onClick?.(e);
           const text = value ?? (typeof children === "string" ? children : "");

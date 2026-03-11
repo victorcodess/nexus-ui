@@ -8,6 +8,7 @@ import SuggestionVertical from "@/components/nexus-ui/examples/suggestion/vertic
 import SuggestionCustomValue from "@/components/nexus-ui/examples/suggestion/custom-value";
 import SuggestionWithIcons from "@/components/nexus-ui/examples/suggestion/with-icons";
 import SuggestionWithPromptInput from "@/components/nexus-ui/examples/suggestion/with-prompt-input";
+import SuggestionVariants from "@/components/nexus-ui/examples/suggestion/variants";
 import ReviewContainer from "@/components/preview-container";
 
 Clickable prompt suggestion chips that guide users toward common queries. Built on shadcn's `Button` with a composable compound pattern.
@@ -190,6 +191,41 @@ import {
 ```
 
 ## Examples
+
+### Variants
+
+The `Suggestion` component supports three variants: `default` (filled background), `outline` (bordered), and `ghost` (transparent until hovered).
+
+<Tabs items={["Preview", "Code"]}>
+<Tab value="Preview">
+<ReviewContainer>
+<SuggestionVariants />
+</ReviewContainer>
+</Tab>
+<Tab value="Code">
+```tsx
+"use client";
+
+import {
+  Suggestions,
+  SuggestionList,
+  Suggestion,
+} from "@/components/nexus-ui/suggestions";
+
+export default function SuggestionVariants() {
+  return (
+    <Suggestions onSelect={(value) => console.log(value)}>
+      <SuggestionList>
+        <Suggestion>Default</Suggestion>
+        <Suggestion variant="outline">Outline</Suggestion>
+        <Suggestion variant="ghost">Ghost</Suggestion>
+      </SuggestionList>
+    </Suggestions>
+  );
+}
+```
+</Tab>
+</Tabs>
 
 ### Vertical Layout
 
@@ -430,6 +466,11 @@ A clickable pill that triggers `onSelect` from the parent `Suggestions` context.
 
 <TypeTable
   type={{
+    variant: {
+      type: '"default" | "outline" | "ghost"',
+      default: '"default"',
+      description: "Visual style of the suggestion pill. Default uses a filled background, outline adds a border, and ghost is transparent until hovered.",
+    },
     value: {
       type: "string",
       description: "The value passed to onSelect. Defaults to the text content of children.",
