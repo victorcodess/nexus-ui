@@ -28,6 +28,7 @@ Copy-paste components into your project. You own the code.
 | Component     | Description                                                        |
 | ------------- | ------------------------------------------------------------------ |
 | `PromptInput` | Composable chat input with auto-resizing textarea and action slots |
+| `Suggestions` | Prompt suggestion chips for guiding user input                     |
 
 ## Quick Start
 
@@ -51,12 +52,14 @@ Then add components:
 
 ```bash
 npx shadcn@latest add @nexus-ui/prompt-input
+npx shadcn@latest add @nexus-ui/suggestions
 ```
 
 Or install directly via URL without any config:
 
 ```bash
 npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+npx shadcn@latest add https://nexus-ui.dev/r/suggestions.json
 ```
 
 ## Usage
