@@ -69,14 +69,60 @@ type SuggestionVariant = keyof typeof suggestionVariants;
 type SuggestionProps = Omit<React.ComponentProps<typeof Button>, "variant"> & {
   value?: string;
   variant?: SuggestionVariant;
+  highlight?: string | string[];
 };
+
+function highlightText(
+  text: string,
+  terms: string | string[],
+): React.ReactNode {
+  const termList = Array.isArray(terms) ? terms : [terms];
+  const escaped = termList.map((t) =>
+    t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+  );
+  const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
+  const parts = text.split(pattern);
+
+  return (
+    <span>
+      {parts.map((part, i) =>
+        escaped.some((e) => new RegExp(`^${e}$`, "i").test(part))
+          ? (<span key={i} className="text-gray-400 dark:text-gray-500">{part}</span>)
+          : (<span key={i} className="text-gray-900 dark:text-gray-100">{part}</span>),
+      )}
+    </span>
+  );
+}
 
 const Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(
   (
-    { className, value, variant = "default", onClick, children, ...props },
+    {
+      className,
+      value,
+      variant = "default",
+      highlight,
+      onClick,
+      children,
+      ...props
+    },
     ref,
   ) => {
     const { onSelect } = React.useContext(SuggestionsContext);
+
+    const textToHighlight =
+      typeof children === "string" ? children : (value ?? "");
+    const nonStringChildren = React.Children.toArray(children).filter(
+      (c) => typeof c !== "string",
+    );
+    const rendered =
+      highlight && textToHighlight ? (
+        <>
+          {highlightText(textToHighlight, highlight)}
+          {nonStringChildren}
+        </>
+      ) : (
+        children
+      );
 
     return (
       <Button
@@ -89,7 +135,7 @@ const Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(
         }}
         {...props}
       >
-        {children}
+        {rendered}
       </Button>
     );
   },
