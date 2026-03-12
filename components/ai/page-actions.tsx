@@ -220,17 +220,17 @@ export function ViewOptions({
               className: "gap-2 rounded-full border-none bg-gray-100 px-3",
             }),
           trigger &&
-            "cursor-pointer text-gray-400 hover:text-gray-600 data-[state=open]:text-gray-600",
+            "cursor-pointer text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 data-[state=open]:text-gray-600 dark:data-[state=open]:text-gray-300",
         )}
       >
         {trigger ?? (
           <>
             Open
-            <ChevronDown className="size-3.5 text-fd-muted-foreground" />
+            <ChevronDown className="size-3.5 text-gray-400 dark:text-gray-500" />
           </>
         )}
       </PopoverTrigger>
-      <PopoverContent className="flex w-[204px]! -translate-x-4 translate-y-1 flex-col rounded-lg border-gray-200 bg-white p-0.5 shadow-modal">
+      <PopoverContent className="flex w-[204px]! -translate-x-4 translate-y-1 flex-col rounded-lg border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-0.5 shadow-modal">
         {items.map((item) => (
           <a
             key={item.href}
@@ -241,7 +241,7 @@ export function ViewOptions({
           >
             {item.icon}
             {item.title}
-            <ArrowUpRight className="ms-auto size-4 text-gray-400 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            <ArrowUpRight className="ms-auto size-4 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
           </a>
         ))}
       </PopoverContent>

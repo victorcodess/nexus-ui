@@ -274,7 +274,7 @@ function FooterItem({ item, index }: { item: Item; index: 0 | 1 }) {
     <Link
       href={item.url}
       className={cn(
-        'flex flex-col w-fit gap-2 rounded-full h-8 px-3 text-sm items-center justify-center text-gray-500 bg-gray-100 transition-colors hover:bg-gray-200 hover:text-gray-700 @max-lg:col-span-full',
+        'flex flex-col w-fit gap-2 rounded-full h-8 px-3 text-sm items-center justify-center text-gray-500 bg-gray-100 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700/50 dark:hover:text-gray-300 dark:text-gray-400 @max-lg:col-span-full',
         index === 1 && 'text-end',
       )}
     >
@@ -321,7 +321,7 @@ export function CopyPageMarkdown({ markdownUrl }: { markdownUrl: string }) {
       type="button"
       disabled={loading}
       onClick={handleCopy}
-      className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600 disabled:opacity-50"
+      className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 dark:text-gray-500 hover:bg-transparent hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
     >
       {copied ? 'Copied!' : 'Copy this page'}
       <Copy className="size-3 font-normal" />
@@ -352,10 +352,10 @@ export function PageBreadcrumb({
   return (
     <div
       {...props}
-      className={cn('flex items-center gap-1.5 text-sm text-fd-muted-foreground', props.className)}
+      className={cn('flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500', props.className)}
     >
       {items.map((item, i) => {
-        const className = cn('truncate', i === items.length - 1 && 'text-fd-primary font-medium');
+        const className = cn('truncate', i === items.length - 1 && 'text-gray-900 dark:text-gray-50 font-medium');
 
         return (
           <Fragment key={i}>

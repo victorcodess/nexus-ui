@@ -15,7 +15,7 @@ const itemVariants = cva(
   {
     variants: {
       variant: {
-        link: "transition-colors hover:text-fd-foreground data-[active=true]:bg-fd-background data-[active=true]:text-fd-foreground font-normal text-sm leading-6 data-[active=true]:hover:transition-colors",
+        link: "transition-colors hover:text-gray-400 data-[active=true]:bg-gray-100 data-[active=true]:text-gray-900 font-normal text-sm leading-6 data-[active=true]:hover:transition-colors dark:text-gray-500 dark:data-[active=true]:text-gray-50 dark:data-[active=true]:bg-gray-800",
         button: "transition-colors hover:text-fd-foreground",
       },
     },
@@ -129,7 +129,7 @@ export function SidebarSeparator({
   return (
     <Base.SidebarSeparator
       className={cn(
-        "px-0 text-xs leading-4 font-normal text-gray-400",
+        "px-0 text-xs leading-4 font-normal text-gray-400 dark:text-gray-500",
         className,
       )}
       {...props}

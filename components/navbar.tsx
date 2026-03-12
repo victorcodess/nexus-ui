@@ -72,7 +72,7 @@ export function Navbar({ navItems = [] }: NavbarProps) {
               className="absolute inset-0 hidden dark:block"
               style={{
                 background:
-                  "repeating-linear-gradient(-45deg, #0A0A0A, #0A0A0A 14px, #171717 14px, #171717 16px)",
+                  "repeating-linear-gradient(-45deg, #171717, #171717 14px, #1D1D1D 14px, #1D1D1D 16px)",
               }}
               aria-hidden
             />

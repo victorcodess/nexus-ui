@@ -142,18 +142,26 @@ export function CodeBlock({
         Actions({
           className:
             "absolute top-3 right-3 z-2 rounded-lg text-gray-400 hover:text-gray-600",
-          children: allowCopy && <CopyButton containerRef={areaRef} showGlow keepBackground={keepBackground} />,
+          children: allowCopy && (
+            <CopyButton
+              containerRef={areaRef}
+              showGlow
+              keepBackground={keepBackground}
+            />
+          ),
         })
       )}
-      <div className="relative overflow-hidden rounded-xl bg-white">
+      <div className="relative overflow-hidden rounded-xl bg-white dark:bg-gray-900">
         <div
           ref={areaRef}
           {...viewportProps}
           role="region"
           tabIndex={0}
           className={cn(
-            "fd-scroll-container no-scrollbar overscroll-x-none  overflow-auto rounded-t-xl px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
-            keepBackground ? "bg-gray-100! dark:bg-white/5!" : "bg-white",
+            "fd-scroll-container no-scrollbar overflow-auto overscroll-x-none rounded-t-xl px-4 py-3.5 text-sm leading-6 transition-[max-height] duration-300 ease-in-out focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none focus-visible:ring-inset",
+            keepBackground
+              ? "bg-gray-100! dark:bg-gray-950!"
+              : "bg-white dark:bg-gray-900",
             viewportProps.className,
             overflows && expanded && "overflow-auto",
             overflows && !expanded && "overflow-hidden",
@@ -174,10 +182,10 @@ export function CodeBlock({
           {children}
         </div>
         {overflows && !expanded && (
-          <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999] from-3% via-[#999999]/20 to-transparent dark:from-background dark:via-background/90">
+          <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999] from-3% via-[#999999]/20 to-transparent dark:from-gray-950 dark:via-gray-950/90">
             <Button
               onClick={() => setExpanded(true)}
-              className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-background dark:text-gray-400 dark:hover:text-gray-200"
+              className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-300"
             >
               Show more
             </Button>
@@ -216,8 +224,10 @@ function CopyButton({
       {showGlow && (
         <div
           className={cn(
-            "absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l from-white from-70% to-white/0",
-            keepBackground ? "from-gray-100 from-70% to-gray-100/0" : "from-white from-70% to-white/0"
+            "absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l",
+            keepBackground
+              ? "from-gray-100 from-70% to-gray-100/0 dark:from-gray-950 dark:to-gray-950/0"
+              : "from-white from-70% to-white/0 dark:from-gray-900 dark:to-gray-900/0",
           )}
         ></div>
       )}
@@ -225,7 +235,7 @@ function CopyButton({
         type="button"
         data-checked={checked || undefined}
         className={cn(
-          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600",
+          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
           className,
         )}
         aria-label={checked ? "Copied Text" : "Copy Text"}
@@ -247,7 +257,7 @@ export function CodeBlockTabs({ ref, ...props }: ComponentProps<typeof Tabs>) {
       ref={mergeRefs(containerRef, ref)}
       {...props}
       className={cn(
-        "rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-background",
+        "rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950",
         !nested && "my-0",
         props.className,
       )}

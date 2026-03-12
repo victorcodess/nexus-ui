@@ -188,10 +188,10 @@ export function DocsPage({
             <div className="flex flex-col">
               <h3
                 id="toc-title"
-                className="inline-flex items-center gap-1.5 text-sm text-fd-muted-foreground"
+                className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500"
               >
-                <Text className="size-4 text-gray-400" />
-                <span className="text-xs leading-4 text-gray-400">
+                <Text className="size-4" />
+                <span className="text-xs leading-4">
                   On this page
                 </span>
               </h3>
@@ -204,7 +204,7 @@ export function DocsPage({
               </TOCScrollArea>
             </div>
 
-            <div className="mx-auto h-px w-[calc(100%-40px)] bg-gray-100"></div>
+            <div className="mx-auto h-px w-[calc(100%-40px)] bg-gray-100 dark:bg-gray-800"></div>
 
             <div className="flex flex-col gap-3 pl-5 transition-colors duration-200 pt-2">
               {markdownUrl && <CopyPageMarkdown markdownUrl={markdownUrl} />}
@@ -213,7 +213,7 @@ export function DocsPage({
                   href={markdownUrl.replace(/^\/llms\.mdx\/docs\//, "/docs/") + ".md"}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600"
+                  className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 dark:text-gray-500 hover:bg-transparent hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   View as markdown <FileText className="size-3 font-normal" />
                 </Link>
@@ -222,7 +222,7 @@ export function DocsPage({
                 href={editUrl ?? "#"}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 hover:bg-transparent hover:text-gray-600"
+                className="flex h-4 w-full cursor-pointer items-center justify-start gap-1 bg-transparent px-0! text-[13px] leading-5 font-normal text-gray-400 dark:text-gray-500 hover:bg-transparent hover:text-gray-600 dark:hover:text-gray-300"
               >
                 Edit on GitHub <SquarePen className="size-3 font-normal" />
               </Link>
@@ -270,7 +270,7 @@ export function DocsDescription({
   return (
     <p
       {...props}
-      className={cn("mb-8 text-base text-fd-muted-foreground", className)}
+      className={cn("mb-8 text-base text-gray-400 dark:text-gray-500", className)}
     >
       {children}
     </p>
@@ -286,7 +286,7 @@ export function DocsTitle({
     <h1
       {...props}
       className={cn(
-        "text-xl leading-5.5 font-medium tracking-[-0.5px] text-gray-900",
+        "text-xl leading-5.5 font-medium tracking-[-0.5px] text-gray-900 dark:text-gray-50",
         className,
       )}
     >

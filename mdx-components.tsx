@@ -30,7 +30,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     table: (props) => (
       <div
         className={[
-          "my-6 prose-no-margin overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-white/5",
+          "my-6 prose-no-margin overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-950",
           "[&_tbody_tr:first-child_td:first-child]:rounded-tl-xl",
           "[&_tbody_tr:first-child_td:last-child]:rounded-tr-xl",
           "[&_tbody_tr:last-child_td:first-child]:rounded-bl-xl",
@@ -38,20 +38,20 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
         ].join(" ")}
       >
         <table
-          className="w-full border-separate border-spacing-0 border-none text-sm"
+          className="w-full border-separate border-spacing-0 border-none text-sm bg-gray-100 dark:bg-gray-900"
           {...props}
         />
       </div>
     ),
     th: (props) => (
       <th
-        className="border-none px-6 py-2.5 text-left text-[14px] font-normal! text-gray-400!"
+        className="border-none px-6 py-2.5 text-left text-[14px] font-normal! text-gray-400! dark:text-gray-500! dark:bg-gray-950"
         {...props}
       />
     ),
     td: (props) => (
       <td
-        className="border-0 border-gray-100 bg-white px-6 py-3.5 text-[14px] dark:border-white/10 dark:bg-background [tr:not(:first-child)_&]:border-t"
+        className="border-0 border-gray-100 bg-white px-6 py-3.5 text-[14px] text-gray-900 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 [tr:not(:first-child)_&]:border-t"
         {...props}
       />
     ),

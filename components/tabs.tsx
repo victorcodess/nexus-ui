@@ -64,9 +64,9 @@ export const TabsList = React.forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      "not-prose flex h-9 gap-2 overflow-x-auto text-fd-secondary-foreground dark:border-white/10",
+      "not-prose flex h-9 gap-2 overflow-x-auto text-fd-secondary-foreground dark:border-gray-800",
       props.className,
-      framed ? "px-4": "",
+      framed ? "px-4" : "",
     )}
   />
 ));
@@ -82,11 +82,11 @@ export const TabsTrigger = React.forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      "inline-flex cursor-pointer items-center gap-2 font-[450] whitespace-nowrap text-gray-400",
+      "inline-flex cursor-pointer items-center gap-2 font-[450] whitespace-nowrap text-gray-400 dark:text-gray-500",
       props.className,
       framed
-        ? "border-b border-transparent px-1 py-2 text-[13px] transition-colors hover:text-gray-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-gray-900 data-[state=active]:text-gray-900 [&_svg]:size-4"
-        : "data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 px-3 rounded-full h-8",
+        ? "border-b border-transparent px-1 py-2 text-[13px] transition-colors hover:text-gray-900 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-gray-900 data-[state=active]:text-gray-900 dark:data-[state=active]:border-gray-50 dark:data-[state=active]:text-gray-50 [&_svg]:size-4"
+        : "h-8 rounded-full px-3 data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-gray-50",
     )}
   />
 ));
@@ -111,8 +111,9 @@ export function Tabs({
       className={cn(
         "flex flex-col overflow-hidden",
         className,
-        framed ?
-          "my-4 rounded-xl border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-background": "gap-3 my-6!",
+        framed
+          ? "my-4 rounded-xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-950"
+          : "my-6! gap-3",
       )}
       value={value}
       onValueChange={(v: string) => {
