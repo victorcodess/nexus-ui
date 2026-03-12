@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,
@@ -82,8 +82,14 @@ const categories = [
 export default function SuggestionWithPanel() {
   const [input, setInput] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const active = categories.find((c) => c.label === activeCategory);
+
+  const closePanel = useCallback(() => {
+    triggerRef.current?.focus();
+    setActiveCategory(null);
+  }, []);
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -111,22 +117,18 @@ export default function SuggestionWithPanel() {
       </PromptInput>
 
       <div className="relative">
-        <Suggestions
-          onSelect={(value) => {
-            setInput(value);
-            setActiveCategory(null);
-          }}
-        >
+        <Suggestions>
           <SuggestionList className="justify-center">
             {categories.map((category) => (
               <Suggestion
                 key={category.label}
                 variant="default"
-                onClick={() =>
+                onClick={(e) => {
+                  triggerRef.current = e.currentTarget;
                   setActiveCategory(
                     activeCategory === category.label ? null : category.label,
-                  )
-                }
+                  );
+                }}
               >
                 <category.icon className="size-3.5" />
                 {category.label}
@@ -136,7 +138,7 @@ export default function SuggestionWithPanel() {
         </Suggestions>
 
         {active && (
-          <SuggestionPanel onClose={() => setActiveCategory(null)}>
+          <SuggestionPanel onClose={closePanel}>
             <SuggestionPanelHeader>
               <SuggestionPanelTitle>
                 <active.icon className="size-3.5 text-gray-400" />
@@ -144,7 +146,7 @@ export default function SuggestionWithPanel() {
                   {active.label}
                 </span>
               </SuggestionPanelTitle>
-              <SuggestionPanelClose onClick={() => setActiveCategory(null)}>
+              <SuggestionPanelClose onClick={closePanel}>
                 <X className="size-3.5" />
               </SuggestionPanelClose>
             </SuggestionPanelHeader>
@@ -152,7 +154,7 @@ export default function SuggestionWithPanel() {
               <Suggestions
                 onSelect={(value) => {
                   setInput(value);
-                  setActiveCategory(null);
+                  closePanel();
                 }}
               >
                 <SuggestionList orientation="vertical" className="gap-2">

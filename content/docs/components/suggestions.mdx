@@ -164,6 +164,7 @@ export { Suggestions, SuggestionList, Suggestion };
 
 export default Suggestions;
 ```
+
 </Step>
 <Step>
 <h3>Update the import paths to match your project setup.</h3>
@@ -378,41 +379,42 @@ import { ArrowUp, Paperclip } from "lucide-react";
 export default function SuggestionWithPromptInput() {
   const [input, setInput] = useState("");
 
-  return (
-    <div className="flex w-full flex-col gap-3">
-      <PromptInput>
-        <PromptInputTextarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <PromptInputActions>
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-                <Paperclip className="size-4" />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
-          <PromptInputActionGroup>
-            <PromptInputAction asChild>
-              <Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
-                <ArrowUp />
-              </Button>
-            </PromptInputAction>
-          </PromptInputActionGroup>
-        </PromptInputActions>
-      </PromptInput>
-      <Suggestions onSelect={(value) => setInput(value)}>
-        <SuggestionList className="justify-center">
-          <Suggestion>What is AI?</Suggestion>
-          <Suggestion>Teach me Engineering from scratch</Suggestion>
-          <Suggestion>Design a weekly workout plan</Suggestion>
-        </SuggestionList>
-      </Suggestions>
-    </div>
-  );
+return (
+<div className="flex w-full flex-col gap-3">
+<PromptInput>
+<PromptInputTextarea
+value={input}
+onChange={(e) => setInput(e.target.value)}
+/>
+<PromptInputActions>
+<PromptInputActionGroup>
+<PromptInputAction asChild>
+<Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
+<Paperclip className="size-4" />
+</Button>
+</PromptInputAction>
+</PromptInputActionGroup>
+<PromptInputActionGroup>
+<PromptInputAction asChild>
+<Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
+<ArrowUp />
+</Button>
+</PromptInputAction>
+</PromptInputActionGroup>
+</PromptInputActions>
+</PromptInput>
+<Suggestions onSelect={(value) => setInput(value)}>
+<SuggestionList className="justify-center">
+<Suggestion>What is AI?</Suggestion>
+<Suggestion>Teach me Engineering from scratch</Suggestion>
+<Suggestion>Design a weekly workout plan</Suggestion>
+</SuggestionList>
+</Suggestions>
+</div>
+);
 }
-```
+
+````
 </Tab>
 </Tabs>
 
@@ -430,7 +432,7 @@ Category chips that open a panel with related suggestions. Uses the `highlight` 
 ```tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,
@@ -509,8 +511,14 @@ const categories = [
 export default function SuggestionWithPanel() {
   const [input, setInput] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const active = categories.find((c) => c.label === activeCategory);
+
+  const closePanel = useCallback(() => {
+    triggerRef.current?.focus();
+    setActiveCategory(null);
+  }, []);
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -538,22 +546,18 @@ export default function SuggestionWithPanel() {
       </PromptInput>
 
       <div className="relative">
-        <Suggestions
-          onSelect={(value) => {
-            setInput(value);
-            setActiveCategory(null);
-          }}
-        >
+        <Suggestions>
           <SuggestionList className="justify-center">
             {categories.map((category) => (
               <Suggestion
                 key={category.label}
                 variant="default"
-                onClick={() =>
+                onClick={(e) => {
+                  triggerRef.current = e.currentTarget;
                   setActiveCategory(
                     activeCategory === category.label ? null : category.label,
-                  )
-                }
+                  );
+                }}
               >
                 <category.icon className="size-3.5" />
                 {category.label}
@@ -563,7 +567,7 @@ export default function SuggestionWithPanel() {
         </Suggestions>
 
         {active && (
-          <SuggestionPanel onClose={() => setActiveCategory(null)}>
+          <SuggestionPanel onClose={closePanel}>
             <SuggestionPanelHeader>
               <SuggestionPanelTitle>
                 <active.icon className="size-3.5 text-gray-400" />
@@ -571,7 +575,7 @@ export default function SuggestionWithPanel() {
                   {active.label}
                 </span>
               </SuggestionPanelTitle>
-              <SuggestionPanelClose onClick={() => setActiveCategory(null)}>
+              <SuggestionPanelClose onClick={closePanel}>
                 <X className="size-3.5" />
               </SuggestionPanelClose>
             </SuggestionPanelHeader>
@@ -579,7 +583,7 @@ export default function SuggestionWithPanel() {
               <Suggestions
                 onSelect={(value) => {
                   setInput(value);
-                  setActiveCategory(null);
+                  closePanel();
                 }}
               >
                 <SuggestionList orientation="vertical" className="gap-2">
@@ -604,7 +608,8 @@ export default function SuggestionWithPanel() {
     </div>
   );
 }
-```
+````
+
 </Tab>
 </Tabs>
 
@@ -618,7 +623,8 @@ The root container that provides `onSelect` context to all child `Suggestion` co
   type={{
     onSelect: {
       type: "(value: string) => void",
-      description: "Callback fired when any Suggestion is clicked. Receives the suggestion's value or text content.",
+      description:
+        "Callback fired when any Suggestion is clicked. Receives the suggestion's value or text content.",
     },
     className: {
       type: "string",
@@ -640,7 +646,8 @@ Layout wrapper for arranging suggestions horizontally or vertically.
     orientation: {
       type: '"horizontal" | "vertical"',
       default: '"horizontal"',
-      description: "Layout direction. Horizontal wraps items in a row, vertical stacks them in a column.",
+      description:
+        "Layout direction. Horizontal wraps items in a row, vertical stacks them in a column.",
     },
     className: {
       type: "string",
@@ -666,7 +673,8 @@ A clickable pill that triggers `onSelect` from the parent `Suggestions` context.
     },
     highlight: {
       type: "string | string[]",
-      description: "Defines the text(s) or word(s) in the suggestion to be highlighted. Matches are case-insensitive. Style the highlighted text via className or by composing your own wrapper.",
+      description:
+        "Defines the text(s) or word(s) in the suggestion to be highlighted. Matches are case-insensitive. Style the highlighted text via className or by composing your own wrapper.",
     },
     value: {
       type: "string",
@@ -691,7 +699,8 @@ Full-width panel that displays below the input, covering the category pills. Clo
   type={{
     onClose: {
       type: "() => void",
-      description: "Callback fired when the panel should close (e.g. Escape key).",
+      description:
+        "Callback fired when the panel should close (e.g. Escape key).",
     },
     className: {
       type: "string",
@@ -747,7 +756,8 @@ Close button for the panel. Use `asChild` to merge props onto a child element.
     asChild: {
       type: "boolean",
       default: "false",
-      description: "Merges props onto the child element instead of rendering a button.",
+      description:
+        "Merges props onto the child element instead of rendering a button.",
     },
     className: {
       type: "string",
@@ -769,7 +779,8 @@ Content wrapper for the panel's suggestion list. Use with `Suggestions` and `Sug
     asChild: {
       type: "boolean",
       default: "false",
-      description: "Merges props onto the child element instead of rendering a div.",
+      description:
+        "Merges props onto the child element instead of rendering a div.",
     },
     className: {
       type: "string",
