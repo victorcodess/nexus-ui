@@ -28,7 +28,7 @@ export default function PromptInputWithTooltips() {
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700">Attach file</TooltipContent>
+              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Attach file</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -38,7 +38,7 @@ export default function PromptInputWithTooltips() {
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700">Upload image</TooltipContent>
+              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Upload image</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -48,7 +48,7 @@ export default function PromptInputWithTooltips() {
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700">Voice input</TooltipContent>
+              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Voice input</TooltipContent>
             </Tooltip>
           </PromptInputActionGroup>
           <PromptInputActionGroup>
@@ -60,7 +60,7 @@ export default function PromptInputWithTooltips() {
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700">Send message</TooltipContent>
+              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Send message</TooltipContent>
             </Tooltip>
           </PromptInputActionGroup>
         </PromptInputActions>
