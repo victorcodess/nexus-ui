@@ -19,30 +19,30 @@ type SuggestionsProps = Omit<
   onSelect?: (value: string) => void;
 };
 
-const Suggestions = React.forwardRef<HTMLDivElement, SuggestionsProps>(
-  ({ className, onSelect, ...props }, ref) => (
+function Suggestions({ className, onSelect, ...props }: SuggestionsProps) {
+  return (
     <SuggestionsContext.Provider value={{ onSelect }}>
       <div
-        ref={ref}
         role="group"
         aria-label="Suggestions"
         className={cn("flex flex-col gap-2", className)}
         {...props}
       />
     </SuggestionsContext.Provider>
-  ),
-);
-
-Suggestions.displayName = "Suggestions";
+  );
+}
 
 type SuggestionListProps = React.HTMLAttributes<HTMLDivElement> & {
   orientation?: "horizontal" | "vertical";
 };
 
-const SuggestionList = React.forwardRef<HTMLDivElement, SuggestionListProps>(
-  ({ className, orientation = "horizontal", ...props }, ref) => (
+function SuggestionList({
+  className,
+  orientation = "horizontal",
+  ...props
+}: SuggestionListProps) {
+  return (
     <div
-      ref={ref}
       role="group"
       aria-label="Suggestions"
       className={cn(
@@ -54,10 +54,8 @@ const SuggestionList = React.forwardRef<HTMLDivElement, SuggestionListProps>(
       )}
       {...props}
     />
-  ),
-);
-
-SuggestionList.displayName = "SuggestionList";
+  );
+}
 
 const suggestionVariants = {
   default:
@@ -102,54 +100,46 @@ function highlightText(
   );
 }
 
-const Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(
-  (
-    {
-      className,
-      value,
-      variant = "default",
-      highlight,
-      onClick,
-      children,
-      ...props
-    },
-    ref,
-  ) => {
-    const { onSelect } = React.useContext(SuggestionsContext);
+function Suggestion({
+  className,
+  value,
+  variant = "default",
+  highlight,
+  onClick,
+  children,
+  ...props
+}: SuggestionProps) {
+  const { onSelect } = React.useContext(SuggestionsContext);
 
-    const textToHighlight =
-      typeof children === "string" ? children : (value ?? "");
-    const nonStringChildren = React.Children.toArray(children).filter(
-      (c) => typeof c !== "string",
+  const textToHighlight =
+    typeof children === "string" ? children : (value ?? "");
+  const nonStringChildren = React.Children.toArray(children).filter(
+    (c) => typeof c !== "string",
+  );
+  const rendered =
+    highlight && textToHighlight ? (
+      <>
+        {highlightText(textToHighlight, highlight)}
+        {nonStringChildren}
+      </>
+    ) : (
+      children
     );
-    const rendered =
-      highlight && textToHighlight ? (
-        <>
-          {highlightText(textToHighlight, highlight)}
-          {nonStringChildren}
-        </>
-      ) : (
-        children
-      );
 
-    return (
-      <Button
-        ref={ref}
-        className={cn(suggestionVariants[variant], className)}
-        onClick={(e) => {
-          onClick?.(e);
-          const text = value ?? (typeof children === "string" ? children : "");
-          if (text && onSelect) onSelect(text);
-        }}
-        {...props}
-      >
-        {rendered}
-      </Button>
-    );
-  },
-);
-
-Suggestion.displayName = "Suggestion";
+  return (
+    <Button
+      className={cn(suggestionVariants[variant], className)}
+      onClick={(e) => {
+        onClick?.(e);
+        const text = value ?? (typeof children === "string" ? children : "");
+        if (text && onSelect) onSelect(text);
+      }}
+      {...props}
+    >
+      {rendered}
+    </Button>
+  );
+}
 
 const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -158,126 +148,124 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE));
 }
 
-type SuggestionPanelProps = React.HTMLAttributes<HTMLDivElement> & {
+type SuggestionPanelProps = React.ComponentProps<"div"> & {
   onClose?: () => void;
 };
 
-const SuggestionPanel = React.forwardRef<HTMLDivElement, SuggestionPanelProps>(
-  ({ className, onClose, ...props }, ref) => {
-    const panelRef = React.useRef<HTMLDivElement>(null);
-    const mergedRef = React.useMemo(
-      () => (node: HTMLDivElement | null) => {
-        (panelRef as React.MutableRefObject<HTMLDivElement | null>).current =
-          node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      },
-      [ref],
-    );
+function SuggestionPanel({
+  className,
+  onClose,
+  ref,
+  ...props
+}: SuggestionPanelProps) {
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = React.useMemo(
+    () => (node: HTMLDivElement | null) => {
+      (panelRef as React.MutableRefObject<HTMLDivElement | null>).current =
+        node;
+      if (typeof ref === "function") ref(node);
+      else if (ref)
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    },
+    [ref],
+  );
 
-    React.useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") onClose?.();
-      };
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose?.();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
-    React.useEffect(() => {
-      const panel = panelRef.current;
-      if (!panel) return;
+  React.useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const focusable = getFocusableElements(panel);
+    if (focusable.length > 0) focusable[0].focus();
+  }, []);
+
+  React.useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
       const focusable = getFocusableElements(panel);
-      if (focusable.length > 0) focusable[0].focus();
-    }, []);
+      if (focusable.length === 0) return;
 
-    React.useEffect(() => {
-      const panel = panelRef.current;
-      if (!panel) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
 
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key !== "Tab") return;
-        const focusable = getFocusableElements(panel);
-        if (focusable.length === 0) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        const active = document.activeElement as HTMLElement | null;
-
-        if (e.shiftKey) {
-          if (active === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (active === last) {
-            e.preventDefault();
-            first.focus();
-          }
+      if (e.shiftKey) {
+        if (active === first) {
+          e.preventDefault();
+          last.focus();
         }
-      };
+      } else {
+        if (active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
 
-      panel.addEventListener("keydown", handleKeyDown);
-      return () => panel.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    panel.addEventListener("keydown", handleKeyDown);
+    return () => panel.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
-    return (
-      <div
-        ref={mergedRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Suggestions panel"
-        className={cn(
-          "absolute inset-x-0 -top-6.75 z-0 mx-auto flex w-[calc(100%-16px)] flex-col items-center justify-center gap-3 rounded-t-[6px] rounded-b-xl bg-gray-100 px-2 py-2 dark:border-white/10 dark:bg-gray-900",
-          className,
-        )}
-        {...props}
-      />
-    );
-  },
-);
+  return (
+    <div
+      ref={mergedRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Suggestions panel"
+      className={cn(
+        "absolute inset-x-0 -top-6.75 z-0 mx-auto flex w-[calc(100%-16px)] flex-col items-center justify-center gap-3 rounded-t-[6px] rounded-b-xl bg-gray-100 px-2 py-2 dark:border-white/10 dark:bg-gray-900",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
 
-SuggestionPanel.displayName = "SuggestionPanel";
+function SuggestionPanelHeader({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn("flex w-full items-center justify-between px-3", className)}
+      {...props}
+    />
+  );
+}
 
-const SuggestionPanelHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex w-full items-center justify-between px-3", className)}
-    {...props}
-  />
-));
-
-SuggestionPanelHeader.displayName = "SuggestionPanelHeader";
-
-const SuggestionPanelTitle = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center gap-1.5", className)}
-    {...props}
-  />
-));
-
-SuggestionPanelTitle.displayName = "SuggestionPanelTitle";
+function SuggestionPanelTitle({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("flex items-center gap-1.5", className)} {...props} />
+  );
+}
 
 type SuggestionPanelCloseProps =
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean;
   };
 
-const SuggestionPanelClose = React.forwardRef<
-  HTMLButtonElement,
-  SuggestionPanelCloseProps
->(({ asChild = false, className, "aria-label": _ariaLabel, ...props }, ref) => {
+function SuggestionPanelClose({
+  asChild = false,
+  className,
+  "aria-label": _ariaLabel,
+  ...props
+}: SuggestionPanelCloseProps) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
-      ref={ref}
       type={asChild ? undefined : "button"}
       aria-label="Close suggestions panel"
       className={cn(
@@ -287,23 +275,20 @@ const SuggestionPanelClose = React.forwardRef<
       {...props}
     />
   );
-});
-
-SuggestionPanelClose.displayName = "SuggestionPanelClose";
+}
 
 type SuggestionPanelContentProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
 };
 
-const SuggestionPanelContent = React.forwardRef<
-  HTMLDivElement,
-  SuggestionPanelContentProps
->(({ asChild = false, className, ...props }, ref) => {
+function SuggestionPanelContent({
+  asChild = false,
+  className,
+  ...props
+}: SuggestionPanelContentProps) {
   const Comp = asChild ? Slot : "div";
-  return <Comp ref={ref} className={cn("w-full", className)} {...props} />;
-});
-
-SuggestionPanelContent.displayName = "SuggestionPanelContent";
+  return <Comp className={cn("w-full", className)} {...props} />;
+}
 
 export {
   Suggestions,
