@@ -345,7 +345,7 @@ function ModelSelectorLabel({
       data-slot="model-selector-label"
       data-inset={inset}
       className={cn(
-        "px-2 py-1.5 text-xs font-medium data-inset:pl-8",
+        "px-3 py-1 text-xs font-[450] text-gray-400 data-inset:pl-8",
         className,
       )}
       {...props}

@@ -6,9 +6,15 @@ import {
   ModelSelector,
   ModelSelectorContent,
   ModelSelectorGroup,
+  ModelSelectorItem,
   ModelSelectorLabel,
+  ModelSelectorPortal,
   ModelSelectorRadioGroup,
   ModelSelectorRadioItem,
+  ModelSelectorSeparator,
+  ModelSelectorSub,
+  ModelSelectorSubContent,
+  ModelSelectorSubTrigger,
   ModelSelectorTrigger,
 } from "@/components/nexus-ui/model-selector";
 import ChatgptIcon from "@/components/svgs/chatgpt";
@@ -41,10 +47,11 @@ export default function ModelSelectorDefault() {
   return (
     <ModelSelector value={model} onValueChange={setModel} items={models} open>
       <ModelSelectorTrigger>
-        {/* <Button variant="outline" className="min-w-[180px] justify-between" /> */}
+
       </ModelSelectorTrigger>
       <ModelSelectorContent className="w-[264px]" align="start">
         <ModelSelectorGroup>
+          <ModelSelectorLabel>Select model</ModelSelectorLabel>
           <ModelSelectorRadioGroup value={model} onValueChange={setModel}>
             {models.map((m) => (
               <ModelSelectorRadioItem
@@ -56,6 +63,20 @@ export default function ModelSelectorDefault() {
               />
             ))}
           </ModelSelectorRadioGroup>
+        </ModelSelectorGroup>
+        <ModelSelectorGroup>
+          <ModelSelectorLabel>Select model</ModelSelectorLabel>
+          <ModelSelectorSub>
+            <ModelSelectorSubTrigger>All models</ModelSelectorSubTrigger>
+            <ModelSelectorPortal>
+              <ModelSelectorSubContent>
+                <ModelSelectorItem>GPT-4</ModelSelectorItem>
+                <ModelSelectorItem>GPT-4o Mini</ModelSelectorItem>
+                <ModelSelectorSeparator />
+                <ModelSelectorItem>Claude 3.5</ModelSelectorItem>
+              </ModelSelectorSubContent>
+            </ModelSelectorPortal>
+          </ModelSelectorSub>
         </ModelSelectorGroup>
       </ModelSelectorContent>
     </ModelSelector>
