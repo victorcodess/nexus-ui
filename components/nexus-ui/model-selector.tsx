@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { CheckIcon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  LockIcon,
+} from "lucide-react";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { cn } from "@/lib/utils";
@@ -139,7 +144,7 @@ function ModelSelectorContent({
         data-slot="model-selector-content"
         sideOffset={sideOffset}
         className={cn(
-          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-0.5 text-popover-foreground shadow-modal",
+          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal",
           className,
         )}
         {...props}
@@ -164,51 +169,22 @@ function ModelSelectorItem({
   className,
   inset,
   variant = "default",
-  icon: Icon,
-  title,
-  description,
-  children,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean;
   variant?: "default" | "destructive";
-  icon?: React.ComponentType<{ className?: string }>;
-  title?: string;
-  description?: string;
 }) {
-  const hasDefaultContent = Icon || title != null || description != null;
-
-  const defaultContent = hasDefaultContent ? (
-    <>
-      {Icon && (
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
-          <Icon className="size-4 text-muted-foreground" />
-        </span>
-      )}
-      <div className="min-w-0 flex-1">
-        {title != null && <p className="truncate font-medium">{title}</p>}
-        {description != null && (
-          <p className="truncate text-xs text-muted-foreground">
-            {description}
-          </p>
-        )}
-      </div>
-    </>
-  ) : null;
-
   return (
     <DropdownMenuPrimitive.Item
-      data-slot="model-selector-item"
+      data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "relative flex cursor-default items-center gap-2.5 rounded-md min-h-9 hover:bg-gray-100 py-3 pr-3 pl-3 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-inset:pl-8 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground data-[variant=destructive]:*:[svg]:text-destructive!",
+        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-md px-3 py-2 text-sm font-normal text-gray-900 outline-hidden select-none focus:bg-gray-100 focus:text-gray-900 data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
         className,
       )}
       {...props}
-    >
-      {children ?? defaultContent}
-    </DropdownMenuPrimitive.Item>
+    />
   );
 }
 
@@ -254,7 +230,7 @@ function ModelSelectorCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="model-selector-checkbox-item"
       className={cn(
-         "relative flex cursor-default items-center gap-2.5 rounded-md min-h-9 hover:bg-gray-100 py-3 pr-3 pl-3 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "relative flex min-h-9 cursor-default items-center gap-2.5 rounded-md py-3 pr-3 pl-3 text-sm outline-hidden select-none hover:bg-gray-100 focus:bg-gray-100 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       checked={checked}
@@ -287,6 +263,7 @@ function ModelSelectorRadioItem({
   icon: Icon,
   title,
   description,
+  disabled,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem> & {
   icon?: React.ComponentType<{ className?: string }>;
@@ -300,8 +277,10 @@ function ModelSelectorRadioItem({
           <Icon className="size-4" />
         </span>
       )}
-      <div className="min-w-0 flex-1 flex flex-col gap-0.25">
-        {title != null && <p className="truncate font-normal text-sm">{title}</p>}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.25">
+        {title != null && (
+          <p className="truncate text-sm font-normal">{title}</p>
+        )}
         {description != null && (
           <p className="truncate text-xs font-[350] text-gray-400">
             {description}
@@ -309,9 +288,13 @@ function ModelSelectorRadioItem({
         )}
       </div>
       <span className="pointer-events-none absolute right-3 flex size-4 items-center justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
-        </DropdownMenuPrimitive.ItemIndicator>
+        {disabled ? (
+          <LockIcon className="size-4" />
+        ) : (
+          <DropdownMenuPrimitive.ItemIndicator>
+            <CheckIcon className="size-4" />
+          </DropdownMenuPrimitive.ItemIndicator>
+        )}
       </span>
     </>
   );
@@ -320,8 +303,9 @@ function ModelSelectorRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="model-selector-radio-item"
       value={value}
+      disabled={disabled}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-md min-h-9 hover:bg-gray-100 py-2 pl-3 pr-9 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-2 pr-9 pl-3 text-sm outline-hidden select-none hover:bg-gray-100 focus:bg-gray-100 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       {...props}
@@ -345,7 +329,7 @@ function ModelSelectorLabel({
       data-slot="model-selector-label"
       data-inset={inset}
       className={cn(
-        "px-3 py-1 text-xs font-[450] text-gray-400 data-inset:pl-8",
+        "px-3 py-2 text-xs font-[450] text-gray-400 data-inset:pl-8",
         className,
       )}
       {...props}
@@ -362,23 +346,8 @@ function ModelSelectorSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="model-selector-separator"
-      className={cn("-mx-1 my-1 h-px bg-border", className)}
-      {...props}
-    />
-  );
-}
-
-ModelSelectorSeparator.displayName = "ModelSelectorSeparator";
-
-function ModelSelectorShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
-  return (
-    <span
-      data-slot="model-selector-shortcut"
       className={cn(
-        "ml-auto text-xs tracking-widest text-muted-foreground",
+        "mx-auto my-2 h-px w-[calc(100%-24px)] bg-gray-200",
         className,
       )}
       {...props}
@@ -386,7 +355,7 @@ function ModelSelectorShortcut({
   );
 }
 
-ModelSelectorShortcut.displayName = "ModelSelectorShortcut";
+ModelSelectorSeparator.displayName = "ModelSelectorSeparator";
 
 function ModelSelectorSub({
   ...props
@@ -411,7 +380,7 @@ function ModelSelectorSubTrigger({
       data-slot="model-selector-sub-trigger"
       data-inset={inset}
       className={cn(
-        "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-inset:pl-8 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+        "flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none focus:bg-gray-100 focus:text-accent-foreground data-inset:pl-8 data-[state=open]:bg-gray-100 data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-gray-900",
         className,
       )}
       {...props}
@@ -432,7 +401,7 @@ function ModelSelectorSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="model-selector-sub-content"
       className={cn(
-        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal",
         className,
       )}
       {...props}
@@ -454,7 +423,6 @@ export {
   ModelSelectorRadioGroup,
   ModelSelectorRadioItem,
   ModelSelectorSeparator,
-  ModelSelectorShortcut,
   ModelSelectorSub,
   ModelSelectorSubTrigger,
   ModelSelectorSubContent,
