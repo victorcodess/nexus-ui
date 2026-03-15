@@ -8,7 +8,9 @@
 
 <p align="center">
   <a href="https://nexus-ui.dev">Documentation</a> ·
-  <a href="https://nexus-ui.dev/docs/components/prompt-input">Components</a>
+  <a href="https://nexus-ui.dev/docs/components/prompt-input">Prompt Input</a> ·
+  <a href="https://nexus-ui.dev/docs/components/model-selector">Model Selector</a> ·
+  <a href="https://nexus-ui.dev/docs/components/suggestions">Suggestions</a>
 </p>
 
 ---
@@ -25,10 +27,11 @@ Copy-paste components into your project. You own the code.
 
 ## Components
 
-| Component     | Description                                                        |
-| ------------- | ------------------------------------------------------------------ |
-| `PromptInput` | Composable chat input with auto-resizing textarea and action slots |
-| `Suggestions` | Prompt suggestion chips for guiding user input                     |
+| Component       | Description                                                                 |
+| --------------- | --------------------------------------------------------------------------- |
+| `PromptInput`   | Composable chat input with auto-resizing textarea and action slots          |
+| `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and items     |
+| `Suggestions`   | Prompt suggestion chips for guiding user input                              |
 
 ## Quick Start
 
@@ -52,6 +55,7 @@ Then add components:
 
 ```bash
 npx shadcn@latest add @nexus-ui/prompt-input
+npx shadcn@latest add @nexus-ui/model-selector
 npx shadcn@latest add @nexus-ui/suggestions
 ```
 
@@ -59,6 +63,7 @@ Or install directly via URL without any config:
 
 ```bash
 npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+npx shadcn@latest add https://nexus-ui.dev/r/model-selector.json
 npx shadcn@latest add https://nexus-ui.dev/r/suggestions.json
 ```
 
