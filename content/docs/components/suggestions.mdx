@@ -842,6 +842,128 @@ export default function SuggestionWithPanel() {
 </Tab>
 </Tabs>
 
+## Vercel AI SDK Integration
+
+Combine Suggestions with [Prompt Input](/docs/components/prompt-input) and the [Vercel AI SDK](https://sdk.vercel.ai) for a chat interface with quick-start prompts.
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+</Step>
+<Step>
+<h3>Create your chat API route</h3>
+
+See [Prompt Input docs](/docs/components/prompt-input#vercel-ai-sdk-integration) for the route implementation.
+</Step>
+<Step>
+<h3>Wire Suggestions + Prompt Input to `useChat`</h3>
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { Button } from "@/components/ui/button";
+import PromptInput, {
+  PromptInputActions,
+  PromptInputAction,
+  PromptInputActionGroup,
+  PromptInputTextarea,
+} from "@/components/nexus-ui/prompt-input";
+import {
+  Suggestions,
+  SuggestionList,
+  Suggestion,
+} from "@/components/nexus-ui/suggestions";
+import { ArrowUp, Loader2, Paperclip } from "lucide-react";
+
+export default function ChatWithSuggestions() {
+  const { sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+  const [input, setInput] = useState("");
+  const isLoading = status !== "ready";
+
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (input.trim()) {
+            sendMessage({ text: input });
+            setInput("");
+          }
+        }}
+        className="w-full"
+      >
+        <PromptInput>
+          <PromptInputTextarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask anything..."
+            disabled={isLoading}
+          />
+          <PromptInputActions>
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+                  <Paperclip className="size-4" />
+                </Button>
+              </PromptInputAction>
+            </PromptInputActionGroup>
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <Button
+                  type="submit"
+                  className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <ArrowUp />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </PromptInputActionGroup>
+          </PromptInputActions>
+        </PromptInput>
+      </form>
+
+      <Suggestions onSelect={(value) => setInput(value)}>
+        <SuggestionList className="justify-center">
+          <Suggestion>What is AI?</Suggestion>
+          <Suggestion>Teach me Engineering from scratch</Suggestion>
+          <Suggestion>How to learn React?</Suggestion>
+          <Suggestion>Design a weekly workout plan</Suggestion>
+          <Suggestion>Places to visit in France</Suggestion>
+        </SuggestionList>
+      </Suggestions>
+    </div>
+  );
+}
+```
+
+For one-click submission (suggestion sends immediately without editing), call `sendMessage` in `onSelect`:
+
+```tsx
+<Suggestions
+  onSelect={(value) => {
+    if (value.trim()) {
+      sendMessage({ text: value });
+      setInput("");
+    }
+  }}
+>
+```
+</Step>
+</Steps>
+
 ## API Reference
 
 ### Suggestions

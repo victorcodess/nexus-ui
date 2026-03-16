@@ -474,6 +474,107 @@ export default function GeminiInput() {
 </Tab>
 </Tabs>
 
+## Vercel AI SDK Integration
+
+Connect Prompt Input to the [Vercel AI SDK](https://sdk.vercel.ai) for streaming chat interfaces.
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+</Step>
+<Step>
+<h3>Create your chat API route</h3>
+
+```ts title="app/api/chat/route.ts"
+import { convertToModelMessages, streamText, UIMessage } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: openai("gpt-4o-mini"),
+    system: "You are a helpful assistant.",
+    messages: await convertToModelMessages(messages),
+  });
+
+  return result.toUIMessageStreamResponse();
+}
+```
+</Step>
+<Step>
+<h3>Wire Prompt Input to `useChat`</h3>
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { Button } from "@/components/ui/button";
+import PromptInput, {
+  PromptInputActions,
+  PromptInputAction,
+  PromptInputActionGroup,
+  PromptInputTextarea,
+} from "@/components/nexus-ui/prompt-input";
+import { ArrowUp, Loader2 } from "lucide-react";
+
+export default function ChatWithPromptInput() {
+  const { sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+  const [input, setInput] = useState("");
+  const isLoading = status !== "ready";
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (input.trim()) {
+          sendMessage({ text: input });
+          setInput("");
+        }
+      }}
+      className="w-full"
+    >
+      <PromptInput>
+        <PromptInputTextarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask anything..."
+          disabled={isLoading}
+        />
+        <PromptInputActions>
+          <PromptInputActionGroup />
+          <PromptInputActionGroup>
+            <PromptInputAction asChild>
+              <Button
+                type="submit"
+                className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <ArrowUp />
+                )}
+              </Button>
+            </PromptInputAction>
+          </PromptInputActionGroup>
+        </PromptInputActions>
+      </PromptInput>
+    </form>
+  );
+}
+```
+</Step>
+</Steps>
+
 ## API Reference
 
 ### PromptInput
