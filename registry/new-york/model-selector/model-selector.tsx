@@ -87,11 +87,11 @@ ModelSelectorPortal.displayName = "ModelSelectorPortal";
 
 const triggerVariants = {
   filled:
-    "inline-flex h-8 items-center gap-1 rounded-full bg-gray-100 px-3 font-normal text-gray-900 outline-none hover:bg-gray-200 data-[state=open]:bg-gray-200",
+    "inline-flex h-8 items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-600 px-3 font-normal text-gray-900 dark:text-gray-100 outline-none hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700",
   outline:
-    "inline-flex h-8 items-center gap-1 rounded-full border border-gray-200 bg-transparent px-3 font-normal text-gray-900 outline-none hover:bg-gray-100 data-[state=open]:bg-gray-100",
+    "inline-flex h-8 items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 bg-transparent px-3 font-normal text-gray-900 dark:text-gray-100 outline-none hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700",
   ghost:
-    "inline-flex h-8 items-center gap-1 rounded-full bg-transparent px-3 font-normal text-gray-900 outline-none hover:bg-gray-100 data-[state=open]:bg-gray-100",
+    "inline-flex h-8 items-center gap-1 rounded-full bg-transparent px-3 font-normal text-gray-900 dark:text-gray-100 outline-none hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700",
 };
 
 function ModelSelectorTrigger({
@@ -154,7 +154,7 @@ function ModelSelectorContent({
         data-slot="model-selector-content"
         sideOffset={sideOffset}
         className={cn(
-          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal",
+          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white dark:bg-gray-600 dark:border-gray-700 p-1 text-popover-foreground shadow-modal",
           className,
         )}
         {...props}
@@ -190,7 +190,7 @@ function ModelSelectorItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-md px-3 py-2 text-sm font-normal text-gray-900 outline-hidden select-none focus:bg-gray-100 focus:text-gray-900 data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
+        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-md px-3 py-2 text-sm font-normal text-gray-900 dark:text-gray-100 outline-hidden select-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-gray-900 dark:focus:text-gray-100 data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
         className,
       )}
       {...props}
@@ -240,7 +240,7 @@ function ModelSelectorCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="model-selector-checkbox-item"
       className={cn(
-        "relative flex min-h-9 cursor-default items-center gap-2.5 rounded-md py-3 pr-3 pl-3 text-sm outline-hidden select-none hover:bg-gray-100 focus:bg-gray-100 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "relative flex min-h-9 cursor-default items-center gap-2.5 rounded-md py-3 pr-3 pl-3 text-sm outline-hidden select-none hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       checked={checked}
@@ -315,7 +315,7 @@ function ModelSelectorRadioItem({
       value={value}
       disabled={disabled}
       className={cn(
-        "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-2 pr-9 pl-3 text-sm outline-hidden select-none hover:bg-gray-100 focus:bg-gray-100 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "relative flex min-h-9 cursor-default items-center gap-2 rounded-md py-2 pr-9 pl-3 text-sm outline-hidden select-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       {...props}
@@ -357,7 +357,7 @@ function ModelSelectorSeparator({
     <DropdownMenuPrimitive.Separator
       data-slot="model-selector-separator"
       className={cn(
-        "mx-auto my-2 h-px w-[calc(100%-24px)] bg-gray-200",
+        "mx-auto my-2 h-px w-[calc(100%-24px)] bg-gray-200 dark:bg-gray-500",
         className,
       )}
       {...props}
@@ -390,7 +390,7 @@ function ModelSelectorSubTrigger({
       data-slot="model-selector-sub-trigger"
       data-inset={inset}
       className={cn(
-        "flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none focus:bg-gray-100 focus:text-accent-foreground data-inset:pl-8 data-[state=open]:bg-gray-100 data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-gray-900",
+        "flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm outline-hidden select-none focus:bg-gray-100 dark:focus:bg-gray-700 focus:text-accent-foreground data-inset:pl-8 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700 data-[state=open]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-gray-900 dark:[&_svg:not([class*='text-'])]:text-gray-100",
         className,
       )}
       {...props}
@@ -411,7 +411,7 @@ function ModelSelectorSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="model-selector-sub-content"
       className={cn(
-        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-600 p-1 text-popover-foreground shadow-modal",
         className,
       )}
       {...props}
