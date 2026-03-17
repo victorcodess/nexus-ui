@@ -46,12 +46,22 @@ Add the Nexus UI registry to your `components.json`:
 ```json
 {
   "registries": {
-    "@nexus-ui": "https://nexus-ui.dev/r/{name}.json"
+    "@nexus-ui": "https://nexus-ui.dev/api/registry/{name}.json"
   }
 }
 ```
 
-Then add components:
+Then add components using either method:
+
+**Option 1: Nexus UI CLI (recommended)**
+
+```bash
+npx nexus-ui@latest
+# or add specific components
+npx nexus-ui@latest add prompt-input model-selector suggestions
+```
+
+**Option 2: shadcn CLI**
 
 ```bash
 npx shadcn@latest add @nexus-ui/prompt-input
@@ -62,9 +72,7 @@ npx shadcn@latest add @nexus-ui/suggestions
 Or install directly via URL without any config:
 
 ```bash
-npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
-npx shadcn@latest add https://nexus-ui.dev/r/model-selector.json
-npx shadcn@latest add https://nexus-ui.dev/r/suggestions.json
+npx shadcn@latest add https://nexus-ui.dev/api/registry/prompt-input.json
 ```
 
 ## Usage

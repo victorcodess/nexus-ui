@@ -1,0 +1,20 @@
+{
+  "name": "nexus-ui",
+  "version": "0.0.1",
+  "description": "CLI for installing Nexus UI components via the shadcn registry",
+  "homepage": "https://nexus-ui.dev",
+  "license": "MIT",
+  "author": "Nexus UI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nexus-ui/nexus-ui.git",
+    "directory": "packages/nexus-ui-cli"
+  },
+  "bin": {
+    "nexus-ui": "index.js"
+  },
+  "files": ["index.js", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=18"
+  }
+}
