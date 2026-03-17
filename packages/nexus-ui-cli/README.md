@@ -7,7 +7,7 @@ CLI for installing [Nexus UI](https://nexus-ui.dev) components via the shadcn re
 Use directly with npx (no install required):
 
 ```bash
-npx nexus-ui@latest
+npx nexus-ui-cli@latest
 ```
 
 ## Usage
@@ -15,16 +15,16 @@ npx nexus-ui@latest
 ### Install all components
 
 ```bash
-npx nexus-ui@latest
+npx nexus-ui-cli@latest
 # or
-npx nexus-ui@latest add all
+npx nexus-ui-cli@latest add all
 ```
 
 ### Install specific components
 
 ```bash
-npx nexus-ui@latest add prompt-input
-npx nexus-ui@latest add prompt-input suggestions model-selector
+npx nexus-ui-cli@latest add prompt-input
+npx nexus-ui-cli@latest add prompt-input suggestions model-selector
 ```
 
 ### Alternative: Use shadcn CLI directly

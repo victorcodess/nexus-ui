@@ -56,9 +56,9 @@ Then add components using either method:
 **Option 1: Nexus UI CLI (recommended)**
 
 ```bash
-npx nexus-ui@latest
+npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui@latest add prompt-input model-selector suggestions
+npx nexus-ui-cli@latest add prompt-input model-selector suggestions
 ```
 
 **Option 2: shadcn CLI**

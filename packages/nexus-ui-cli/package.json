@@ -1,5 +1,5 @@
 {
-  "name": "nexus-ui",
+  "name": "nexus-ui-cli",
   "version": "0.0.1",
   "description": "CLI for installing Nexus UI components via the shadcn registry",
   "homepage": "https://nexus-ui.dev",
@@ -11,7 +11,7 @@
     "directory": "packages/nexus-ui-cli"
   },
   "bin": {
-    "nexus-ui": "index.js"
+    "nexus-ui-cli": "index.js"
   },
   "files": ["index.js", "README.md", "LICENSE"],
   "engines": {
