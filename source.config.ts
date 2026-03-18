@@ -9,7 +9,9 @@ export const docs = defineDocs({
   docs: {
     schema: pageSchema,
     postprocess: {
-      includeProcessedMarkdown: true,
+      // Disabled: causes ~12GB heap during Turbopack compilation.
+      // Re-enable if you need /llms-full.txt or /llms.mdx/docs/... routes.
+      includeProcessedMarkdown: false,
     },
   },
   meta: {
