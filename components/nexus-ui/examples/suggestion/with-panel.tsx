@@ -80,12 +80,26 @@ const categories = [
 
 export default function SuggestionWithPanel() {
   const [input, setInput] = useState("");
+  const [open, setOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const active = categories.find((c) => c.label === activeCategory);
 
-  const closePanel = useCallback(() => {
+  const handleCategoryClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, category: string) => {
+      triggerRef.current = e.currentTarget;
+      setActiveCategory(activeCategory === category ? null : category);
+      setOpen(activeCategory === category ? false : true);
+    },
+    [activeCategory],
+  );
+
+  const handleOpenChange = useCallback((next: boolean) => {
+    setOpen(next);
+  }, []);
+
+  const handleClose = useCallback(() => {
     triggerRef.current?.focus();
     setActiveCategory(null);
   }, []);
@@ -122,12 +136,7 @@ export default function SuggestionWithPanel() {
               <Suggestion
                 key={category.label}
                 variant="default"
-                onClick={(e) => {
-                  triggerRef.current = e.currentTarget;
-                  setActiveCategory(
-                    activeCategory === category.label ? null : category.label,
-                  );
-                }}
+                onClick={(e) => handleCategoryClick(e, category.label)}
               >
                 <category.icon className="size-3.5" />
                 {category.label}
@@ -136,26 +145,31 @@ export default function SuggestionWithPanel() {
           </SuggestionList>
         </Suggestions>
 
-        {active && (
-          <SuggestionPanel onClose={closePanel}>
-            <SuggestionPanelHeader>
-              <SuggestionPanelTitle>
-                <active.icon className="size-3.5 text-gray-400" />
-                <span className="text-[13px] font-[350] text-gray-400">
-                  {active.label}
-                </span>
-              </SuggestionPanelTitle>
-              <SuggestionPanelClose onClick={closePanel}>
-                <X className="size-3.5" />
-              </SuggestionPanelClose>
-            </SuggestionPanelHeader>
-            <SuggestionPanelContent>
-              <Suggestions
-                onSelect={(value) => {
-                  setInput(value);
-                  closePanel();
-                }}
-              >
+        <SuggestionPanel
+          open={open}
+          onOpenChange={handleOpenChange}
+          onClose={handleClose}
+        >
+          {active && (
+            <>
+              <SuggestionPanelHeader>
+                <SuggestionPanelTitle>
+                  <active.icon className="size-3.5 text-gray-400" />
+                  <span className="text-[13px] font-[350] text-gray-400">
+                    {active.label}
+                  </span>
+                </SuggestionPanelTitle>
+                <SuggestionPanelClose>
+                  <X className="size-3.5" />
+                </SuggestionPanelClose>
+              </SuggestionPanelHeader>
+              <SuggestionPanelContent>
+                <Suggestions
+                  onSelect={(value) => {
+                    setInput(value);
+                    setOpen(false);
+                  }}
+                >
                 <SuggestionList orientation="vertical" className="gap-2">
                   {active.suggestions.map((text) => (
                     <Suggestion
@@ -172,8 +186,9 @@ export default function SuggestionWithPanel() {
                 </SuggestionList>
               </Suggestions>
             </SuggestionPanelContent>
-          </SuggestionPanel>
-        )}
+            </>
+          )}
+        </SuggestionPanel>
       </div>
     </div>
   );
