@@ -58,12 +58,12 @@ export default function ModelSelectorWithPromptInput() {
       <PromptInputActions>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <Paperclip className="size-4" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <Image className="size-4" />
             </Button>
           </PromptInputAction>
@@ -76,7 +76,7 @@ export default function ModelSelectorWithPromptInput() {
               items={models}
             >
               <ModelSelectorTrigger variant="ghost" />
-              <ModelSelectorContent className="w-[264px]" align="start">
+              <ModelSelectorContent className="w-[264px]" align="end">
                 <ModelSelectorGroup>
                   <ModelSelectorLabel>Select model</ModelSelectorLabel>
                   <ModelSelectorRadioGroup
@@ -98,7 +98,7 @@ export default function ModelSelectorWithPromptInput() {
             </ModelSelector>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <Mic className="size-4" />
             </Button>
           </PromptInputAction>

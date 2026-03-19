@@ -7,9 +7,29 @@ import {
   ChevronRightIcon,
   LockIcon,
 } from "lucide-react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { cn } from "@/lib/utils";
+
+const triggerVariants = cva(
+  "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 font-normal text-gray-900 dark:text-gray-100 outline-none transition-colors duration-200 ease-out [&>svg:last-child]:transition-transform [&>svg:last-child]:duration-200 data-[state=open]:[&>svg:last-child]:rotate-180",
+  {
+    variants: {
+      variant: {
+        filled:
+          "bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700",
+        outline:
+          "border border-gray-200 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700",
+        ghost:
+          "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700",
+      },
+    },
+    defaultVariants: {
+      variant: "filled",
+    },
+  },
+);
 
 export type ModelItemData = {
   icon?: React.ComponentType<{ className?: string }>;
@@ -85,24 +105,14 @@ function ModelSelectorPortal({
 
 ModelSelectorPortal.displayName = "ModelSelectorPortal";
 
-const triggerVariants = {
-  filled:
-    "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-600 px-3 font-normal text-gray-900 dark:text-gray-100 outline-none transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 [&>svg:last-child]:transition-transform [&>svg:last-child]:duration-200 data-[state=open]:[&>svg:last-child]:rotate-180",
-  outline:
-    "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 bg-transparent px-3 font-normal text-gray-900 dark:text-gray-100 outline-none transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700 [&>svg:last-child]:transition-transform [&>svg:last-child]:duration-200 data-[state=open]:[&>svg:last-child]:rotate-180",
-  ghost:
-    "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full bg-transparent px-3 font-normal text-gray-900 dark:text-gray-100 outline-none transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-700 [&>svg:last-child]:transition-transform [&>svg:last-child]:duration-200 data-[state=open]:[&>svg:last-child]:rotate-180",
-};
-
 function ModelSelectorTrigger({
   className,
   children,
   asChild,
   variant = "filled",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger> & {
-  variant?: "filled" | "outline" | "ghost";
-}) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger> &
+  VariantProps<typeof triggerVariants>) {
   const { value, items } = useModelSelectorContext();
   const selected = items.get(value);
 
@@ -133,7 +143,7 @@ function ModelSelectorTrigger({
       data-slot="model-selector-trigger"
       data-variant={variant}
       asChild={asChild}
-      className={cn(triggerVariants[variant], className)}
+      className={cn(triggerVariants({ variant }), className)}
       {...props}
     >
       {triggerContent}
@@ -154,7 +164,7 @@ function ModelSelectorContent({
         data-slot="model-selector-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden dark:border-gray-700 dark:bg-gray-600 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=closed]:duration-0 dark:border-gray-700 dark:bg-gray-600 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className,
         )}
         {...props}
@@ -411,7 +421,7 @@ function ModelSelectorSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="model-selector-sub-content"
       className={cn(
-        "z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-gray-700 dark:bg-gray-600 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+        "z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-lg border border-gray-200 bg-white p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:duration-0 dark:border-gray-700 dark:bg-gray-600 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
         className,
       )}
       {...props}
