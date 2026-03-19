@@ -144,7 +144,6 @@ trigger to show the selection (e.g. "Select models", "GPT-4", or "3 models").
 ### With Prompt Input
 
 Place the model selector in a `PromptInputActionGroup` alongside attach, image, mic, and send buttons.
-Use `variant="outline"` for a lighter look that fits the input bar.
 
 <DemoWithCode src="components/nexus-ui/examples/model-selector/with-prompt-input.tsx">
   <ModelSelectorWithPromptInput />
@@ -170,6 +169,7 @@ Use the Model Selector with the [Vercel AI SDK](https://sdk.vercel.ai) to let us
 ```bash
 npm install ai @ai-sdk/react @ai-sdk/openai
 ```
+
 </Step>
 <Step>
 <h3>Create your chat API route</h3>
@@ -193,6 +193,7 @@ export async function POST(req: Request) {
   return result.toUIMessageStreamResponse();
 }
 ```
+
 </Step>
 <Step>
 <h3>Wire Model Selector + Prompt Input to `useChat`</h3>
@@ -306,6 +307,7 @@ export default function ChatWithModelSelector() {
   );
 }
 ```
+
 </Step>
 </Steps>
 
@@ -349,12 +351,14 @@ Supports `asChild` to merge into a child element (e.g. Button).
     variant: {
       type: '"filled" | "outline" | "ghost"',
       default: '"filled"',
-      description: "Visual style. Use outline or ghost when placing inside a prompt input or dense UI.",
+      description:
+        "Visual style. Use outline or ghost when placing inside a prompt input or dense UI.",
     },
     asChild: {
       type: "boolean",
       default: "false",
-      description: "When true, merges props onto the child element instead of rendering a button.",
+      description:
+        "When true, merges props onto the child element instead of rendering a button.",
     },
   }}
 />
@@ -368,12 +372,14 @@ A plain menu item (no selection state). Use for toggles, links, or actions.
     inset: {
       type: "boolean",
       default: "false",
-      description: "Adds left padding for alignment with items that have icons.",
+      description:
+        "Adds left padding for alignment with items that have icons.",
     },
     variant: {
       type: '"default" | "destructive"',
       default: '"default"',
-      description: "Visual variant. Use destructive for delete or dangerous actions.",
+      description:
+        "Visual variant. Use destructive for delete or dangerous actions.",
     },
   }}
 />
@@ -411,7 +417,8 @@ A radio-style item for single selection. Shows a check when selected, or a lock 
   type={{
     value: {
       type: "string",
-      description: "The value for this option. Must be unique within the RadioGroup.",
+      description:
+        "The value for this option. Must be unique within the RadioGroup.",
     },
     disabled: {
       type: "boolean",

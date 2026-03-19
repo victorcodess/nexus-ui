@@ -177,9 +177,8 @@ export default function ChatWithPromptInput() {
   const isLoading = status !== "ready";
 
   const handleSubmit = useCallback(
-    (e?: React.FormEvent) => {
-      e?.preventDefault();
-      const trimmed = input.trim();
+    (value?: string) => {
+      const trimmed = (value ?? input).trim();
       if (trimmed) {
         sendMessage({ text: trimmed });
         setInput("");
@@ -189,7 +188,7 @@ export default function ChatWithPromptInput() {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="w-full">
       <PromptInput onSubmit={handleSubmit}>
         <PromptInputTextarea
           value={input}
@@ -233,9 +232,9 @@ The root container that wraps the textarea and action bar.
 <TypeTable
   type={{
     onSubmit: {
-      type: "(value: string) => void",
+      type: "(value: string) => void (optional)",
       description:
-        "Called when Enter is pressed in the textarea (without Shift). Use with value/onChange on PromptInputTextarea for controlled mode. Shift+Enter inserts a new line.",
+        "Called when Enter is pressed in the textarea (without Shift). Receives the current textarea value. Use with value/onChange on PromptInputTextarea for controlled mode. Shift+Enter inserts a new line.",
     },
     className: {
       type: "string",
@@ -245,10 +244,6 @@ The root container that wraps the textarea and action bar.
       type: "React.MouseEventHandler<HTMLDivElement>",
       description:
         "Called after the internal click handler. The internal handler focuses the textarea when clicking non-interactive areas.",
-    },
-    ref: {
-      type: "React.Ref<HTMLDivElement>",
-      description: "Forwarded ref to the root div element.",
     },
   }}
 />
@@ -265,7 +260,12 @@ An auto-resizing textarea wrapped in a scroll area. Accepts all standard `textar
     },
     disabled: {
       type: "boolean",
+      default: "false",
       description: "Disables the textarea (e.g. while the AI is responding).",
+    },
+    onChange: {
+      type: "React.ChangeEventHandler<HTMLTextAreaElement>",
+      description: "Called when the value changes. Use with value for controlled mode.",
     },
     onKeyDown: {
       type: "React.KeyboardEventHandler<HTMLTextAreaElement>",
@@ -281,6 +281,10 @@ An auto-resizing textarea wrapped in a scroll area. Accepts all standard `textar
       description:
         "Forwarded ref to the textarea element. Merged with the internal ref used for click-to-focus.",
     },
+    value: {
+      type: "string",
+      description: "Controlled value. Use with onChange for controlled mode.",
+    },
   }}
 />
 
@@ -294,10 +298,6 @@ A flex container for action buttons. Uses `justify-between` to position child gr
       type: "string",
       description: "Additional CSS classes to apply to the actions container.",
     },
-    ref: {
-      type: "React.Ref<HTMLDivElement>",
-      description: "Forwarded ref to the actions div element.",
-    },
   }}
 />
 
@@ -310,10 +310,6 @@ Groups related action buttons together with a horizontal layout.
     className: {
       type: "string",
       description: "Additional CSS classes to apply to the group.",
-    },
-    ref: {
-      type: "React.Ref<HTMLDivElement>",
-      description: "Forwarded ref to the group div element.",
     },
   }}
 />
@@ -333,10 +329,6 @@ A wrapper for individual action buttons. Supports polymorphism via `asChild`.
     className: {
       type: "string",
       description: "Additional CSS classes to apply to the action.",
-    },
-    ref: {
-      type: "React.Ref<HTMLDivElement>",
-      description: "Forwarded ref to the action element.",
     },
   }}
 />
