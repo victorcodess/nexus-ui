@@ -213,6 +213,7 @@ export default function ChatWithPromptInput() {
   );
 }
 ```
+
 </Step>
 </Steps>
 
@@ -227,6 +228,10 @@ The root container that wraps the textarea and action bar.
     className: {
       type: "string",
       description: "Additional CSS classes to apply to the container.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLDivElement>",
+      description: "Called after the internal click handler. The internal handler focuses the textarea when clicking non-interactive areas.",
     },
     ref: {
       type: "React.Ref<HTMLDivElement>",
@@ -252,7 +257,7 @@ An auto-resizing textarea wrapped in a scroll area. Accepts all standard `textar
     },
     ref: {
       type: "React.Ref<HTMLTextAreaElement>",
-      description: "Forwarded ref to the textarea element.",
+      description: "Forwarded ref to the textarea element. Merged with the internal ref used for click-to-focus.",
     },
   }}
 />
@@ -300,7 +305,8 @@ A wrapper for individual action buttons. Supports polymorphism via `asChild`.
     asChild: {
       type: "boolean",
       default: "false",
-      description: "When true, merges props onto the child element instead of rendering a wrapper div. Uses Radix UI Slot.",
+      description:
+        "When true, merges props onto the child element instead of rendering a wrapper div. Uses Radix UI Slot.",
     },
     className: {
       type: "string",
