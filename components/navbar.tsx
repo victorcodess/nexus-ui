@@ -27,23 +27,13 @@ export function Navbar({ navItems = [] }: NavbarProps) {
   }, [pathname, closeSidebar]);
 
   useEffect(() => {
-    const nav = document.getElementById("nd-nav");
     if (sidebarOpen) {
-      const scrollbarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
-      const px = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = px;
-      if (nav) nav.style.paddingRight = px;
     } else {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
-      if (nav) nav.style.paddingRight = "";
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
-      if (nav) nav.style.paddingRight = "";
     };
   }, [sidebarOpen]);
 
@@ -274,7 +264,7 @@ function MobileSidebar({
               rel="noreferrer noopener"
               target="_blank"
               aria-label="GitHub"
-              className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+              className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
             >
               <GithubIcon className="size-4.5" />
             </a>
@@ -283,7 +273,7 @@ function MobileSidebar({
               rel="noreferrer noopener"
               target="_blank"
               aria-label="X / Twitter"
-              className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+              className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
             >
               <XIcon className="size-4.5" />
             </a>

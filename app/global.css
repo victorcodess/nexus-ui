@@ -142,8 +142,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scrollbar-gutter: stable;
+  }
   body {
     @apply bg-white text-foreground dark:bg-gray-900;
+  }
+  /* Prevent Radix from adding scrollbar compensation (we use overflow-y: scroll instead) */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
   }
 }
 

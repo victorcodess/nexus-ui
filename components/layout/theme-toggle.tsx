@@ -34,7 +34,7 @@ export function SmallThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center rounded-full text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900",
+        "inline-flex cursor-pointer items-center justify-center rounded-full text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100",
         className,
       )}
       aria-label="Toggle Theme"
