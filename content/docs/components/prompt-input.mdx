@@ -126,6 +126,7 @@ Connect Prompt Input to the [Vercel AI SDK](https://sdk.vercel.ai) for streaming
 ```bash
 npm install ai @ai-sdk/react @ai-sdk/openai
 ```
+
 </Step>
 <Step>
 <h3>Create your chat API route</h3>
@@ -146,6 +147,7 @@ export async function POST(req: Request) {
   return result.toUIMessageStreamResponse();
 }
 ```
+
 </Step>
 <Step>
 <h3>Wire Prompt Input to `useChat`</h3>
@@ -231,7 +233,8 @@ The root container that wraps the textarea and action bar.
     },
     onClick: {
       type: "React.MouseEventHandler<HTMLDivElement>",
-      description: "Called after the internal click handler. The internal handler focuses the textarea when clicking non-interactive areas.",
+      description:
+        "Called after the internal click handler. The internal handler focuses the textarea when clicking non-interactive areas.",
     },
     ref: {
       type: "React.Ref<HTMLDivElement>",
@@ -257,7 +260,8 @@ An auto-resizing textarea wrapped in a scroll area. Accepts all standard `textar
     },
     ref: {
       type: "React.Ref<HTMLTextAreaElement>",
-      description: "Forwarded ref to the textarea element. Merged with the internal ref used for click-to-focus.",
+      description:
+        "Forwarded ref to the textarea element. Merged with the internal ref used for click-to-focus.",
     },
   }}
 />
