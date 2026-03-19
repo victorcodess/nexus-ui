@@ -11,49 +11,9 @@ import PromptInputWithTooltips from "@/components/nexus-ui/examples/prompt-input
 
 A flexible, composable input component for building chat interfaces. Includes an auto-resizing textarea with scroll support and customizable action slots for buttons like send, attach, and more.
 
-<Tabs items={["Preview", "Code"]} className="my-10">
-<Tab value="Preview">
-<ReviewContainer>
-<PromptInputDefault />
-</ReviewContainer>
-</Tab>
-<Tab value="Code">
-```tsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip } from "lucide-react";
-
-export default function ChatInput() {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full border-none bg-transparent hover:bg-gray-200">
-              <Paperclip />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-}
-```
-</Tab>
-</Tabs>
+<DemoWithCode src="components/nexus-ui/examples/prompt-input/default.tsx">
+  <PromptInputDefault />
+</DemoWithCode>
 
 ## Installation
 
@@ -87,110 +47,7 @@ bunx shadcn@latest add @nexus-ui/prompt-input
 <Step>
 <h3>Copy and paste the following code into your project.</h3>
 
-```tsx title="components/nexus-ui/prompt-input.tsx"
-"use client";
-
-import * as React from "react";
-import { Slot } from "radix-ui";
-
-import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea, ScrollViewport } from "@/components/ui/scroll-area";
-
-type PromptInputProps = React.HTMLAttributes<HTMLDivElement>;
-
-const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "flex h-auto w-full flex-col gap-0 rounded-[24px] border border-border-primary bg-surface-elevated",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
-
-PromptInput.displayName = "PromptInput";
-
-type PromptInputTextareaProps = React.ComponentProps<typeof Textarea>;
-
-const PromptInputTextarea = React.forwardRef<
-  HTMLTextAreaElement,
-  PromptInputTextareaProps
->(({ className, ...props }, ref) => (
-  <ScrollArea className="max-h-40">
-    <ScrollViewport>
-      <Textarea
-        ref={ref}
-        placeholder="How can I help you today?"
-        className={cn(
-          "min-h-14 w-full resize-none border-0 bg-transparent px-4 py-4 text-sm leading-6 font-normal text-gray-900 shadow-none outline-none placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent dark:text-white",
-          className,
-        )}
-        {...props}
-      />
-    </ScrollViewport>
-  </ScrollArea>
-));
-
-PromptInputTextarea.displayName = "PromptInputTextarea";
-
-type PromptInputActionsProps = React.HTMLAttributes<HTMLDivElement>;
-
-const PromptInputActions = React.forwardRef<
-  HTMLDivElement,
-  PromptInputActionsProps
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "flex w-full shrink-0 items-center justify-between px-2 py-2",
-      className,
-    )}
-    {...props}
-  />
-));
-
-PromptInputActions.displayName = "PromptInputActions";
-
-type PromptInputActionGroupProps = React.HTMLAttributes<HTMLDivElement>;
-
-const PromptInputActionGroup = React.forwardRef<
-  HTMLDivElement,
-  PromptInputActionGroupProps
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex gap-2", className)} {...props} />
-));
-
-PromptInputActionGroup.displayName = "PromptInputActionGroup";
-
-type PromptInputActionProps = React.HTMLAttributes<HTMLDivElement> & {
-  asChild?: boolean;
-};
-
-const PromptInputAction = React.forwardRef<
-  HTMLDivElement,
-  PromptInputActionProps
->(({ asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot.Root : "div";
-
-  return <Comp ref={ref} {...props} />;
-});
-
-PromptInputAction.displayName = "PromptInputAction";
-
-export {
-  PromptInput,
-  PromptInputTextarea,
-  PromptInputActions,
-  PromptInputActionGroup,
-  PromptInputAction,
-};
-
-export default PromptInput;
-```
+<ComponentSource src="registry/new-york/prompt-input/prompt-input.tsx" title="components/nexus-ui/prompt-input.tsx" />
 </Step>
 <Step>
 <h3>Update the import paths to match your project setup.</h3>
@@ -230,249 +87,33 @@ import PromptInput, {
 
 A minimal prompt input with just a textarea and send button.
 
-<Tabs items={["Preview", "Code"]}>
-<Tab value="Preview">
-<ReviewContainer>
-<PromptInputBasic />
-</ReviewContainer>
-</Tab>
-<Tab value="Code">
-```tsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp } from "lucide-react";
-
-export default function PromptInputBasic() {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup />
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-}
-```
-</Tab>
-</Tabs>
+<DemoWithCode src="components/nexus-ui/examples/prompt-input/basic.tsx">
+  <PromptInputBasic />
+</DemoWithCode>
 
 ### With Multiple Actions
 
 Combine multiple action buttons in a single group.
 
-<Tabs items={["Preview", "Code"]}>
-<Tab value="Preview">
-<ReviewContainer>
-<PromptInputMultipleActions />
-</ReviewContainer>
-</Tab>
-<Tab value="Code">
-```tsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Mic, Paperclip } from "lucide-react";
-
-export default function PromptInputMultipleActions() {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-              <Paperclip className="size-4" />
-            </Button>
-          </PromptInputAction>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-              <Mic className="size-4" />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-}
-```
-</Tab>
-</Tabs>
+<DemoWithCode src="components/nexus-ui/examples/prompt-input/multiple-actions.tsx">
+  <PromptInputMultipleActions />
+</DemoWithCode>
 
 ### With Tooltips
 
 Action buttons wrapped in shadcn tooltips for descriptive hover labels.
 
-<Tabs items={["Preview", "Code"]}>
-<Tab value="Preview">
-<ReviewContainer>
-<PromptInputWithTooltips />
-</ReviewContainer>
-</Tab>
-<Tab value="Code">
-```tsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ArrowUp, Image, Mic, Paperclip } from "lucide-react";
-
-export default function PromptInputWithTooltips() {
-  return (
-    <TooltipProvider delayDuration={200}>
-      <PromptInput>
-        <PromptInputTextarea />
-        <PromptInputActions>
-          <PromptInputActionGroup>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PromptInputAction asChild>
-                  <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-                    <Paperclip className="size-4" />
-                  </Button>
-                </PromptInputAction>
-              </TooltipTrigger>
-              <TooltipContent>Attach file</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PromptInputAction asChild>
-                  <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-                    <Image className="size-4" />
-                  </Button>
-                </PromptInputAction>
-              </TooltipTrigger>
-              <TooltipContent>Upload image</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PromptInputAction asChild>
-                  <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200">
-                    <Mic className="size-4" />
-                  </Button>
-                </PromptInputAction>
-              </TooltipTrigger>
-              <TooltipContent>Voice input</TooltipContent>
-            </Tooltip>
-          </PromptInputActionGroup>
-          <PromptInputActionGroup>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <PromptInputAction asChild>
-                  <Button className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800">
-                    <ArrowUp />
-                  </Button>
-                </PromptInputAction>
-              </TooltipTrigger>
-              <TooltipContent>Send message</TooltipContent>
-            </Tooltip>
-          </PromptInputActionGroup>
-        </PromptInputActions>
-      </PromptInput>
-    </TooltipProvider>
-  );
-}
-```
-</Tab>
-</Tabs>
+<DemoWithCode src="components/nexus-ui/examples/prompt-input/with-tooltips.tsx">
+  <PromptInputWithTooltips />
+</DemoWithCode>
 
 ### Gemini Style
 
 A variant inspired by Gemini's input design with custom icons and a model selector.
 
-<Tabs items={["Preview", "Code"]}>
-<Tab value="Preview">
-<ReviewContainer>
-<GeminiInput />
-</ReviewContainer>
-</Tab>
-<Tab value="Code">
-```tsx
-import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import {
-  GeminiAdd,
-  GeminiPageInfo,
-  GeminiMic,
-  GeminiCaret,
-} from "@/components/svgs/gemini-icons";
-
-export default function GeminiInput() {
-  return (
-    <PromptInput className="rounded-[32px] p-3 shadow-none dark:border-none">
-      <PromptInputTextarea
-        placeholder="Ask Gemini 3"
-        className="min-h-12 px-3 py-2.25 text-base! placeholder:text-base"
-      />
-      <PromptInputActions className="px-0 pt-2 pb-0">
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-10 rounded-full border-none bg-transparent text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiAdd className="size-5 text-[#5D5D5D]" />
-            </Button>
-          </PromptInputAction>
-          <PromptInputAction asChild>
-            <Button className="size-10 rounded-full border-none bg-transparent text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiPageInfo className="size-5 text-[#5D5D5D]" />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="h-10 gap-1.75 rounded-full border-none bg-transparent text-[13px] text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <span>Fast</span>
-              <GeminiCaret className="-mb-0.5 size-5 text-[#5D5D5D]" />
-            </Button>
-          </PromptInputAction>
-          <PromptInputAction asChild>
-            <Button className="size-10 rounded-full border-none bg-transparent text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiMic className="size-5 text-[#5D5D5D]" />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-}
-```
-</Tab>
-</Tabs>
+<DemoWithCode src="components/nexus-ui/examples/prompt-input/gemini-input.tsx">
+  <GeminiInput />
+</DemoWithCode>
 
 ## Vercel AI SDK Integration
 

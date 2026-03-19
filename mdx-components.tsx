@@ -12,6 +12,8 @@ import { Tab, Tabs } from "./components/tabs";
 import { TypeTable } from "./components/type-table";
 import { Step, Steps } from "./components/steps";
 import ReviewContainer from "@/components/preview-container";
+import { DemoWithCode } from "@/components/demo-with-code";
+import { ComponentSource } from "@/components/component-source";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -23,6 +25,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Steps,
     TypeTable,
     ReviewContainer,
+    DemoWithCode,
+    ComponentSource,
     CodeBlockTab,
     CodeBlockTabs,
     CodeBlockTabsList,
