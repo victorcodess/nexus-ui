@@ -255,7 +255,7 @@ function SuggestionPanel({
         data-state={open ? "open" : "closed"}
         onAnimationEnd={handleAnimationEnd}
         className={cn(
-          "absolute inset-x-0 -top-6.75 z-0 mx-auto flex w-[calc(100%-16px)] flex-col items-center justify-center gap-3 rounded-t-[6px] rounded-b-xl bg-gray-100 px-2 py-2 dark:border-white/10 dark:bg-gray-900 duration-200 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2",
+          "absolute inset-x-0 -top-7.5 z-0 mx-auto flex w-[calc(100%-16px)] flex-col items-center justify-center gap-3 rounded-t-0 rounded-b-[20px] bg-gray-100 px-2 py-3 dark:border-white/10 dark:bg-gray-900 duration-200 data-[state=closed]:duration-100 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2",
           className,
         )}
         {...props}

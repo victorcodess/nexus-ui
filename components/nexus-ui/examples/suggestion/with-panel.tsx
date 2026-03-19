@@ -106,7 +106,7 @@ export default function SuggestionWithPanel() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <PromptInput className="z-2">
+      <PromptInput className="z-2 shadow-sm">
         <PromptInputTextarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -155,7 +155,7 @@ export default function SuggestionWithPanel() {
               <SuggestionPanelHeader>
                 <SuggestionPanelTitle>
                   <active.icon className="size-3.5 text-gray-400" />
-                  <span className="text-[13px] font-[350] text-gray-400">
+                  <span className="text-[13px] font-normal text-gray-400">
                     {active.label}
                   </span>
                 </SuggestionPanelTitle>
