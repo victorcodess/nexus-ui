@@ -75,11 +75,30 @@ export function GeminiSend({ className }: { className?: string }) {
       viewBox="0 -960 960 960"
       width="24px"
       fill="none"
-      className={cn("size-4 -mr-1 text-gray-900 dark:text-gray-50", className)}
+      className={cn("-mr-1 size-4 text-gray-900 dark:text-gray-50", className)}
     >
       {/* Filled send icon - solid center, shallower notch, rounded outer corners */}
       <path
         d="M172-160 720-400Q920-480 720-560L172-802Q80-840 80-740L80-560 400-480 80-440 80-220Q80-120 172-160Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function GeminiCheck({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="24px"
+      viewBox="0 -960 960 960"
+      width="24px"
+      fill="none"
+      className={cn("text-gray-900 dark:text-gray-50", className)}
+    >
+      {/* Filled circle with checkmark (inverted from outlined) */}
+      <path
+        d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"
         fill="currentColor"
       />
     </svg>
