@@ -107,12 +107,13 @@ export async function generateMetadata(
       title: page.data.title,
       description: page.data.description ?? undefined,
       url: pageUrl,
-      images: getPageImage(page).url,
+      images: [{ url: getPageImage(page).url }],
     },
     twitter: {
       card: "summary_large_image",
       title: page.data.title,
       description: page.data.description ?? undefined,
+      images: [getPageImage(page).url],
     },
     alternates: {
       canonical: pageUrl,
