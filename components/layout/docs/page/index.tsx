@@ -168,7 +168,7 @@ export function DocsPage({
         data-full={full}
         className={cn(
           "mx-auto flex w-full max-w-[750px] flex-col gap-4 px-4 py-6 [grid-area:main] md:px-6 md:pt-8 xl:px-8 xl:pt-10",
-          full ? "max-w-[1168px]" : "xl:layout:[--fd-toc-width:222px]",
+          full ? "max-w-[1168px]" : "xl:layout:[--fd-toc-width:262px]",
           className,
         )}
       >
@@ -182,7 +182,7 @@ export function DocsPage({
         (tocReplace ?? (
           <div
             id="nd-toc"
-            className="sticky top-(--fd-docs-row-1) ms-auto flex h-(--fd-docs-height) w-(--fd-toc-width) flex-col gap-5 pe-5 pt-5 pb-2 [grid-area:toc] max-xl:hidden"
+            className="sticky top-(--fd-docs-row-1) ms-auto flex h-(--fd-docs-height) w-(--fd-toc-width) flex-col gap-5 pe-10 pt-5 pb-2 [grid-area:toc] max-xl:hidden"
           >
             {tocOptions.header}
             <div className="flex flex-col">
