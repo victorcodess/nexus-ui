@@ -149,6 +149,13 @@
   html:not(:has([data-page="home"])) {
     scrollbar-gutter: stable;
   }
+  
+  @media (max-width: 767px) {
+    html:has([data-page="home"]) {
+      scrollbar-gutter: stable;
+    }
+  }
+  
   body {
     @apply bg-white text-foreground dark:bg-gray-900;
   }

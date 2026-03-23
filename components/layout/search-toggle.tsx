@@ -1,19 +1,21 @@
-'use client';
-import type { ComponentProps } from 'react';
-import { Search } from 'lucide-react';
-import { useSearchContext } from 'fumadocs-ui/contexts/search';
-import { useI18n } from 'fumadocs-ui/contexts/i18n';
-import { cn } from '../../lib/cn';
-import { type ButtonProps, buttonVariants } from '../ui/button';
+"use client";
+import type { ComponentProps } from "react";
+import { useSearchContext } from "fumadocs-ui/contexts/search";
+import { useI18n } from "fumadocs-ui/contexts/i18n";
+import { cn } from "../../lib/cn";
+import { type ButtonProps, buttonVariants } from "../ui/button";
+import { Search01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
-interface SearchToggleProps extends Omit<ComponentProps<'button'>, 'variant'>, ButtonProps {
+interface SearchToggleProps
+  extends Omit<ComponentProps<"button">, "variant">, ButtonProps {
   hideIfDisabled?: boolean;
 }
 
 export function SearchToggle({
   hideIfDisabled,
-  size = 'icon-sm',
-  variant = 'ghost',
+  size = "icon-sm",
+  variant = "ghost",
   ...props
 }: SearchToggleProps) {
   const { setOpenSearch, enabled } = useSearchContext();
@@ -35,7 +37,7 @@ export function SearchToggle({
         setOpenSearch(true);
       }}
     >
-      <Search className="size-4.5" />
+      <HugeiconsIcon icon={Search01Icon} className="size-4.5" strokeWidth={2} />
     </button>
   );
 }
@@ -43,7 +45,7 @@ export function SearchToggle({
 export function LargeSearchToggle({
   hideIfDisabled,
   ...props
-}: ComponentProps<'button'> & {
+}: ComponentProps<"button"> & {
   hideIfDisabled?: boolean;
 }) {
   const { enabled, hotKey, setOpenSearch } = useSearchContext();
@@ -56,18 +58,21 @@ export function LargeSearchToggle({
       data-search-full=""
       {...props}
       className={cn(
-        'inline-flex items-center gap-2 rounded-full border border-gray-200 dark:border-gray-800 dark:bg-gray-950 bg-gray-100 p-1.5 ps-2 pe-2 text-sm text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-gray-900 dark:hover:text-gray-400 cursor-pointer w-[240px]',
+        "inline-flex w-[240px] cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-100 p-1.5 ps-2 pe-2 text-sm text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900 dark:hover:text-gray-400",
         props.className,
       )}
       onClick={() => {
         setOpenSearch(true);
       }}
     >
-      <Search className="size-4" />
+      <HugeiconsIcon icon={Search01Icon} className="size-4" strokeWidth={2} />
       {text.search}
       <div className="ms-auto inline-flex gap-1">
         {hotKey.map((k, i) => (
-          <kbd key={i} className="rounded-sm size-5 text-sm inline-flex items-center justify-center border border-gray-200 dark:border-gray-700 dark:bg-gray-800 bg-gray-50 dark:text-gray-400">
+          <kbd
+            key={i}
+            className="inline-flex size-5 items-center justify-center rounded-sm border border-gray-200 bg-gray-50 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+          >
             {k.display}
           </kbd>
         ))}

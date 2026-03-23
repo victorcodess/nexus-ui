@@ -9,6 +9,8 @@ import type { NavItem } from "@/lib/source";
 import { Menu, X } from "lucide-react";
 import { buttonVariants } from "./ui/button";
 import { useCallback, useEffect, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { PanelRightIcon } from "@hugeicons/core-free-icons";
 
 interface NavbarProps {
   navItems?: NavItem[];
@@ -89,6 +91,7 @@ export function Navbar({ navItems = [] }: NavbarProps) {
           <MobileNavTrigger
             onSearch={
               <SearchToggle className="size-10.5 cursor-pointer rounded-full bg-transparent text-gray-100 hover:text-gray-100 hover:bg-gray-800" />
+              
             }
             onMenuOpen={() => setSidebarOpen(true)}
           />
@@ -221,7 +224,7 @@ function MobileNavTrigger({
         aria-label="Toggle Menu"
         onClick={onMenuOpen}
       >
-        <Menu className="size-5" />
+        <HugeiconsIcon icon={PanelRightIcon} className="size-4.5" strokeWidth={2} />
       </button>
     </div>
   );

@@ -30,7 +30,7 @@ export default function HomePage() {
   };
   return (
     <main className="flex h-full min-h-screen w-full flex-col overflow-auto bg-white pt-0 lg:h-screen lg:pt-0 dark:bg-gray-900">
-      <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-b-[20px] bg-gray-950 lg:h-[480px] lg:rounded-b-[24px] dark:border-b dark:border-b-gray-800 md:border-none">
+      <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-b-[20px] bg-gray-950 md:border-none lg:h-[480px] lg:rounded-b-[24px] dark:border-b dark:border-b-gray-800">
         <svg
           width="100%"
           height="100%"
@@ -99,8 +99,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row h-full md:h-[calc(100vh-352px)] w-full gap-6 md:gap-4 overflow-hidden px-4 md:px-6 pt-0 pb-4 md:py-4 lg:h-[calc(100vh-480px)] ">
-        <div className="order-2 flex h-full w-full md:w-fit flex-wrap items-center justify-center gap-2 md:order-1 md:h-full md:flex-col md:items-start md:justify-start">
+      <div className="flex h-full w-full flex-col gap-6 overflow-hidden px-4 pt-0 pb-4 md:h-[calc(100vh-352px)] md:flex-row md:gap-4 md:px-6 md:py-4 lg:h-[calc(100vh-480px)]">
+        <div className="order-2 flex h-full w-full flex-wrap items-center justify-center gap-2 md:order-1 md:h-full md:w-fit md:flex-col md:items-start md:justify-start">
           <Button className="w-fit rounded-full bg-gray-100 text-sm leading-6 font-normal text-gray-900 hover:bg-gray-300">
             Prompt Input
           </Button>
@@ -110,12 +110,12 @@ export default function HomePage() {
           <Button className="w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900">
             Suggestions
           </Button>
-          <Button className="w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900 hidden md:flex">
+          <Button className="hidden w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900 md:flex">
             See all
           </Button>
         </div>
 
-        <div className="order-1 relative h-full w-full md:order-2 md:w-1/2">
+        <div className="relative order-1 h-full w-full md:order-2 md:w-1/2">
           <div className="absolute top-4 right-4 z-10 flex h-8 w-fit items-center justify-center gap-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -143,7 +143,7 @@ export default function HomePage() {
               );
             })}
           </div>
-          <div className="flex h-full w-full flex-col items-center justify-end rounded-b-[20px] md:rounded-[24px] bg-gray-100 p-3 pt-21.5 lg:p-6 dark:bg-gray-950">
+          <div className="flex h-full w-full flex-col items-center justify-end rounded-b-[20px] bg-gray-100 p-3 pt-21.5 md:rounded-[24px] lg:p-6 dark:bg-gray-950">
             {inputComponents[activeTab]}
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
             <DynamicCodeBlock lang="ts" code={code} />
 
             <button
-              className="bor der absolute top-5 right-5 flex size-7 cursor-pointer items-center justify-center text-gray-500"
+              className="absolute top-5 right-5 flex size-7 z-1 cursor-pointer items-center justify-center text-gray-500"
               onClick={handleCopy}
             >
               {checked ? (
@@ -170,6 +170,12 @@ export default function HomePage() {
                 />
               )}
             </button>
+            <div
+              className={cn(
+                "absolute top-0 right-0 z-0 size-20 rounded-full rounded-tr-lg bg-linear-to-l",
+                "from-gray-100 from-65% to-95% to-gray-100/0 dark:from-gray-950 dark:to-gray-950/0",
+              )}
+            ></div>
           </div>
         </div>
       </div>
