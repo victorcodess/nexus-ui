@@ -42,8 +42,8 @@ export function Navbar({ navItems = [] }: NavbarProps) {
       <header
         id="nd-nav"
         className={cn(
-          "fixed top-0 z-40 h-14 w-full lg:px-20 2xl:px-40",
-          "bg-white/90 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none dark:bg-gray-900 dark:lg:bg-transparent",
+          "fixed top-0 z-40 h-14 w-full lg:px-0 2xl:px-0",
+          "bg-transparent backdrop-blur-none lg:backdrop-blur-none dark:bg-gray-900 dark:lg:bg-transparent",
           isDocs &&
             "overflow-hidden border-b border-dashed border-gray-200 px-0 lg:px-0 2xl:px-0 dark:border-white/10",
         )}
@@ -70,7 +70,7 @@ export function Navbar({ navItems = [] }: NavbarProps) {
         )}
         <nav
           className={cn(
-            "relative flex h-14 w-full items-center justify-between gap-6 px-4 lg:w-[calc(50%+40px)] lg:px-6 2xl:w-[calc(50%+80px)]",
+            "relative flex h-14 w-full items-center justify-between gap-6 px-4 lg:px-6",
             isDocs && "w-full py-3 lg:w-full lg:px-5 2xl:w-full",
           )}
         >
@@ -88,7 +88,7 @@ export function Navbar({ navItems = [] }: NavbarProps) {
 
           <MobileNavTrigger
             onSearch={
-              <SearchToggle className="cursor-pointer rounded-full bg-transparent size-10.5 text-gray-900 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800" />
+              <SearchToggle className="size-10.5 cursor-pointer rounded-full bg-transparent text-gray-100 hover:text-gray-100 hover:bg-gray-800" />
             }
             onMenuOpen={() => setSidebarOpen(true)}
           />
@@ -111,7 +111,7 @@ function Logo() {
   return (
     <Link
       href="/"
-      className="inline-flex shrink-0 items-center gap-1 text-base font-medium"
+      className="inline-flex shrink-0 items-center gap-1 text-base font-medium text-gray-50"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +152,7 @@ function DesktopNav({
           "cursor-pointer rounded-md px-3 py-2 text-sm transition-colors",
           isDocs && !isComponents
             ? "font-medium text-gray-900 dark:text-gray-400"
-            : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100",
+            : "text-gray-400 hover:text-gray-200",
         )}
       >
         Docs
@@ -163,7 +163,7 @@ function DesktopNav({
           "cursor-pointer rounded-md px-3 py-2 text-sm transition-colors",
           isComponents
             ? "font-medium text-gray-900 dark:text-white"
-            : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100",
+            : "text-gray-400 hover:text-gray-200",
         )}
       >
         Components
@@ -174,7 +174,7 @@ function DesktopNav({
         rel="noreferrer noopener"
         target="_blank"
         aria-label="GitHub"
-        className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+        className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-800 hover:text-gray-200"
       >
         <GithubIcon />
       </a>
@@ -185,7 +185,7 @@ function DesktopNav({
           rel="noreferrer noopener"
           target="_blank"
           aria-label="X / Twitter"
-          className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+          className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-800 hover:text-gray-200"
         >
           <XIcon className="size-4.5" />
         </a>
@@ -195,7 +195,7 @@ function DesktopNav({
         <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900" />
       )} */}
 
-      <SmallThemeToggle className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100" />
+      <SmallThemeToggle className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-800 hover:text-gray-200" />
     </div>
   );
 }
@@ -210,13 +210,13 @@ function MobileNavTrigger({
   onMenuOpen: () => void;
 }) {
   return (
-    <div className="flex items-center sm:hidden gap-2">
+    <div className="flex items-center gap-2 sm:hidden">
       {onSearch}
       <button
         type="button"
         className={cn(
           buttonVariants({ variant: "ghost", size: "icon" }),
-          "cursor-pointer rounded-full size-10.5",
+          "size-10.5 cursor-pointer rounded-full text-gray-100 hover:text-gray-100 hover:bg-gray-800",
         )}
         aria-label="Toggle Menu"
         onClick={onMenuOpen}
@@ -279,7 +279,7 @@ function MobileSidebar({
             </a>
           </div>
           <div className="flex items-center gap-2">
-            <SmallThemeToggle className="cursor-pointer rounded-full size-10.5" />
+            <SmallThemeToggle className="size-10.5 cursor-pointer rounded-full" />
             <button
               type="button"
               className={cn(
@@ -339,7 +339,7 @@ function isNavActive(url: string, pathname: string | null): boolean {
 
 /* ─── Icons ────────────────────────────────────────────────────────── */
 
-function GithubIcon({ className }: { className?: string }) {
+export function GithubIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

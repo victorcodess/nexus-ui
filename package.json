@@ -16,6 +16,8 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
     "@ai-sdk/react": "^3.0.118",
+    "@hugeicons/core-free-icons": "^4.0.0",
+    "@hugeicons/react": "^1.1.6",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-popover": "^1.1.15",

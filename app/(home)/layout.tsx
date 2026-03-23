@@ -7,11 +7,13 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   const navItems = getNavItems();
 
   return (
-    <HomeLayout
-      {...baseOptions()}
-      nav={{ ...baseOptions().nav, component: <Navbar navItems={navItems} /> }}
-    >
-      {children}
-    </HomeLayout>
+    <div data-page="home">
+      <HomeLayout
+        {...baseOptions()}
+        nav={{ ...baseOptions().nav, component: <Navbar navItems={navItems} /> }}
+      >
+        {children}
+      </HomeLayout>
+    </div>
   );
 }

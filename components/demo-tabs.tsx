@@ -3,24 +3,22 @@ import ChatgptIcon from "@/components/svgs/chatgpt";
 import { ClaudeIcon } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
 import ChatgptInput from "@/components/nexus-ui/examples/prompt-input/chatgpt-input";
-import NexusInput from "@/components/nexus-ui/examples/prompt-input/default";
+
 import ClaudeInput from "@/components/nexus-ui/examples/prompt-input/claude-input";
 import GeminiInput from "@/components/nexus-ui/examples/prompt-input/gemini-input";
 import V0Input from "@/components/nexus-ui/examples/prompt-input/v0-input";
 import V0Icon from "@/components/svgs/v0";
 
-export type TabKey = "nexus" | "gemini" | "chatgpt" | "claude" | "v0";
+export type TabKey = "gemini" | "chatgpt" | "claude" | "v0";
 
 export const tabs: { key: TabKey; label: string; icon: typeof NexusIcon }[] = [
-  { key: "nexus", label: "Nexus", icon: NexusIcon },
-  { key: "gemini", label: "Gemini", icon: GeminiIcon },
-  { key: "chatgpt", label: "ChatGPT", icon: ChatgptIcon },
   { key: "claude", label: "Claude", icon: ClaudeIcon },
   { key: "v0", label: "v0", icon: V0Icon },
+  { key: "gemini", label: "Gemini", icon: GeminiIcon },
+  { key: "chatgpt", label: "ChatGPT", icon: ChatgptIcon },
 ];
 
 export const inputComponents: Record<TabKey, React.ReactNode> = {
-  nexus: <NexusInput />,
   gemini: <GeminiInput />,
   chatgpt: <ChatgptInput />,
   claude: <ClaudeInput />,
@@ -28,42 +26,6 @@ export const inputComponents: Record<TabKey, React.ReactNode> = {
 };
 
 export const codeSnippets: Record<TabKey, string> = {
-  nexus: `import { Button } from "@/components/ui/button";
-import PromptInput, {
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
-  PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip } from "lucide-react";
-
-const NexusInput = () => {
-  return (
-    <PromptInput>
-      <PromptInputTextarea />
-      <PromptInputActions>
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <Paperclip />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-
-        <PromptInputActionGroup>
-          <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-gray-700 text-[13px] leading-6 font-normal text-white hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <ArrowUp />
-            </Button>
-          </PromptInputAction>
-        </PromptInputActionGroup>
-      </PromptInputActions>
-    </PromptInput>
-  );
-};
-
-export default NexusInput;`,
-
   gemini: `import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,

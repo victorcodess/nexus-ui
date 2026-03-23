@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Check, Copy } from "lucide-react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { useState } from "react";
 import {
@@ -11,77 +10,13 @@ import {
   codeSnippets,
   type TabKey,
 } from "../../components/demo-tabs";
-
-const lightStripes = {
-  background:
-    "repeating-linear-gradient(-45deg, #f5f5f5, #f5f5f5 14px, #f0f0f0 14px, #f0f0f0 16px)",
-  borderImageSource:
-    "repeating-linear-gradient(to bottom, #e5e5e5 0px, #e5e5e5 10px, transparent 10px, transparent 20px)",
-};
-const darkStripes = {
-  background:
-    "repeating-linear-gradient(-45deg, #0A0A0A, #0A0A0A 14px, #171717 14px, #171717 16px)",
-  borderImageSource:
-    "repeating-linear-gradient(to bottom, #262626 0px, #262626 10px, transparent 10px, transparent 20px)",
-};
-const borderImageStyle = {
-  borderStyle: "dashed" as const,
-  borderImageSlice: 1,
-};
-
-function StripedPanel({
-  className,
-  borderSide,
-  children,
-}: {
-  className: string;
-  borderSide: "left" | "right";
-  children?: React.ReactNode;
-}) {
-  const borderClass = borderSide === "right" ? "border-r" : "lg:border-l";
-  const showTopBorderLine = borderSide === "left";
-  return (
-    <div className={`relative ${className}`}>
-      {/* Dedicated top border (mobile only) – gradient dashes with wider spacing */}
-      {showTopBorderLine && (
-        <>
-          <div
-            className="absolute top-0 right-0 left-0 z-10 h-[1.5px] lg:hidden! dark:hidden"
-            style={{
-              background:
-                "repeating-linear-gradient(to right, #e5e5e5 0px, #e5e5e5 14px, transparent 14px, transparent 24px)",
-            }}
-            aria-hidden
-          />
-          <div
-            className="absolute top-0 right-0 left-0 z-10 hidden h-[1.5px] lg:hidden! dark:block"
-            style={{
-              background:
-                "repeating-linear-gradient(to right, #262626 0px, #262626 14px, transparent 14px, transparent 24px)",
-            }}
-            aria-hidden
-          />
-        </>
-      )}
-      {/* Light mode – dashed border only on inner layer */}
-      <div
-        className={`absolute inset-0 dark:hidden ${borderClass} border-transparent`}
-        style={{ ...lightStripes, ...borderImageStyle }}
-        aria-hidden
-      />
-      {/* Dark mode */}
-      <div
-        className={`absolute inset-0 hidden dark:block ${borderClass} border-transparent`}
-        style={{ ...darkStripes, ...borderImageStyle }}
-        aria-hidden
-      />
-      <div className="relative h-full w-full">{children}</div>
-    </div>
-  );
-}
+import { GithubIcon } from "@/components/navbar";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Copy01Icon, Tick01Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<TabKey>("nexus");
+  const [activeTab, setActiveTab] = useState<TabKey>("claude");
   const [checked, setChecked] = useState(false);
 
   const code = codeSnippets[activeTab];
@@ -94,78 +29,149 @@ export default function HomePage() {
     }, 2000);
   };
   return (
-    <main className="flex h-full min-h-screen w-full overflow-auto bg-white pt-12 lg:h-screen lg:pt-0 dark:bg-gray-900">
-      <StripedPanel
-        className="hidden h-full w-20 shrink-0 lg:block 2xl:w-40"
-        borderSide="right"
-      />
+    <main className="flex h-full min-h-screen w-full flex-col overflow-auto bg-white pt-0 lg:h-screen lg:pt-0 dark:bg-gray-900">
+      <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-b-[20px] bg-gray-950 lg:h-[480px] lg:rounded-b-[24px] dark:border-b dark:border-b-gray-800">
+        <svg
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+          className="hidde absolute inset-0"
+        >
+          <pattern
+            id="pattern-checkers"
+            x="0"
+            y="0"
+            width="100%"
+            height="26"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(-68.23)"
+          >
+            <line
+              x1="0"
+              y1="7"
+              x2="100%"
+              y2="7"
+              stroke="#171717"
+              strokeDasharray="8 4"
+            />
+          </pattern>
 
-      <div className="flex w-full flex-col lg:h-full lg:w-[calc(100%-80px)] lg:flex-row 2xl:w-[calc(100%-160px)]">
-        <div className="flex h-auto w-full flex-col items-center justify-center lg:h-full lg:w-1/2 lg:items-start lg:justify-end">
-          <div className="px-auto flex w-fit flex-col items-center gap-4 py-15 lg:items-start lg:p-10">
-            <div className="flex flex-col items-center gap-1 lg:items-start">
-              <h1 className="text-2xl leading-[38px] font-medium tracking-[-0.8px] text-gray-900 lg:text-[32px] dark:text-gray-50">
-                Build Better AI Interfaces
-              </h1>
-              <p className="w-[272px] text-center text-sm leading-6 font-[350] text-gray-500 lg:w-[317px] lg:text-left lg:text-base dark:text-gray-400">
-                Beautiful, composable components for building AI-native applications.
-              </p>
-            </div>
+          <rect
+            x="0%"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="url(#pattern-checkers)"
+          ></rect>
+        </svg>
+
+        <div className="px-auto z-10 flex w-fit flex-col items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-1">
+            <h1 className="text-center text-2xl leading-[38px] font-[450] tracking-[-0.8px] text-gray-50 lg:text-[32px]">
+              Build Better AI Interfaces
+            </h1>
+            <p className="w-[272px] text-center text-sm leading-6 font-[350] text-gray-400 lg:w-[317px] lg:text-base">
+              Beautiful, composable components for building AI-native
+              applications.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2">
             <Button
-              className="w-fit rounded-full bg-gray-900 text-sm leading-6 font-normal text-white dark:bg-white dark:text-gray-900"
+              className="w-fit rounded-full bg-gray-100 text-sm leading-6 font-normal text-gray-900 hover:bg-gray-300"
               asChild
             >
               <Link href="/docs">Get Started</Link>
             </Button>
+            <Button
+              className="w-fit gap-1.5 rounded-full bg-gray-800 px-4! text-sm leading-6 font-normal text-white hover:bg-gray-700"
+              asChild
+            >
+              <Link
+                href="https://github.com/victorcodess/nexus-ui"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <GithubIcon />
+                Star on GitHub
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row h-full md:h-[calc(100vh-352px)] w-full gap-6 md:gap-4 overflow-hidden px-4 md:px-6 pt-0 pb-4 md:py-4 lg:h-[calc(100vh-480px)] ">
+        <div className="order-2 flex h-full w-full md:w-fit flex-wrap items-center justify-center gap-2 md:order-1 md:h-full md:flex-col md:items-start md:justify-start">
+          <Button className="w-fit rounded-full bg-gray-100 text-sm leading-6 font-normal text-gray-900 hover:bg-gray-300">
+            Prompt Input
+          </Button>
+          <Button className="w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900">
+            Model Selector
+          </Button>
+          <Button className="w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900">
+            Suggestions
+          </Button>
+          <Button className="w-fit rounded-full bg-transparent text-sm leading-6 font-normal text-gray-400 hover:bg-gray-100 hover:text-gray-900 hidden md:flex">
+            See all
+          </Button>
+        </div>
+
+        <div className="order-1 relative h-full w-full md:order-2 md:w-1/2">
+          <div className="absolute top-4 right-4 z-10 flex h-8 w-fit items-center justify-center gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              return (
+                <Button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={cn(
+                    "group relative size-8 cursor-pointer gap-1 rounded-full text-sm leading-6 font-normal",
+                    isActive
+                      ? "bg-gray-200 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800"
+                      : "bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800",
+                  )}
+                >
+                  <Icon className="size-4" />
+                  <span
+                    className={cn(
+                      "pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full opacity-0 transition-opacity duration-200 group-hover:opacity-100",
+                    )}
+                  >
+                    {tab.label}
+                  </span>
+                </Button>
+              );
+            })}
+          </div>
+          <div className="flex h-full w-full flex-col items-center justify-end rounded-b-[20px] md:rounded-[24px] bg-gray-100 p-3 pt-21.5 lg:p-6 dark:bg-gray-950">
+            {inputComponents[activeTab]}
           </div>
         </div>
 
-        <StripedPanel
-          className="h-full min-h-[500px] w-full flex-1 lg:h-full lg:w-1/2"
-          borderSide="left"
-        >
-          <div className="flex h-full w-full flex-col items-center px-4 lg:justify-between lg:px-6">
-            <div className="flex h-55 w-full flex-col items-center justify-end rounded-b-[40px] border-x border-b border-gray-200 bg-white p-3 pt-21.5 lg:h-16/51 lg:p-7 dark:border-gray-800 dark:bg-gray-900">
-              {inputComponents[activeTab]}
-            </div>
+        <div className="order-3 h-full w-full overflow-hidden md:w-1/2">
+          <div className="lg:[&_.fd-scroll-container]:ma x-h-10 relative h-full w-full overflow-hidden rounded-[24px] bg-gray-100 dark:bg-gray-950 [&_.fd-scroll-container]:no-scrollbar [&_.fd-scroll-container]:max-h-none [&_.fd-scroll-container]:py-7 [&_.fd-scroll-container]:pr-3.5 [&_.fd-scroll-container]:pl-7 lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-[24px] [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:shadow-none">
+            <DynamicCodeBlock lang="ts" code={code} />
 
-            <div className="flex w-full flex-wrap items-center justify-center gap-2 py-6 lg:h-4/51 lg:py-0">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.key;
-                return (
-                  <Button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`w-fit cursor-pointer gap-1 rounded-full text-sm leading-6 font-normal ${
-                      isActive
-                        ? "bg-gray-200 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800"
-                        : "bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    <Icon className="size-4" />
-                    {tab.label}
-                  </Button>
-                );
-              })}
-            </div>
-
-            <div className="relative w-full overflow-hidden rounded-t-[40px] border-x border-t border-gray-200 bg-white lg:h-31/51 dark:border-gray-800 dark:bg-gray-900 [&_.fd-scroll-container]:no-scrollbar [&_.fd-scroll-container]:max-h-none! [&_.fd-scroll-container]:py-7 [&_.fd-scroll-container]:pr-3.5 [&_.fd-scroll-container]:pl-7 lg:[&_.fd-scroll-container]:h-full [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:h-full [&>figure]:rounded-none [&>figure]:rounded-t-[40px] [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:shadow-none">
-              <DynamicCodeBlock lang="ts" code={code} />
-
-              <button
-                className="bor der absolute top-5 right-5 flex size-7 cursor-pointer items-center justify-center text-gray-500"
-                onClick={handleCopy}
-              >
-                {checked ? (
-                  <Check className="size-4.5" />
-                ) : (
-                  <Copy className="size-4.5" />
-                )}
-              </button>
-            </div>
+            <button
+              className="bor der absolute top-5 right-5 flex size-7 cursor-pointer items-center justify-center text-gray-500"
+              onClick={handleCopy}
+            >
+              {checked ? (
+                <HugeiconsIcon
+                  icon={Tick01Icon}
+                  strokeWidth={1.75}
+                  className="size-5"
+                />
+              ) : (
+                <HugeiconsIcon
+                  icon={Copy01Icon}
+                  strokeWidth={1.75}
+                  className="size-4.5"
+                />
+              )}
+            </button>
           </div>
-        </StripedPanel>
+        </div>
       </div>
     </main>
   );
