@@ -25,7 +25,7 @@ function ClaudeAudioLines({ className }: { className?: string }) {
       viewBox="0 0 21 21"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="inline-block overflow-visible"
+      className={cn("inline-block overflow-visible", className)}
     >
       <rect
         x="0"

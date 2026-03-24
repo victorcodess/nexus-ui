@@ -5,7 +5,6 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, AudioLines, Paperclip } from "lucide-react";
 import {
   ClaudeAdd,
   ClaudeAudioLines,
@@ -17,12 +16,12 @@ const ClaudeInput = () => {
     <PromptInput className="gap-3 rounded-[20px] p-3.5 shadow-none">
       <PromptInputTextarea
         placeholder="How can I help you today?"
-        className="min-h-12 px-1.5 py-1.5 placeholder:text-base"
+        className="min-h-12 px-1.5 py-1.5 placeholder:text-[15px] placeholder:font-[350]"
       />
       <PromptInputActions className="px-1 py-0">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-gray-600 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
               <ClaudeAdd className="size-5" />
             </Button>
           </PromptInputAction>
