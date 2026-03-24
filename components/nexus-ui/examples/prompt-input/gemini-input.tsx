@@ -66,7 +66,7 @@ const GeminiInput = () => {
   return (
     <PromptInput
       onSubmit={doSubmit}
-      className="rounded-[32px] border-none bg-gray-100 p-3 shadow-none"
+      className="rounded-[32px] p-3 shadow-none"
     >
       <PromptInputTextarea
         value={input}
@@ -112,7 +112,7 @@ const GeminiInput = () => {
                 <GeminiCaret className="-mb-0.5 size-5 text-[#5D5D5D]" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
-                className="w-[320px] rounded-2xl border-none bg-gray-200 px-0 py-2 shadow-none"
+                className="w-[320px] rounded-xl border border-gray-200 bg-white px-0 py-2 shadow-modal dark:border-gray-700 dark:bg-gray-800"
                 align="end"
                 sideOffset={8}
               >
@@ -133,7 +133,7 @@ const GeminiInput = () => {
                         indicator={
                           <GeminiCheck className="size-6 text-blue-500 dark:text-blue-400" />
                         }
-                        className="gap-10 rounded-none px-4 focus:bg-gray-100/50 **:data-[slot=model-selector-radio-item-indicator]:right-4"
+                        className="gap-10 rounded-none px-4 focus:bg-gray-100 **:data-[slot=model-selector-radio-item-indicator]:right-4 dark:focus:bg-gray-900"
                       />
                     ))}
                   </ModelSelectorRadioGroup>

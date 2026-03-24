@@ -42,7 +42,7 @@ import {
 
 const GeminiInput = () => {
   return (
-    <PromptInput className="rounded-[32px] p-3 shadow-none dark:border-none">
+    <PromptInput className="rounded-[32px] p-3 shadow-none">
       <PromptInputTextarea
         placeholder="Ask Gemini 3"
         className="min-h-12 px-3 py-2.25 text-base! placeholder:text-base"
