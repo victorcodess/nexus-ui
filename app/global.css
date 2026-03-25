@@ -149,15 +149,19 @@
   html:not(:has([data-page="home"])) {
     scrollbar-gutter: stable;
   }
-  
-  @media (max-width: 767px) {
+
+  html:has([data-page="home"]) {
+    @apply bg-gray-950;
+  }
+
+  /* @media (max-width: 767px) {
     html:has([data-page="home"]) {
       scrollbar-gutter: stable;
     }
-  }
-  
-  body {
-    @apply bg-white text-foreground dark:bg-gray-900;
+  } */
+
+  body{
+    @apply bg-white dark:bg-gray-900;
   }
   /* Prevent Radix from adding scrollbar compensation (we use overflow-y: scroll instead) */
   body[data-scroll-locked] {

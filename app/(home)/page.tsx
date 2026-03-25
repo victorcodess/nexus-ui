@@ -5,7 +5,7 @@ import { HomeDemoSection } from "@/components/home/home-demo-section";
 
 export default function HomePage() {
   return (
-    <main className="flex h-full min-h-screen w-full flex-col overflow-auto bg-white pt-0 lg:h-screen lg:pt-0 dark:bg-gray-900">
+    <main className="flex h-screen w-full flex-col overflow-auto bg-transparent pt-0 lg:pt-0">
       <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-b-[20px] bg-gray-950 md:border-none lg:h-[480px] lg:rounded-b-[24px] dark:border-b dark:border-b-gray-800">
         <svg
           width="100%"
