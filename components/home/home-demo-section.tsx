@@ -81,13 +81,13 @@ export function HomeDemoSection() {
         })}
       </div>
 
-      <div className="order-1 h-[200px] min-h-0 w-full shrink-0 md:order-2 md:h-full md:w-1/2 md:shrink">
+      <div className="order-1 h-[calc(100%-64px)] sm:h-[200px] min-h-0 w-full md:order-2 md:h-full md:w-1/2">
         <div className="flex h-full w-full flex-col items-center justify-end rounded-b-[20px] bg-gray-100 p-3 md:rounded-[24px] lg:p-6 dark:bg-gray-950">
           <Preview />
         </div>
       </div>
 
-      <div className="order-3 flex min-h-0 w-full flex-1 flex-col overflow-hidden md:order-3 md:h-full md:w-1/2 md:flex-none">
+      <div className="order-3 hidden sm:flex min-h-0 w-full flex-1 flex-col overflow-hidden md:order-3 md:h-full md:w-1/2 md:flex-none">
         <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[24px] bg-gray-100 dark:bg-gray-950 [&_.fd-scroll-container]:h-full [&_.fd-scroll-container]:min-h-0 [&_.fd-scroll-container]:max-h-none [&_.fd-scroll-container]:overflow-y-auto [&_.fd-scroll-container]:py-7 [&_.fd-scroll-container]:pr-3.5 [&_.fd-scroll-container]:pl-7 [&_.fd-scroll-container]:no-scrollbar [&_.lucide-clipboard]:hidden [&_div.absolute.top-3.right-2]:hidden [&_pre]:text-sm [&_pre]:leading-6 [&>figure]:flex [&>figure]:h-full [&>figure]:min-h-0 [&>figure]:flex-col [&>figure]:rounded-[24px] [&>figure]:border-none [&>figure]:bg-transparent [&>figure]:shadow-none">
           <DynamicCodeBlock lang="ts" code={code} />
 
