@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Check, Send, Square } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PromptInput, {
   PromptInputActions,
@@ -54,18 +54,9 @@ const claudeModels = [
 ];
 
 const moreModels = [
-  {
-    value: "opus-4.5",
-    title: "Opus 4.5",
-  },
-  {
-    value: "opus-3",
-    title: "Opus 3",
-  },
-  {
-    value: "sonnet-4.5",
-    title: "Sonnet 4.5",
-  },
+  { value: "opus-4.5", title: "Opus 4.5" },
+  { value: "opus-3", title: "Opus 3" },
+  { value: "sonnet-4.5", title: "Sonnet 4.5" },
 ];
 
 const ClaudeInput = () => {
@@ -86,6 +77,7 @@ const ClaudeInput = () => {
   }, []);
 
   const isLoading = status === "loading";
+  const allModels = React.useMemo(() => [...claudeModels, ...moreModels], []);
 
   return (
     <PromptInput
@@ -113,16 +105,15 @@ const ClaudeInput = () => {
             <ModelSelector
               value={model}
               onValueChange={setModel}
-              items={[...claudeModels, ...moreModels]}
+              items={allModels}
             >
               <ModelSelectorTrigger
                 variant="ghost"
                 className="h-8 cursor-pointer gap-1 rounded-sm border-none bg-transparent pr-1.5 pl-2.5 text-[13px] leading-6 font-normal text-gray-900 transition-all hover:bg-gray-200 active:scale-97 data-[state=open]:bg-gray-200 dark:text-white dark:hover:bg-gray-900 dark:data-[state=open]:bg-gray-900"
               >
                 <span>
-                  {[...claudeModels, ...moreModels].find(
-                    (m) => m.value === model,
-                  )?.title ?? "Opus 4.6"}
+                  {allModels.find((m) => m.value === model)?.title ??
+                    "Opus 4.6"}
                 </span>
                 <ClaudeCaret className="size-4" />
               </ModelSelectorTrigger>

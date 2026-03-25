@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import PromptInput, {
   PromptInputActions,
@@ -5,9 +8,28 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { AudioLines, Globe, Paperclip } from "lucide-react";
+import {
+  ModelSelector,
+  ModelSelectorContent,
+  ModelSelectorGroup,
+  ModelSelectorRadioGroup,
+  ModelSelectorRadioItem,
+  ModelSelectorTrigger,
+} from "@/components/nexus-ui/model-selector";
+import { AudioLines, Check, ChevronDown, Globe, Paperclip } from "lucide-react";
 
-export default function PromptInputChatGPT() {
+const chatgptModels = [
+  { value: "gpt-4o", title: "GPT-4o" },
+  { value: "gpt-4", title: "GPT-4" },
+  { value: "o3-mini", title: "o3-mini" },
+];
+
+const ChatgptInput = () => {
+  const [model, setModel] = React.useState("gpt-4o");
+
+  const selectedTitle =
+    chatgptModels.find((m) => m.value === model)?.title ?? "GPT-4o";
+
   return (
     <PromptInput className="rounded-[28px] shadow-none">
       <PromptInputTextarea
@@ -28,6 +50,49 @@ export default function PromptInputChatGPT() {
               <span className="hidden sm:inline">Search</span>
             </Button>
           </PromptInputAction>
+          <PromptInputAction asChild>
+            <ModelSelector
+              value={model}
+              onValueChange={setModel}
+              items={chatgptModels}
+            >
+              <ModelSelectorTrigger
+                variant="ghost"
+                className="h-9 gap-1 rounded-full border border-border-primary px-2.5 text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:h-9 sm:px-3 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+              >
+                <span className="max-w-28 truncate sm:max-w-none">
+                  {selectedTitle}
+                </span>
+                <ChevronDown className="size-4 shrink-0 opacity-60" />
+              </ModelSelectorTrigger>
+              <ModelSelectorContent
+                className="min-w-[200px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-modal dark:border-gray-700 dark:bg-gray-800"
+                align="start"
+              >
+                <ModelSelectorGroup>
+                  <ModelSelectorRadioGroup
+                    value={model}
+                    onValueChange={setModel}
+                  >
+                    {chatgptModels.map((m) => (
+                      <ModelSelectorRadioItem
+                        key={m.value}
+                        value={m.value}
+                        title={m.title}
+                        indicator={
+                          <Check
+                            className="size-4 text-gray-900 dark:text-white"
+                            strokeWidth={2}
+                          />
+                        }
+                        className="rounded-md px-2 py-1.5 focus:bg-gray-100 dark:focus:bg-gray-900"
+                      />
+                    ))}
+                  </ModelSelectorRadioGroup>
+                </ModelSelectorGroup>
+              </ModelSelectorContent>
+            </ModelSelector>
+          </PromptInputAction>
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
@@ -40,4 +105,6 @@ export default function PromptInputChatGPT() {
       </PromptInputActions>
     </PromptInput>
   );
-}
+};
+
+export default ChatgptInput;
