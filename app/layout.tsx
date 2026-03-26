@@ -1,6 +1,7 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "./global.css";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import {
   SITE_URL,
   SITE_NAME,
@@ -75,6 +76,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
           }}
         />
         <RootProvider>{children}</RootProvider>
+        <Analytics />
       </body>
     </html>
   );
