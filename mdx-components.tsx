@@ -14,6 +14,7 @@ import { Step, Steps } from "./components/steps";
 import ReviewContainer from "@/components/preview-container";
 import { DemoWithCode } from "@/components/demo-with-code";
 import { ComponentSource } from "@/components/component-source";
+import { Card, Cards } from "@/components/cards";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -27,6 +28,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ReviewContainer,
     DemoWithCode,
     ComponentSource,
+    Card,
+    Cards,
     CodeBlockTab,
     CodeBlockTabs,
     CodeBlockTabsList,
@@ -42,7 +45,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
         ].join(" ")}
       >
         <table
-          className="w-full border-separate border-spacing-0 border-none text-sm bg-gray-100 dark:bg-gray-900"
+          className="w-full border-separate border-spacing-0 border-none text-sm bg-gray-100 dark:bg-gray-950"
           {...props}
         />
       </div>
