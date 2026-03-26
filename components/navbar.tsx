@@ -180,9 +180,7 @@ function DesktopNav({
         href="/docs/components/prompt-input"
         className={cn(
           "cursor-pointer rounded-md px-3 py-2 text-sm transition-colors",
-          isComponents
-            ? "text-gray-100"
-            : "text-gray-400 hover:text-gray-200",
+          isComponents ? "text-gray-100" : "text-gray-400 hover:text-gray-200",
         )}
       >
         Components
@@ -198,17 +196,15 @@ function DesktopNav({
         <GithubIcon />
       </a>
 
-      {isDocs && (
-        <a
-          href="https://x.com/victorwilliams_"
-          rel="noreferrer noopener"
-          target="_blank"
-          aria-label="X / Twitter"
-          className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-800 hover:text-gray-200"
-        >
-          <XIcon className="size-4.5" />
-        </a>
-      )}
+      <a
+        href="https://x.com/nexus__ui"
+        rel="noreferrer noopener"
+        target="_blank"
+        aria-label="X / Twitter"
+        className="inline-flex size-10.5 items-center justify-center rounded-full text-gray-400 transition-colors duration-200 hover:bg-gray-800 hover:text-gray-200"
+      >
+        <XIcon className="size-4.5" />
+      </a>
 
       {/* {!isDocs && (
         <SearchToggle className="cursor-pointer rounded-full bg-transparent p-4.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900" />
