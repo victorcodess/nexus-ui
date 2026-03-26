@@ -82,7 +82,7 @@ const ClaudeInput = () => {
   return (
     <PromptInput
       onSubmit={doSubmit}
-      className="gap-3 rounded-[20px] p-3.5 shadow-sm"
+      className="gap-3 rounded-[20px] p-3.5 shadow-lg"
     >
       <PromptInputTextarea
         value={input}

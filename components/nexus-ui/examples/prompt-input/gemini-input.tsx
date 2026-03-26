@@ -64,7 +64,7 @@ const GeminiInput = () => {
   const isLoading = status === "loading";
 
   return (
-    <PromptInput onSubmit={doSubmit} className="rounded-[32px] p-3 shadow-none">
+    <PromptInput onSubmit={doSubmit} className="rounded-[32px] p-3 shadow-lg">
       <PromptInputTextarea
         value={input}
         onChange={(e) => setInput(e.target.value)}

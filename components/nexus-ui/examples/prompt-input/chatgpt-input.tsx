@@ -31,7 +31,7 @@ const ChatgptInput = () => {
     chatgptModels.find((m) => m.value === model)?.title ?? "GPT-4o";
 
   return (
-    <PromptInput className="rounded-[28px] shadow-none">
+    <PromptInput className="rounded-[28px] shadow-lg">
       <PromptInputTextarea
         placeholder="Ask anything"
         className="min-h-16 px-6"

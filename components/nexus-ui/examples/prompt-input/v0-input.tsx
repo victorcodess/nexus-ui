@@ -61,7 +61,7 @@ const V0Input = () => {
   return (
     <PromptInput
       onSubmit={doSubmit}
-      className="gap-2 rounded-xl p-3 shadow-none"
+      className="gap-2 rounded-xl p-3 shadow-lg"
     >
       <PromptInputTextarea
         value={input}
