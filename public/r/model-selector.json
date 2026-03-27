@@ -5,7 +5,8 @@
   "description": "A dropdown for selecting an AI model with radio groups, sub-menus, and custom items.",
   "dependencies": [
     "radix-ui",
-    "lucide-react"
+    "@hugeicons/react",
+    "@hugeicons/core-free-icons"
   ],
   "registryDependencies": [],
   "files": [

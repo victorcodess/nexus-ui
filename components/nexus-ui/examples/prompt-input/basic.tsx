@@ -8,7 +8,8 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Square } from "lucide-react";
+import { ArrowUp02Icon, SquareIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 type InputStatus = "idle" | "loading" | "error" | "submitted";
 
@@ -47,9 +48,17 @@ export default function PromptInputBasic() {
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <Square className="size-3.5 fill-current" />
+                <HugeiconsIcon
+                  icon={SquareIcon}
+                  strokeWidth={2.0}
+                  className="size-3.5 fill-current"
+                />
               ) : (
-                <ArrowUp />
+                <HugeiconsIcon
+                  icon={ArrowUp02Icon}
+                  strokeWidth={2.0}
+                  className="size-4"
+                />
               )}
             </Button>
           </PromptInputAction>

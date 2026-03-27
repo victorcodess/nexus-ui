@@ -26,7 +26,8 @@ import {
   GeminiSend,
   GeminiCheck,
 } from "@/components/svgs/gemini-icons";
-import { Square } from "lucide-react";
+import { SquareIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { cn } from "@/lib/utils";
 
 type InputStatus = "idle" | "loading" | "error" | "submitted";
@@ -171,7 +172,7 @@ const GeminiInput = () => {
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <Square className="size-3.5 fill-current text-blue-400" />
+                <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current text-blue-400" />
               ) : input.trim() ? (
                 <GeminiSend className="size-5 text-[#5D5D5D]" />
               ) : (

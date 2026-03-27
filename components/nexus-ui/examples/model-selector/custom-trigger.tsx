@@ -13,7 +13,8 @@ import {
 import ChatgptIcon from "@/components/svgs/chatgpt";
 import { ClaudeIcon2 } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { AiMagicIcon, ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 const models = [
   { value: "gpt-4", icon: ChatgptIcon, title: "GPT-4" },
@@ -29,12 +30,20 @@ export default function ModelSelectorCustomTrigger() {
   return (
     <ModelSelector value={model} onValueChange={setModel} items={models}>
       <ModelSelectorTrigger variant="outline" className="gap-2">
-        <Sparkles className="size-3.5 text-gray-500 dark:text-gray-400" />
+        <HugeiconsIcon
+          icon={AiMagicIcon}
+          strokeWidth={2.0}
+          className="size-3.5 text-gray-500 dark:text-gray-400"
+        />
         <span className="text-gray-500 dark:text-gray-400">Using</span>
         <span className="font-medium text-gray-900 dark:text-gray-100">
           {selected?.title ?? model}
         </span>
-        <ChevronDown className="size-4 shrink-0 text-gray-400 dark:text-gray-500" />
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          strokeWidth={2.0}
+          className="size-4 shrink-0 text-gray-400 dark:text-gray-500"
+        />
       </ModelSelectorTrigger>
       <ModelSelectorContent className="w-[264px]" align="start">
         <ModelSelectorGroup>

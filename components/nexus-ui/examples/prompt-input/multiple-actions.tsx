@@ -8,7 +8,13 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Mic, Paperclip, Square } from "lucide-react";
+import {
+  ArrowUp02Icon,
+  SquareIcon,
+  Mic02Icon,
+  PlusSignIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 type InputStatus = "idle" | "loading" | "error" | "submitted";
 
@@ -44,7 +50,7 @@ export default function PromptInputMultipleActions() {
               type="button"
               className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700"
             >
-              <Paperclip className="size-4" />
+              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
@@ -52,7 +58,7 @@ export default function PromptInputMultipleActions() {
               type="button"
               className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700"
             >
-              <Mic className="size-4" />
+              <HugeiconsIcon icon={Mic02Icon} strokeWidth={2.0} className="size-4" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
@@ -65,9 +71,9 @@ export default function PromptInputMultipleActions() {
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <Square className="size-3.5 fill-current" />
+                <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
               ) : (
-                <ArrowUp />
+                <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
               )}
             </Button>
           </PromptInputAction>

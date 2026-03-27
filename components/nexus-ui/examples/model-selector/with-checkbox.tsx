@@ -12,7 +12,8 @@ import {
 import ChatgptIcon from "@/components/svgs/chatgpt";
 import { ClaudeIcon2 } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
-import { ChevronDown } from "lucide-react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 const models = [
   {
@@ -65,7 +66,7 @@ export default function ModelSelectorWithCheckbox() {
     >
       <ModelSelectorTrigger variant="outline">
         <span className="truncate">{triggerLabel}</span>
-        <ChevronDown className="size-4 shrink-0" />
+        <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2.0} className="size-4 shrink-0" />
       </ModelSelectorTrigger>
       <ModelSelectorContent className="w-[264px]" align="start">
         <ModelSelectorGroup>

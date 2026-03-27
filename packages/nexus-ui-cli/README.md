@@ -103,7 +103,8 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputAction,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip } from "lucide-react";
+import { ArrowUp02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 export default function ChatInput() {
   return (
@@ -113,14 +114,14 @@ export default function ChatInput() {
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button variant="ghost" size="icon">
-              <Paperclip />
+              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button size="sm">
-              <ArrowUp />
+              <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>

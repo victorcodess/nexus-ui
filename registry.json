@@ -38,7 +38,7 @@
       "type": "registry:ui",
       "title": "Model Selector",
       "description": "A dropdown for selecting an AI model with radio groups, sub-menus, and custom items.",
-      "dependencies": ["radix-ui", "lucide-react"],
+      "dependencies": ["radix-ui", "@hugeicons/react", "@hugeicons/core-free-icons"],
       "registryDependencies": [],
       "files": [
         {

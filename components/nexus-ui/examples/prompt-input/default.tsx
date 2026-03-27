@@ -8,7 +8,12 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, Paperclip, Square } from "lucide-react";
+import {
+  ArrowUp02Icon,
+  SquareIcon,
+  PlusSignIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 type InputStatus = "idle" | "loading" | "error" | "submitted";
 
@@ -46,7 +51,7 @@ export default function PromptInputDefault() {
               type="button"
               className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700"
             >
-              <Paperclip />
+              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
@@ -59,9 +64,9 @@ export default function PromptInputDefault() {
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <Square className="size-3.5 fill-current" />
+                <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
               ) : (
-                <ArrowUp />
+                <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
               )}
             </Button>
           </PromptInputAction>

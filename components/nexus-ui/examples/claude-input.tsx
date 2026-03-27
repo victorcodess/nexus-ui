@@ -5,7 +5,6 @@ import PromptInput, {
   PromptInputActionGroup,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { ArrowUp, AudioLines, Paperclip } from "lucide-react";
 import {
   ClaudeAdd,
   ClaudeAudioLines,

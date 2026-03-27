@@ -221,7 +221,12 @@ import {
   ModelSelectorTrigger,
 } from "@/components/nexus-ui/model-selector";
 import ChatgptIcon from "@/components/svgs/chatgpt";
-import { ArrowUp, Loader2, Paperclip } from "lucide-react";
+import {
+  ArrowUp02Icon,
+  PlusSignIcon,
+  SquareIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 const models = [
   { value: "gpt-4", icon: ChatgptIcon, title: "GPT-4", description: "Most capable" },
@@ -282,7 +287,7 @@ export default function ChatWithModelSelector() {
             </ModelSelector>
             <PromptInputAction asChild>
               <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-                <Paperclip className="size-4" />
+                <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
               </Button>
             </PromptInputAction>
           </PromptInputActionGroup>
@@ -294,9 +299,9 @@ export default function ChatWithModelSelector() {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <Loader2 className="size-4 animate-spin" />
+                  <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
                 ) : (
-                  <ArrowUp />
+                  <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
                 )}
               </Button>
             </PromptInputAction>

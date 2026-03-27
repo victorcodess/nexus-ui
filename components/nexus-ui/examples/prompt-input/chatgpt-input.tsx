@@ -16,7 +16,14 @@ import {
   ModelSelectorRadioItem,
   ModelSelectorTrigger,
 } from "@/components/nexus-ui/model-selector";
-import { AudioLines, Check, ChevronDown, Globe, Paperclip } from "lucide-react";
+import {
+  ArrowDown01Icon,
+  Mic02Icon,
+  PlusSignIcon,
+  Search01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 const chatgptModels = [
   { value: "gpt-4o", title: "GPT-4o" },
@@ -40,13 +47,13 @@ const ChatgptInput = () => {
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
-              <Paperclip className="size-4 text-[#5D5D5D]" />
+              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4 text-[#5D5D5D]" />
               <span className="hidden sm:inline">Attach</span>
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
             <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
-              <Globe className="size-4 text-[#5D5D5D]" />
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2.0} className="size-4 text-[#5D5D5D]" />
               <span className="hidden sm:inline">Search</span>
             </Button>
           </PromptInputAction>
@@ -63,7 +70,7 @@ const ChatgptInput = () => {
                 <span className="max-w-28 truncate sm:max-w-none">
                   {selectedTitle}
                 </span>
-                <ChevronDown className="size-4 shrink-0 opacity-60" />
+                <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2.0} className="size-4 shrink-0 opacity-60" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
                 className="min-w-[200px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-modal dark:border-gray-700 dark:bg-gray-800"
@@ -80,9 +87,10 @@ const ChatgptInput = () => {
                         value={m.value}
                         title={m.title}
                         indicator={
-                          <Check
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            strokeWidth={2.0}
                             className="size-4 text-gray-900 dark:text-white"
-                            strokeWidth={2}
                           />
                         }
                         className="rounded-md px-2 py-1.5 focus:bg-gray-100 dark:focus:bg-gray-900"
@@ -97,7 +105,7 @@ const ChatgptInput = () => {
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button className="w-9 cursor-pointer gap-1 rounded-full bg-gray-200 text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
-              <AudioLines className="size-4" />
+              <HugeiconsIcon icon={Mic02Icon} strokeWidth={2.0} className="size-4" />
               <span className="hidden sm:inline">Voice</span>
             </Button>
           </PromptInputAction>

@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Tick02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { cn } from "@/lib/utils";
 import PromptInput, {
   PromptInputActions,
@@ -134,9 +135,10 @@ const ClaudeInput = () => {
                         title={m.title}
                         description={m.description}
                         indicator={
-                          <Check
+                          <HugeiconsIcon
+                            icon={Tick02Icon}
+                            strokeWidth={2.0}
                             className="size-4.5 text-blue-500 dark:text-blue-400"
-                            strokeWidth={2}
                           />
                         }
                         className="gap-10 rounded-md px-2 py-1.5 focus:bg-gray-100 **:data-[slot=model-selector-radio-item-indicator]:right-4 dark:focus:bg-gray-900"
