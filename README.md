@@ -1,9 +1,11 @@
+<img width="2400" height="1260" alt="image" src="https://github.com/user-attachments/assets/d70ca019-c9fb-4f37-94b3-a9f238a4c7e7" />
+
 <p align="center">
   <h1 align="center">Nexus UI</h1>
 </p>
 
 <p align="center">
-  Flexible, customizable components for modern AI experiences.
+  Beautiful, customizable components for modern AI experiences.
 </p>
 
 <p align="center">
