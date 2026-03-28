@@ -5,12 +5,10 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   Cancel01Icon,
+  Image02Icon,
   File02Icon,
   Video02Icon,
   MusicNote02Icon,
-  Pdf02Icon,
-  Doc02Icon,
-  Ppt02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -23,6 +21,8 @@ export interface AttachmentMeta {
   type: "image" | "file" | "video" | "audio";
   name?: string;
   url?: string;
+  /** Raster preview URL (e.g. PDF first page). When unset, preview uses the icon for `type`. */
+  thumbnailUrl?: string;
   mimeType?: string;
   size?: number;
   width?: number;
@@ -86,32 +86,20 @@ function kindLabel(item: AttachmentMeta): string | undefined {
   return undefined;
 }
 
-function fileIconFor(item: AttachmentMeta) {
-  const mime = item.mimeType?.toLowerCase() ?? "";
-  const name = item.name?.toLowerCase() ?? "";
-  if (mime.includes("pdf") || name.endsWith(".pdf")) return Pdf02Icon;
-  if (
-    mime.includes("word") ||
-    mime.includes("msword") ||
-    name.endsWith(".doc") ||
-    name.endsWith(".docx")
-  )
-    return Doc02Icon;
-  if (
-    mime.includes("presentation") ||
-    mime.includes("powerpoint") ||
-    name.endsWith(".ppt") ||
-    name.endsWith(".pptx")
-  )
-    return Ppt02Icon;
-  if (item.type === "video") return Video02Icon;
-  if (item.type === "audio") return MusicNote02Icon;
-  return File02Icon;
+function iconForAttachmentType(type: AttachmentMeta["type"]) {
+  switch (type) {
+    case "image":
+      return Image02Icon;
+    case "video":
+      return Video02Icon;
+    case "audio":
+      return MusicNote02Icon;
+    default:
+      return File02Icon;
+  }
 }
 
-function inferCardSubtitleMode(
-  attachment: AttachmentMeta,
-): "size" | "kind" {
+function inferCardSubtitleMode(attachment: AttachmentMeta): "size" | "kind" {
   if (
     attachment.size != null &&
     Number.isFinite(attachment.size) &&
@@ -147,7 +135,10 @@ function attachmentShellClass(
   attachment: AttachmentMeta,
 ): string {
   if (variant === "box") {
-    if (attachment.type === "image" && attachment.url) return "";
+    const hasRasterPreview =
+      Boolean(attachment.thumbnailUrl) ||
+      (attachment.type === "image" && Boolean(attachment.url));
+    if (hasRasterPreview) return "";
     return "bg-gray-100 dark:bg-gray-700";
   }
   return "border-gray-100 bg-gray-100 dark:border-gray-700 dark:bg-gray-700";
@@ -167,15 +158,14 @@ type AttachmentsContextValue = {
   disabled: boolean;
 };
 
-const AttachmentsContext =
-  React.createContext<AttachmentsContextValue | null>(null);
+const AttachmentsContext = React.createContext<AttachmentsContextValue | null>(
+  null,
+);
 
 function useAttachmentsContext(component: string) {
   const ctx = React.useContext(AttachmentsContext);
   if (!ctx) {
-    throw new Error(
-      `${component} must be used within <Attachments>`,
-    );
+    throw new Error(`${component} must be used within <Attachments>`);
   }
   return ctx;
 }
@@ -192,9 +182,7 @@ const AttachmentItemContext =
 function useAttachmentItemContext(component: string) {
   const ctx = React.useContext(AttachmentItemContext);
   if (!ctx) {
-    throw new Error(
-      `${component} must be used within <Attachment>`,
-    );
+    throw new Error(`${component} must be used within <Attachment>`);
   }
   return ctx;
 }
@@ -246,9 +234,7 @@ function Attachments({
       }
 
       const withinSize =
-        maxSize != null
-          ? incoming.filter((f) => f.size <= maxSize)
-          : incoming;
+        maxSize != null ? incoming.filter((f) => f.size <= maxSize) : incoming;
 
       const room =
         maxFiles != null
@@ -421,6 +407,9 @@ type AttachmentProps = Omit<
   onRemove?: () => void;
   /** Card secondary line; inferred from `attachment.size` when omitted. */
   cardSubtitle?: "size" | "kind";
+  /**
+   * When set, replaces the default layout.
+   */
   children?: React.ReactNode;
 };
 
@@ -445,8 +434,7 @@ function Attachment({
   );
 
   const shell = attachmentShellClass(variant ?? "box", attachment);
-  const showProgress =
-    progress != null && Number.isFinite(progress);
+  const showProgress = progress != null && Number.isFinite(progress);
 
   const defaultLayout =
     variant === "box" ? (
@@ -488,9 +476,7 @@ function Attachment({
       >
         {variant === "pill" ? <AttachmentPillFadeLayer /> : null}
         {children ?? defaultLayout}
-        {showProgress ? (
-          <AttachmentProgress value={progress} />
-        ) : null}
+        {showProgress ? <AttachmentProgress value={progress} /> : null}
       </div>
     </AttachmentItemContext.Provider>
   );
@@ -523,31 +509,28 @@ function AttachmentPreview({
   variant: variantProp,
   ...props
 }: AttachmentPreviewProps) {
-  const { variant, attachment } = useAttachmentItemContext(
-    "AttachmentPreview",
-  );
+  const { variant, attachment } = useAttachmentItemContext("AttachmentPreview");
   const v = variantProp ?? variant;
-  const isImage = attachment.type === "image" && Boolean(attachment.url);
+  const rasterSrc =
+    attachment.thumbnailUrl ??
+    (attachment.type === "image" && attachment.url
+      ? attachment.url
+      : undefined);
+  const showRaster = Boolean(rasterSrc);
   const pillPlainIcon =
-    v === "pill" && !isImage
+    v === "pill" && !showRaster
       ? "border-0 bg-transparent dark:bg-transparent"
       : "";
 
   const iconClass = v === "pill" ? "size-5" : "size-7";
 
   const content = (() => {
-    if (isImage && attachment.url) {
-      return (
-        <img
-          src={attachment.url}
-          alt=""
-          className="size-full object-cover"
-        />
-      );
+    if (rasterSrc) {
+      return <img src={rasterSrc} alt="" className="size-full object-cover" />;
     }
     return (
       <HugeiconsIcon
-        icon={fileIconFor(attachment)}
+        icon={iconForAttachmentType(attachment.type)}
         strokeWidth={1.5}
         className={iconClass}
       />
@@ -557,7 +540,11 @@ function AttachmentPreview({
   return (
     <div
       data-slot="attachment-preview"
-      className={cn(attachmentPreviewVariants({ variant: v }), pillPlainIcon, className)}
+      className={cn(
+        attachmentPreviewVariants({ variant: v }),
+        pillPlainIcon,
+        className,
+      )}
       {...props}
     >
       {content}
@@ -595,12 +582,10 @@ function AttachmentRemove({
   "aria-label": ariaLabelProp,
   ...props
 }: AttachmentRemoveProps) {
-  const { variant, attachment, onRemove } = useAttachmentItemContext(
-    "AttachmentRemove",
-  );
+  const { variant, attachment, onRemove } =
+    useAttachmentItemContext("AttachmentRemove");
   const position =
-    positionProp ??
-    (variant === "box" ? "corner" : "center-end");
+    positionProp ?? (variant === "box" ? "corner" : "center-end");
 
   const ariaLabel =
     ariaLabelProp ?? `Remove ${attachment.name ?? "attachment"}`;

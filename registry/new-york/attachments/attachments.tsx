@@ -5,12 +5,10 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   Cancel01Icon,
+  Image02Icon,
   File02Icon,
   Video02Icon,
   MusicNote02Icon,
-  Pdf02Icon,
-  Doc02Icon,
-  Ppt02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -23,6 +21,8 @@ export interface AttachmentMeta {
   type: "image" | "file" | "video" | "audio";
   name?: string;
   url?: string;
+  /** Raster preview URL (e.g. PDF first page). When unset, preview uses the icon for `type`. */
+  thumbnailUrl?: string;
   mimeType?: string;
   size?: number;
   width?: number;
@@ -86,27 +86,17 @@ function kindLabel(item: AttachmentMeta): string | undefined {
   return undefined;
 }
 
-function fileIconFor(item: AttachmentMeta) {
-  const mime = item.mimeType?.toLowerCase() ?? "";
-  const name = item.name?.toLowerCase() ?? "";
-  if (mime.includes("pdf") || name.endsWith(".pdf")) return Pdf02Icon;
-  if (
-    mime.includes("word") ||
-    mime.includes("msword") ||
-    name.endsWith(".doc") ||
-    name.endsWith(".docx")
-  )
-    return Doc02Icon;
-  if (
-    mime.includes("presentation") ||
-    mime.includes("powerpoint") ||
-    name.endsWith(".ppt") ||
-    name.endsWith(".pptx")
-  )
-    return Ppt02Icon;
-  if (item.type === "video") return Video02Icon;
-  if (item.type === "audio") return MusicNote02Icon;
-  return File02Icon;
+function iconForAttachmentType(type: AttachmentMeta["type"]) {
+  switch (type) {
+    case "image":
+      return Image02Icon;
+    case "video":
+      return Video02Icon;
+    case "audio":
+      return MusicNote02Icon;
+    default:
+      return File02Icon;
+  }
 }
 
 function inferCardSubtitleMode(
@@ -147,7 +137,10 @@ function attachmentShellClass(
   attachment: AttachmentMeta,
 ): string {
   if (variant === "box") {
-    if (attachment.type === "image" && attachment.url) return "";
+    const hasRasterPreview =
+      Boolean(attachment.thumbnailUrl) ||
+      (attachment.type === "image" && Boolean(attachment.url));
+    if (hasRasterPreview) return "";
     return "bg-gray-100 dark:bg-gray-700";
   }
   return "border-gray-100 bg-gray-100 dark:border-gray-700 dark:bg-gray-700";
@@ -235,8 +228,8 @@ function Attachments({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const list = e.target.files;
       if (!list?.length || disabled) {
-        e.target.value = "";
         onFileInputChange?.(e);
+        e.target.value = "";
         return;
       }
 
@@ -421,6 +414,9 @@ type AttachmentProps = Omit<
   onRemove?: () => void;
   /** Card secondary line; inferred from `attachment.size` when omitted. */
   cardSubtitle?: "size" | "kind";
+  /**
+   * When set, replaces the default layout. 
+   */
   children?: React.ReactNode;
 };
 
@@ -527,19 +523,24 @@ function AttachmentPreview({
     "AttachmentPreview",
   );
   const v = variantProp ?? variant;
-  const isImage = attachment.type === "image" && Boolean(attachment.url);
+  const rasterSrc =
+    attachment.thumbnailUrl ??
+    (attachment.type === "image" && attachment.url
+      ? attachment.url
+      : undefined);
+  const showRaster = Boolean(rasterSrc);
   const pillPlainIcon =
-    v === "pill" && !isImage
+    v === "pill" && !showRaster
       ? "border-0 bg-transparent dark:bg-transparent"
       : "";
 
   const iconClass = v === "pill" ? "size-5" : "size-7";
 
   const content = (() => {
-    if (isImage && attachment.url) {
+    if (rasterSrc) {
       return (
         <img
-          src={attachment.url}
+          src={rasterSrc}
           alt=""
           className="size-full object-cover"
         />
@@ -547,7 +548,7 @@ function AttachmentPreview({
     }
     return (
       <HugeiconsIcon
-        icon={fileIconFor(attachment)}
+        icon={iconForAttachmentType(attachment.type)}
         strokeWidth={1.5}
         className={iconClass}
       />
