@@ -1,12 +1,557 @@
 ---
 title: Attachments
-description: File and image attachment with preview, progress, and remove action
+description: Composable file attachments for chat inputs and messages with preview, variants, and upload wiring
 ---
 
 import AttachmentsDefault from "@/components/nexus-ui/examples/attachments/default";
+import AttachmentsVariantCard from "@/components/nexus-ui/examples/attachments/variant-card";
+import AttachmentsVariantPill from "@/components/nexus-ui/examples/attachments/variant-pill";
+import AttachmentsWithPromptInput from "@/components/nexus-ui/examples/attachments/with-prompt-input";
+import AttachmentsWithProgress from "@/components/nexus-ui/examples/attachments/with-progress";
 
-File and image attachment with preview, progress, and remove action
+Composable attachment UI for chat and messaging: thumbnails or type icons, remove actions, optional upload progress, and a controlled `Attachments` root that owns the hidden file input and pairs with `AttachmentTrigger`.
 
 <DemoWithCode src="components/nexus-ui/examples/attachments/default.tsx">
   <AttachmentsDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/attachments
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/attachments
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/attachments
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/attachments
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/attachments/attachments.tsx" title="components/nexus-ui/attachments.tsx" />
+</Step>
+<Step>
+<h3>Update the import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Attachments,
+  AttachmentTrigger,
+  AttachmentList,
+  Attachment,
+} from "@/components/nexus-ui/attachments";
+```
+
+```tsx keepBackground noCollapse
+<Attachments
+  attachments={attachments}
+  onAttachmentsChange={setAttachments}
+  accept="image/*"
+  multiple
+>
+  <AttachmentTrigger asChild>
+    <button type="button">Add files</button>
+  </AttachmentTrigger>
+  <AttachmentList>
+    {attachments.map((a) => (
+      <Attachment
+        key={`${a.name}-${a.size}`}
+        variant="pill"
+        attachment={a}
+        onRemove={() =>
+          setAttachments((prev) => prev.filter((x) => x !== a))
+        }
+      />
+    ))}
+  </AttachmentList>
+</Attachments>
+```
+
+`AttachmentTrigger` and any other component that calls the file picker **must** be rendered **inside** `Attachments` so they receive context from the same provider as the hidden input.
+
+## Examples
+
+### Card variant
+
+Wider tile with thumbnail, file name, and a second line: formatted **size** when **`attachment.size`** is set, otherwise a **kind** label inferred from MIME type or extension.
+
+<DemoWithCode src="components/nexus-ui/examples/attachments/variant-card.tsx">
+  <AttachmentsVariantCard />
+</DemoWithCode>
+
+### Pill variant
+
+Compact inline chip with thumbnail and file name. A hover fade sits over the trailing edge so long names can share space with the remove control.
+
+<DemoWithCode src="components/nexus-ui/examples/attachments/variant-pill.tsx">
+  <AttachmentsVariantPill />
+</DemoWithCode>
+
+### With Prompt Input
+
+`Attachments` wraps the hidden input; keep **`AttachmentTrigger`** (and the list) **inside** the same **`Attachments`** tree as the [Prompt Input](/docs/components/prompt-input) textarea and actions.
+
+<DemoWithCode src="components/nexus-ui/examples/attachments/with-prompt-input.tsx">
+  <AttachmentsWithPromptInput />
+</DemoWithCode>
+
+### Upload progress
+
+Pass **`progress`** (`0`–`100`) on **`Attachment`** to show a thin bar along the bottom of the tile. Omit it when the upload finishes.
+
+<DemoWithCode src="components/nexus-ui/examples/attachments/with-progress.tsx">
+  <AttachmentsWithProgress />
+</DemoWithCode>
+
+## Vercel AI SDK Integration
+
+Use **Attachments** with the [Vercel AI SDK](https://sdk.vercel.ai) and [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat): `sendMessage` accepts a **`files`** argument (**`FileList`** or an array of [`FileUIPart`](https://ai-sdk.dev/docs/reference/ai-sdk-core/ui-message) objects). The SDK turns them into user message parts for multimodal models.
+
+See [Prompt Input](/docs/components/prompt-input#vercel-ai-sdk-integration) for a minimal chat API route. The same route works when messages include **file** parts—**`convertToModelMessages`** includes those parts in the model request.
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+
+</Step>
+<Step>
+<h3>Create your chat API route</h3>
+
+Use the route from the Prompt Input docs, or ensure your handler calls **`streamText`** (or **`generateText`**) with **`messages: await convertToModelMessages(messages)`** so **file** parts are forwarded to the provider.
+
+</Step>
+<Step>
+<h3>Wire Prompt Input, Attachments, and `sendMessage`</h3>
+
+Build **`FileUIPart`** values from your **`AttachmentMeta`** list and pass them as **`files`** (URLs can be data URLs, HTTPS URLs, or blob URLs your app can read; for production, prefer stable URLs after upload). Wrap **`PromptInputTextarea`**, **`PromptInputActions`**, and the optional **`AttachmentList`** in **`Attachments`** so **`AttachmentTrigger`** stays in context.
+
+```tsx
+"use client";
+
+import { useCallback, useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type FileUIPart } from "ai";
+import { Button } from "@/components/ui/button";
+import PromptInput, {
+  PromptInputAction,
+  PromptInputActionGroup,
+  PromptInputActions,
+  PromptInputTextarea,
+} from "@/components/nexus-ui/prompt-input";
+import {
+  Attachments,
+  Attachment,
+  AttachmentList,
+  AttachmentTrigger,
+  type AttachmentMeta,
+} from "@/components/nexus-ui/attachments";
+import { ArrowUp02Icon, PlusSignIcon, SquareIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+
+function attachmentKey(a: AttachmentMeta) {
+  return `${a.name ?? ""}-${a.size ?? ""}-${a.mimeType ?? ""}-${a.url ?? ""}`;
+}
+
+function toFileParts(items: AttachmentMeta[]): FileUIPart[] {
+  return items
+    .filter((a) => a.url)
+    .map((a) => ({
+      type: "file" as const,
+      url: a.url!,
+      mediaType: a.mimeType ?? "application/octet-stream",
+      filename: a.name,
+    }));
+}
+
+export default function ChatWithAttachments() {
+  const { sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+  const [input, setInput] = useState("");
+  const [attachments, setAttachments] = useState<AttachmentMeta[]>([]);
+  const isLoading = status !== "ready";
+
+  const handleSubmit = useCallback(
+    (value?: string) => {
+      const trimmed = (value ?? input).trim();
+      const files = toFileParts(attachments);
+      if (!trimmed && files.length === 0) return;
+      sendMessage({
+        text: trimmed,
+        ...(files.length ? { files } : {}),
+      });
+      setInput("");
+      setAttachments([]);
+    },
+    [attachments, input, sendMessage],
+  );
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+      className="w-full"
+    >
+      <PromptInput onSubmit={handleSubmit}>
+        <Attachments
+          attachments={attachments}
+          onAttachmentsChange={setAttachments}
+          accept="image/*"
+          multiple
+          disabled={isLoading}
+        >
+          {attachments.length > 0 ? (
+            <AttachmentList className="px-3 pt-3">
+              {attachments.map((item) => (
+                <Attachment
+                  key={attachmentKey(item)}
+                  variant="pill"
+                  attachment={item}
+                  onRemove={() =>
+                    setAttachments((prev) =>
+                      prev.filter((x) => attachmentKey(x) !== attachmentKey(item)),
+                    )
+                  }
+                />
+              ))}
+            </AttachmentList>
+          ) : null}
+          <PromptInputTextarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Message with attachments…"
+            disabled={isLoading}
+          />
+          <PromptInputActions>
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <AttachmentTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    disabled={isLoading}
+                  >
+                    <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
+                  </Button>
+                </AttachmentTrigger>
+              </PromptInputAction>
+            </PromptInputActionGroup>
+            <PromptInputActionGroup>
+              <PromptInputAction asChild>
+                <Button
+                  type="submit"
+                  className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
+                  ) : (
+                    <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
+                  )}
+                </Button>
+              </PromptInputAction>
+            </PromptInputActionGroup>
+          </PromptInputActions>
+        </Attachments>
+      </PromptInput>
+    </form>
+  );
+}
+```
+
+The AI SDK [attachments guide](https://ai-sdk.dev/docs/ai-sdk-ui/chatbot#attachments) also covers **`FileList`** and automatic conversion for **`image/*`** and **`text/*`** when you pass a native file input.
+
+</Step>
+</Steps>
+
+## API Reference
+
+### Attachments
+
+Controlled root: holds **`AttachmentMeta[]`**, wires **`onAttachmentsChange`**, renders a screen-reader-only **`input type="file"`**, and exposes context for **`AttachmentTrigger`**. Renders the input first, then **`children`**. Must wrap every **`AttachmentTrigger`** that opens its picker.
+
+<TypeTable
+  type={{
+    attachments: {
+      type: "AttachmentMeta[]",
+      description: "Controlled list of attachment metadata shown in the UI and updated when the user picks files.",
+    },
+    onAttachmentsChange: {
+      type: "(attachments: AttachmentMeta[]) => void",
+      description:
+        "Called with the next list when files are chosen. New items are appended after `maxSize` and slot limits are applied.",
+    },
+    accept: {
+      type: "string",
+      description: "Passed to the file input `accept` attribute.",
+    },
+    multiple: {
+      type: "boolean",
+      default: "true",
+      description: "Allow multiple files per dialog open.",
+    },
+    maxFiles: {
+      type: "number",
+      description: "Maximum total attachments; additional picks are truncated.",
+    },
+    maxSize: {
+      type: "number",
+      description: "Maximum size per file in bytes; larger files are skipped.",
+    },
+    disabled: {
+      type: "boolean",
+      default: "false",
+      description: "Disables the file input and prevents `AttachmentTrigger` from opening the dialog.",
+    },
+    onFileInputChange: {
+      type: "React.ChangeEventHandler<HTMLInputElement>",
+      description:
+        "Optional. Fires after the internal change handler; the event still reflects selected files until the input value is cleared.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Triggers, lists, and surrounding layout (for example prompt chrome).",
+    },
+  }}
+/>
+
+### AttachmentTrigger
+
+Button (or slotted child) that opens the **`Attachments`** file dialog. Extends standard **`button`** props; supports **`asChild`** for composing with **`Button`**.
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description: "Merge behavior onto the child element instead of rendering a `button`.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the default `button`.",
+    },
+    disabled: {
+      type: "boolean",
+      description: "Native disabled attribute; combine with root `disabled` for full picker lockout.",
+    },
+    type: {
+      type: '"button" | "submit" | "reset"',
+      default: '"button"',
+      description: "Button type when not using `asChild`.",
+    },
+  }}
+/>
+
+### AttachmentList
+
+Horizontal, scrollable row for attachment tiles. Sets **`role="list"`** by default. Extends **`React.HTMLAttributes<HTMLDivElement>`**.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional CSS classes (for example padding inside a prompt).",
+    },
+    role: {
+      type: "string",
+      default: '"list"',
+      description: "ARIA role for the container.",
+    },
+  }}
+/>
+
+### Attachment
+
+One attachment tile. Chooses a default layout from **`variant`** unless **`children`** is provided. Renders **`AttachmentProgress`** when **`progress`** is a finite number.
+
+<TypeTable
+  type={{
+    variant: {
+      type: '"box" | "card" | "pill"',
+      default: '"box"',
+      description:
+        "`box`: square preview; `card`: row with metadata; `pill`: compact chip with optional fade for long names.",
+    },
+    attachment: {
+      type: "AttachmentMeta",
+      description: "Metadata driving preview, labels, and remove behavior.",
+    },
+    progress: {
+      type: "number",
+      description: "0–100; shows a bottom progress bar when set and finite.",
+    },
+    onRemove: {
+      type: "() => void",
+      description: "Called when the default remove control is activated.",
+    },
+    cardSubtitle: {
+      type: '"size" | "kind"',
+      description:
+        "`card` only. Second line of text; when omitted, inferred from whether `attachment.size` is a positive number.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Replaces the default layout when provided (custom composition).",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the tile root.",
+    },
+  }}
+/>
+
+### AttachmentPreview
+
+Preview region inside an **`Attachment`**: raster image when **`thumbnailUrl`** or an image **`url`** exists, otherwise the type icon for **`attachment.type`**. Reads **`variant`** and **`attachment`** from **`Attachment`** context. Can override the visual **`variant`** for the preview shell only.
+
+<TypeTable
+  type={{
+    variant: {
+      type: '"box" | "card" | "pill"',
+      description:
+        "Optional override for preview framing; defaults to the parent `Attachment` variant.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the preview container.",
+    },
+  }}
+/>
+
+### AttachmentRemove
+
+Remove control for the current attachment. Default **`aria-label`** uses **`attachment.name`**. Merges **`onClick`** with **`onRemove`** from context. Extends **`button`** props; supports **`asChild`**.
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description: "Merge onto the child element instead of rendering a `button`.",
+    },
+    position: {
+      type: '"corner" | "center-end"',
+      description:
+        "Icon position; defaults to `corner` for `box` and `center-end` for `card` / `pill`.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the remove control.",
+    },
+    "aria-label": {
+      type: "string",
+      description: "Accessible label; falls back to `Remove ${attachment.name}`.",
+    },
+  }}
+/>
+
+### AttachmentInfo
+
+Column wrapper for card title and subtitle text. Pure layout; extends **`React.HTMLAttributes<HTMLDivElement>`**.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the info column.",
+    },
+  }}
+/>
+
+### AttachmentProperty
+
+Renders a single line of text from **`attachment`**: file **name**, formatted **size**, or a **kind** label (for example PDF) from MIME type or extension. The **`as`** prop selects which field to show.
+
+<TypeTable
+  type={{
+    as: {
+      type: '"name" | "size" | "kind"',
+      description:
+        "`name`: file name; `size`: formatted `attachment.size`; `kind`: short type label when available.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the rendered paragraph.",
+    },
+  }}
+/>
+
+### AttachmentProgress
+
+Thin horizontal progress bar meant to sit along the bottom edge of a tile. Usually passed indirectly via **`Attachment`** **`progress`**. **`value`** is clamped to **0–100**.
+
+<TypeTable
+  type={{
+    value: {
+      type: "number",
+      description: "Progress from 0 to 100; width of the filled segment.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the track container.",
+    },
+  }}
+/>
+
+### AttachmentMeta
+
+Metadata object for one attachment (not a React component). Used with **`Attachments`**, **`Attachment`**, and when mapping to AI SDK **`FileUIPart`** values.
+
+```ts
+export interface AttachmentMeta {
+  type: "image" | "file" | "video" | "audio";
+  name?: string;
+  url?: string;
+  /** Raster preview URL (e.g. PDF first page). When unset, preview uses the icon for `type`. */
+  thumbnailUrl?: string;
+  mimeType?: string;
+  size?: number;
+  width?: number;
+  height?: number;
+  data?: Buffer | Blob;
+}
+```
+
+### toAttachmentMeta
+
+Maps a browser **`File`** to **`AttachmentMeta`**. Sets **`type`** from **`file.type`**, and sets **`url`** from **`options.objectUrl`** when provided (typical for image **`URL.createObjectURL`** previews).
+
+```ts
+export function toAttachmentMeta(
+  file: File,
+  options?: { objectUrl?: string },
+): AttachmentMeta;
+```

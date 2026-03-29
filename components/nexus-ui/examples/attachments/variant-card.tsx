@@ -10,23 +10,38 @@ const imgSrc =
 const items: AttachmentMeta[] = [
   {
     type: "image",
-    name: "photo.jpg",
+    name: "image.png",
     url: imgSrc,
-    mimeType: "image/jpeg",
+    mimeType: "image/png",
+    size: 1_258_291,
   },
-  { type: "file", name: "notes.txt", mimeType: "text/plain" },
-  { type: "video", name: "clip.mp4", mimeType: "video/mp4" },
-  { type: "audio", name: "song.mp3", mimeType: "audio/mpeg" },
+  {
+    type: "file",
+    name: "untitled.pdf",
+    mimeType: "application/pdf",
+  },
+  {
+    type: "file",
+    name: "untitled.doc",
+    mimeType: "application/msword",
+  },
+  {
+    type: "file",
+    name: "untitled.pptx",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    size: Math.round(21.3 * 1024 * 1024),
+  },
 ];
 
-function AttachmentsDefault() {
+function AttachmentsVariantCard() {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <AttachmentList>
         {items.map((item) => (
           <Attachment
-            key={`${item.name}-${item.type}-${item.mimeType}`}
-            variant="box"
+            key={`${item.name}-${item.mimeType}`}
+            variant="card"
             attachment={item}
           />
         ))}
@@ -35,4 +50,4 @@ function AttachmentsDefault() {
   );
 }
 
-export default AttachmentsDefault;
+export default AttachmentsVariantCard;

@@ -10,23 +10,37 @@ const imgSrc =
 const items: AttachmentMeta[] = [
   {
     type: "image",
-    name: "photo.jpg",
+    name: "Skyline.png",
     url: imgSrc,
-    mimeType: "image/jpeg",
+    mimeType: "image/png",
   },
-  { type: "file", name: "notes.txt", mimeType: "text/plain" },
-  { type: "video", name: "clip.mp4", mimeType: "video/mp4" },
-  { type: "audio", name: "song.mp3", mimeType: "audio/mpeg" },
+  {
+    type: "file",
+    name: "Marketing-Plan.pdf",
+    mimeType: "application/pdf",
+  },
+  {
+    type: "file",
+    name: "Report on Design.docx",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  },
+  {
+    type: "file",
+    name: "DEMO_SLIDES.pptx",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  },
 ];
 
-function AttachmentsDefault() {
+function AttachmentsVariantPill() {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <AttachmentList>
         {items.map((item) => (
           <Attachment
-            key={`${item.name}-${item.type}-${item.mimeType}`}
-            variant="box"
+            key={`${item.name}-${item.mimeType}`}
+            variant="pill"
             attachment={item}
           />
         ))}
@@ -35,4 +49,4 @@ function AttachmentsDefault() {
   );
 }
 
-export default AttachmentsDefault;
+export default AttachmentsVariantPill;
