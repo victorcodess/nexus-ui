@@ -10,27 +10,27 @@ const imgSrc =
 const items: AttachmentMeta[] = [
   {
     type: "image",
-    name: "image.png",
+    name: "Skyline.png",
     url: imgSrc,
     mimeType: "image/png",
-    size: 1_258_291,
+    size: 1_240_000,
   },
   {
     type: "file",
-    name: "untitled.pdf",
+    name: "Marketing-Plan.pdf",
     mimeType: "application/pdf",
   },
   {
     type: "file",
-    name: "untitled.doc",
-    mimeType: "application/msword",
+    name: "Report on Design.docx",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    size: 89_200,
   },
   {
     type: "file",
-    name: "untitled.pptx",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    size: Math.round(21.3 * 1024 * 1024),
+    name: "DEMO.pptx",
+    mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   },
 ];
 
