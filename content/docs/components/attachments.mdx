@@ -114,7 +114,7 @@ Compact inline chip with thumbnail and file name. A hover fade sits over the tra
 
 ### With Prompt Input
 
-`Attachments` wraps the hidden input; keep **`AttachmentTrigger`** (and the list) **inside** the same **`Attachments`** tree as the [Prompt Input](/docs/components/prompt-input) textarea and actions.
+Wrap **[Prompt Input](/docs/components/prompt-input) with `Attachments`** (not the other way around) so **`AttachmentTrigger`**, the list, and the textarea stay in one **`Attachments`** tree. That layout also scales to **drag-and-drop on a wider chat or page shell**: you can lift **`Attachments`** around the whole column and still reuse **`onAttachmentsChange`** / **`toAttachmentMeta`** for drops outside the prompt box.
 
 <DemoWithCode src="components/nexus-ui/examples/attachments/with-prompt-input.tsx">
   <AttachmentsWithPromptInput />
@@ -152,7 +152,7 @@ Use the route from the Prompt Input docs, or ensure your handler calls **`stream
 <Step>
 <h3>Wire Prompt Input, Attachments, and `sendMessage`</h3>
 
-Build **`FileUIPart`** values from your **`AttachmentMeta`** list and pass them as **`files`** (URLs can be data URLs, HTTPS URLs, or blob URLs your app can read; for production, prefer stable URLs after upload). Wrap **`PromptInputTextarea`**, **`PromptInputActions`**, and the optional **`AttachmentList`** in **`Attachments`** so **`AttachmentTrigger`** stays in context.
+Build **`FileUIPart`** values from your **`AttachmentMeta`** list and pass them as **`files`** (URLs can be data URLs, HTTPS URLs, or blob URLs your app can read; for production, prefer stable URLs after upload). Put **`Attachments`** around **`PromptInput`** so **`AttachmentTrigger`** stays in context and you can later wrap the same **`Attachments`** subtree with a chat-wide drop zone if needed.
 
 ```tsx
 "use client";
@@ -223,14 +223,14 @@ export default function ChatWithAttachments() {
       }}
       className="w-full"
     >
-      <PromptInput onSubmit={handleSubmit}>
-        <Attachments
-          attachments={attachments}
-          onAttachmentsChange={setAttachments}
-          accept="image/*"
-          multiple
-          disabled={isLoading}
-        >
+      <Attachments
+        attachments={attachments}
+        onAttachmentsChange={setAttachments}
+        accept="image/*"
+        multiple
+        disabled={isLoading}
+      >
+        <PromptInput onSubmit={handleSubmit}>
           {attachments.length > 0 ? (
             <AttachmentList className="px-3 pt-3">
               {attachments.map((item) => (
@@ -255,7 +255,7 @@ export default function ChatWithAttachments() {
           />
           <PromptInputActions>
             <PromptInputActionGroup>
-              <PromptInputAction asChild>
+              <PromptInputAction>
                 <AttachmentTrigger asChild>
                   <Button
                     type="button"
@@ -285,8 +285,8 @@ export default function ChatWithAttachments() {
               </PromptInputAction>
             </PromptInputActionGroup>
           </PromptInputActions>
-        </Attachments>
-      </PromptInput>
+        </PromptInput>
+      </Attachments>
     </form>
   );
 }
