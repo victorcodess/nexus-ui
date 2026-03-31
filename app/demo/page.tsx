@@ -2,7 +2,7 @@ import AttachmentsDemo from "@/components/nexus-ui/examples/attachments/attachme
 
 export default function DemoPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-6">
+    <div className="relative min-h-screen w-full bg-white">
       <AttachmentsDemo />
     </div>
   );

@@ -13,6 +13,7 @@ import {
   SquareIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { motion } from "motion/react";
 
 import {
   Attachment,
@@ -162,18 +163,89 @@ const categories = [
   },
 ];
 
+/** Ease-out curve shared by entrance transitions (CSS cubic-bezier via Motion). */
+const enterEase = [0.22, 1, 0.36, 1] as const;
+
+/** Same easing/duration as attachment strip height (open/close + variant). */
+const attachmentStripShellTransitionClass =
+  "w-full overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]";
+
+/** Seconds after mount before suggestions run their enter animation (Motion ignores variant `delay` on parents with no animated props). */
+const suggestionsStartDelaySec = 0.6;
+
+const suggestionsContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.09,
+    },
+  },
+};
+
+const suggestionPillVariants = {
+  hidden: {
+    opacity: 0,
+    y: 12,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: enterEase,
+    },
+  },
+};
+
 type InputStatus = "idle" | "loading" | "error" | "submitted";
+
+const ATTACHMENT_VARIANTS = ["compact", "detailed", "inline"] as const;
+type AttachmentDemoVariant = (typeof ATTACHMENT_VARIANTS)[number];
 
 function AttachmentsDemo() {
   const [model, setModel] = React.useState("gpt-4");
   const [message, setMessage] = React.useState("");
   const [attachments, setAttachments] = React.useState<AttachmentMeta[]>([]);
+  const [attachmentVariant, setAttachmentVariant] =
+    React.useState<AttachmentDemoVariant>("detailed");
+  const [attachmentLayoutTabsVisible, setAttachmentLayoutTabsVisible] =
+    React.useState(false);
+  /** Drives strip shell height (0 vs measured); `height` CSS animates open/close and variant resizes. */
+  const [attachmentStripOpen, setAttachmentStripOpen] = React.useState(false);
+  const [attachmentStripContentHeight, setAttachmentStripContentHeight] =
+    React.useState(0);
+  const attachmentStripMeasureRef = React.useRef<HTMLDivElement>(null);
+  /** While collapsing, still render this list until grid transition ends (then clear + revoke blobs). */
+  const [stripCollapseSnapshot, setStripCollapseSnapshot] = React.useState<
+    AttachmentMeta[] | null
+  >(null);
+  const lastNonEmptyAttachmentsRef = React.useRef<AttachmentMeta[]>([]);
+  const pendingBlobRevokeRef = React.useRef<AttachmentMeta[] | null>(null);
+
   const [status, setStatus] = React.useState<InputStatus>("idle");
   const [suggestionsOpen, setSuggestionsOpen] = React.useState(false);
+  const [suggestionsEnter, setSuggestionsEnter] = React.useState(false);
   const [activeCategory, setActiveCategory] = React.useState<string | null>(
     null,
   );
   const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    const ms = Math.round(suggestionsStartDelaySec * 1000);
+    const id = window.setTimeout(() => setSuggestionsEnter(true), ms);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  React.useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!e.metaKey) return;
+      if (e.key !== "h" && e.key !== "H") return;
+      e.preventDefault();
+      setAttachmentLayoutTabsVisible((v) => !v);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const active = categories.find((c) => c.label === activeCategory);
 
@@ -184,15 +256,56 @@ function AttachmentsDemo() {
 
   const syncAttachments = React.useCallback((next: AttachmentMeta[]) => {
     setAttachments((prev) => {
-      for (const a of prev) {
-        const u = a.url;
-        if (u?.startsWith("blob:") && !next.some((n) => n.url === u)) {
-          URL.revokeObjectURL(u);
+      const isFullClear = next.length === 0 && prev.length > 0;
+
+      if (isFullClear) {
+        pendingBlobRevokeRef.current = prev;
+      } else {
+        pendingBlobRevokeRef.current = null;
+        for (const a of prev) {
+          const u = a.url;
+          if (u?.startsWith("blob:") && !next.some((n) => n.url === u)) {
+            URL.revokeObjectURL(u);
+          }
         }
       }
+
       return next;
     });
   }, []);
+
+  React.useLayoutEffect(() => {
+    if (attachments.length > 0) {
+      lastNonEmptyAttachmentsRef.current = attachments;
+      setStripCollapseSnapshot(null);
+      setAttachmentStripOpen(true);
+      return;
+    }
+
+    if (lastNonEmptyAttachmentsRef.current.length > 0) {
+      setStripCollapseSnapshot([...lastNonEmptyAttachmentsRef.current]);
+    }
+    setAttachmentStripOpen(false);
+  }, [attachments]);
+
+  const handleAttachmentStripTransitionEnd = React.useCallback(
+    (e: React.TransitionEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.propertyName !== "height") return;
+      if (attachmentStripOpen) return;
+
+      const pending = pendingBlobRevokeRef.current;
+      if (pending) {
+        for (const a of pending) {
+          if (a.url?.startsWith("blob:")) URL.revokeObjectURL(a.url);
+        }
+        pendingBlobRevokeRef.current = null;
+      }
+      lastNonEmptyAttachmentsRef.current = [];
+      setStripCollapseSnapshot(null);
+    },
+    [attachmentStripOpen],
+  );
 
   const attachmentsRef = React.useRef(attachments);
   attachmentsRef.current = attachments;
@@ -351,185 +464,298 @@ function AttachmentsDemo() {
   const isLoading = status === "loading";
   const canSend = message.trim().length > 0 || attachments.length > 0;
 
+  const attachmentStripItems =
+    attachments.length > 0 ? attachments : (stripCollapseSnapshot ?? []);
+
+  React.useLayoutEffect(() => {
+    if (attachmentStripItems.length === 0) {
+      setAttachmentStripContentHeight(0);
+      return;
+    }
+    const el = attachmentStripMeasureRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const node = attachmentStripMeasureRef.current;
+      if (!node) return;
+      const h = Math.ceil(
+        Math.max(node.scrollHeight, node.getBoundingClientRect().height),
+      );
+      setAttachmentStripContentHeight((prev) => (prev === h ? prev : h));
+    };
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    measure();
+    return () => ro.disconnect();
+  }, [attachmentStripItems.length]);
+
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-      {/* Attachments outer: easy to wrap a full chat column for page-level drag-and-drop */}
-      <Attachments
-        attachments={attachments}
-        onAttachmentsChange={syncAttachments}
-        accept="*/*"
-        multiple
+    <>
+      <motion.div
+        role="tablist"
+        aria-label="Attachment layout"
+        aria-hidden={!attachmentLayoutTabsVisible}
+        className={cn(
+          "not-prose absolute top-1/4 right-0 left-0 z-50 flex h-9 items-center justify-center gap-2 bg-white px-4 dark:bg-gray-950",
+          !attachmentLayoutTabsVisible && "pointer-events-none",
+        )}
+        initial={false}
+        animate={{ opacity: attachmentLayoutTabsVisible ? 1 : 0 }}
+        transition={{ duration: 0.35, ease: enterEase }}
+        style={{ willChange: "opacity" }}
       >
-        <PromptInput onSubmit={handleSubmit} className="z-2 shadow-sm">
-          {attachments.length > 0 ? (
-            <AttachmentList className="min-h-0 flex-nowrap justify-start overflow-x-auto overflow-y-hidden px-4 pt-4 [scrollbar-color:var(--scrollbar-thumb)_transparent] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-track]:bg-transparent">
-              {attachments.map((item) => {
-                const key = attachmentKey(item);
-                const progress = progressByKey[key];
-                return (
-                  <Attachment
-                    key={key}
-                    variant="detailed"
-                    attachment={item}
-                    progress={progress}
-                    onRemove={() => removeAttachment(item)}
-                  />
-                );
-              })}
-            </AttachmentList>
-          ) : null}
-          <PromptInputTextarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Message with attachments…"
-            disabled={isLoading}
-          />
-          <PromptInputActions>
-            <PromptInputActionGroup>
-              <PromptInputAction>
-                <AttachmentTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    <HugeiconsIcon
-                      icon={PlusSignIcon}
-                      strokeWidth={2.0}
-                      className="size-4"
-                    />
-                  </Button>
-                </AttachmentTrigger>
-              </PromptInputAction>
-              <PromptInputAction asChild>
-                <ModelSelector
-                  value={model}
-                  onValueChange={setModel}
-                  items={models}
+        {ATTACHMENT_VARIANTS.map((v) => {
+          const label =
+            v === "compact"
+              ? "Compact"
+              : v === "detailed"
+                ? "Detailed"
+                : "Inline";
+          const selected = attachmentVariant === v;
+          return (
+            <button
+              key={v}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              data-state={selected ? "active" : "inactive"}
+              tabIndex={attachmentLayoutTabsVisible ? undefined : -1}
+              onClick={() => setAttachmentVariant(v)}
+              className={cn(
+                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-full px-3 text-[13px] font-[450] whitespace-nowrap text-gray-400 transition-colors outline-none select-none dark:text-gray-500",
+                "focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 dark:focus-visible:ring-gray-500 dark:focus-visible:ring-offset-gray-950",
+                "hover:text-gray-900 dark:hover:text-gray-50",
+                selected &&
+                  "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50",
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </motion.div>
+
+      <div className="mx-auto w-full max-w-xl px-6 pt-11 pb-8">
+        <div className="flex min-h-[calc(100vh-2.75rem)] flex-col justify-center gap-6">
+          {/* Prompt block: fades in first on load */}
+          <motion.div
+            className="relative z-2 w-full"
+            initial={{ opacity: 0, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: enterEase, delay: 0.5 }}
+            style={{ willChange: "opacity, transform" }}
+          >
+            {/* Attachments outer: easy to wrap a full chat column for page-level drag-and-drop */}
+            <Attachments
+              attachments={attachments}
+              onAttachmentsChange={syncAttachments}
+              accept="*/*"
+              multiple
+            >
+              <PromptInput onSubmit={handleSubmit} className="shadow-sm">
+                <div
+                  className={attachmentStripShellTransitionClass}
+                  style={{
+                    height: attachmentStripOpen
+                      ? attachmentStripContentHeight
+                      : 0,
+                  }}
+                  onTransitionEnd={handleAttachmentStripTransitionEnd}
                 >
-                  <ModelSelectorTrigger variant="ghost" />
-                  <ModelSelectorContent className="w-[264px]" align="start">
-                    <ModelSelectorGroup>
-                      <ModelSelectorLabel>Select model</ModelSelectorLabel>
-                      <ModelSelectorRadioGroup
+                  <div ref={attachmentStripMeasureRef}>
+                    {attachmentStripItems.length > 0 ? (
+                      <AttachmentList className="min-h-0 flex-nowrap justify-start overflow-x-auto overflow-y-hidden px-4 pt-4 [scrollbar-color:var(--scrollbar-thumb)_transparent] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-track]:bg-transparent">
+                        {attachmentStripItems.map((item) => {
+                          const key = attachmentKey(item);
+                          const progress = progressByKey[key];
+                          return (
+                            <Attachment
+                              key={key}
+                              variant={attachmentVariant}
+                              attachment={item}
+                              progress={progress}
+                              onRemove={() => removeAttachment(item)}
+                            />
+                          );
+                        })}
+                      </AttachmentList>
+                    ) : null}
+                  </div>
+                </div>
+                <PromptInputTextarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="How can I help you today?"
+                  disabled={isLoading}
+                />
+                <PromptInputActions>
+                  <PromptInputActionGroup>
+                    <PromptInputAction>
+                      <AttachmentTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                        >
+                          <HugeiconsIcon
+                            icon={PlusSignIcon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </AttachmentTrigger>
+                    </PromptInputAction>
+                    <PromptInputAction asChild>
+                      <ModelSelector
                         value={model}
                         onValueChange={setModel}
+                        items={models}
                       >
-                        {models.map((m) => (
-                          <ModelSelectorRadioItem
-                            key={m.value}
-                            value={m.value}
-                            icon={m.icon}
-                            title={m.title}
-                            description={m.description}
+                        <ModelSelectorTrigger variant="ghost" />
+                        <ModelSelectorContent
+                          className="w-[264px]"
+                          align="start"
+                        >
+                          <ModelSelectorGroup>
+                            <ModelSelectorLabel>
+                              Select model
+                            </ModelSelectorLabel>
+                            <ModelSelectorRadioGroup
+                              value={model}
+                              onValueChange={setModel}
+                            >
+                              {models.map((m) => (
+                                <ModelSelectorRadioItem
+                                  key={m.value}
+                                  value={m.value}
+                                  icon={m.icon}
+                                  title={m.title}
+                                  description={m.description}
+                                />
+                              ))}
+                            </ModelSelectorRadioGroup>
+                          </ModelSelectorGroup>
+                        </ModelSelectorContent>
+                      </ModelSelector>
+                    </PromptInputAction>
+                  </PromptInputActionGroup>
+                  <PromptInputActionGroup>
+                    <PromptInputAction asChild>
+                      <Button
+                        type="button"
+                        className="size-8 cursor-pointer rounded-full bg-gray-700 text-white transition-transform hover:bg-gray-800 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                        disabled={isLoading || !canSend}
+                        onClick={() => handleSubmit(message)}
+                      >
+                        {isLoading ? (
+                          <HugeiconsIcon
+                            icon={SquareIcon}
+                            strokeWidth={2.0}
+                            className="size-3.5 fill-current"
                           />
+                        ) : (
+                          <HugeiconsIcon
+                            icon={ArrowUp02Icon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        )}
+                      </Button>
+                    </PromptInputAction>
+                  </PromptInputActionGroup>
+                </PromptInputActions>
+              </PromptInput>
+            </Attachments>
+          </motion.div>
+
+          {/* Suggestions stay `hidden` until `suggestionsStartDelaySec`, then stagger in */}
+          <motion.div
+            className="relative"
+            variants={suggestionsContainerVariants}
+            initial="hidden"
+            animate={suggestionsEnter ? "visible" : "hidden"}
+            style={{ willChange: "opacity" }}
+          >
+            <Suggestions>
+              <SuggestionList className="animate-none justify-center">
+                {categories.map((category) => (
+                  <motion.div
+                    key={category.label}
+                    variants={suggestionPillVariants}
+                    className="flex"
+                    style={{ willChange: "opacity, transform" }}
+                  >
+                    <Suggestion
+                      variant="filled"
+                      onClick={(e) => handleCategoryClick(e, category.label)}
+                      className={cn(suggestionsOpen && "opacity-0")}
+                    >
+                      <category.icon className="size-3.5" />
+                      {category.label}
+                    </Suggestion>
+                  </motion.div>
+                ))}
+              </SuggestionList>
+            </Suggestions>
+
+            <SuggestionPanel
+              open={suggestionsOpen}
+              onOpenChange={handleSuggestionsOpenChange}
+              onClose={handleSuggestionPanelClose}
+            >
+              {active && (
+                <>
+                  <SuggestionPanelHeader className="h-6">
+                    <SuggestionPanelTitle>
+                      <active.icon className="size-3.5 text-gray-400" />
+                      <span className="text-[13px] font-normal text-gray-400">
+                        {active.label}
+                      </span>
+                    </SuggestionPanelTitle>
+                    <SuggestionPanelClose className="-mr-0.75 size-5">
+                      <HugeiconsIcon
+                        icon={Cancel01Icon}
+                        strokeWidth={2.0}
+                        className="size-4"
+                      />
+                    </SuggestionPanelClose>
+                  </SuggestionPanelHeader>
+                  <SuggestionPanelContent>
+                    <Suggestions
+                      onSelect={(value) => {
+                        setMessage(value);
+                        setSuggestionsOpen(false);
+                      }}
+                    >
+                      <SuggestionList orientation="vertical" className="gap-2">
+                        {active.suggestions.map((text) => (
+                          <Suggestion
+                            key={text}
+                            variant="ghost"
+                            highlight={active.highlight}
+                            value={text}
+                            className="group h-auto w-full justify-between rounded-[6px] px-3 text-left whitespace-normal text-gray-900 hover:bg-gray-200/72"
+                          >
+                            {text}
+                            <HugeiconsIcon
+                              icon={ArrowRight01Icon}
+                              strokeWidth={2.0}
+                              className="size-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-500"
+                            />
+                          </Suggestion>
                         ))}
-                      </ModelSelectorRadioGroup>
-                    </ModelSelectorGroup>
-                  </ModelSelectorContent>
-                </ModelSelector>
-              </PromptInputAction>
-            </PromptInputActionGroup>
-            <PromptInputActionGroup>
-              <PromptInputAction asChild>
-                <Button
-                  type="button"
-                  className="size-8 cursor-pointer rounded-full bg-gray-700 text-white transition-transform hover:bg-gray-800 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                  disabled={isLoading || !canSend}
-                  onClick={() => handleSubmit(message)}
-                >
-                  {isLoading ? (
-                    <HugeiconsIcon
-                      icon={SquareIcon}
-                      strokeWidth={2.0}
-                      className="size-3.5 fill-current"
-                    />
-                  ) : (
-                    <HugeiconsIcon
-                      icon={ArrowUp02Icon}
-                      strokeWidth={2.0}
-                      className="size-4"
-                    />
-                  )}
-                </Button>
-              </PromptInputAction>
-            </PromptInputActionGroup>
-          </PromptInputActions>
-        </PromptInput>
-      </Attachments>
-
-      <div className="relative">
-        <Suggestions>
-          <SuggestionList className="justify-center">
-            {categories.map((category) => (
-              <Suggestion
-                key={category.label}
-                variant="filled"
-                onClick={(e) => handleCategoryClick(e, category.label)}
-                className={cn(suggestionsOpen && "opacity-0")}
-              >
-                <category.icon className="size-3.5" />
-                {category.label}
-              </Suggestion>
-            ))}
-          </SuggestionList>
-        </Suggestions>
-
-        <SuggestionPanel
-          open={suggestionsOpen}
-          onOpenChange={handleSuggestionsOpenChange}
-          onClose={handleSuggestionPanelClose}
-        >
-          {active && (
-            <>
-              <SuggestionPanelHeader className="h-6">
-                <SuggestionPanelTitle>
-                  <active.icon className="size-3.5 text-gray-400" />
-                  <span className="text-[13px] font-normal text-gray-400">
-                    {active.label}
-                  </span>
-                </SuggestionPanelTitle>
-                <SuggestionPanelClose className="-mr-0.75 size-5">
-                  <HugeiconsIcon
-                    icon={Cancel01Icon}
-                    strokeWidth={2.0}
-                    className="size-4"
-                  />
-                </SuggestionPanelClose>
-              </SuggestionPanelHeader>
-              <SuggestionPanelContent>
-                <Suggestions
-                  onSelect={(value) => {
-                    setMessage(value);
-                    setSuggestionsOpen(false);
-                  }}
-                >
-                  <SuggestionList orientation="vertical" className="gap-2">
-                    {active.suggestions.map((text) => (
-                      <Suggestion
-                        key={text}
-                        variant="ghost"
-                        highlight={active.highlight}
-                        value={text}
-                        className="group h-auto w-full justify-between rounded-[6px] px-3 text-left whitespace-normal text-gray-900 hover:bg-gray-200/72"
-                      >
-                        {text}
-                        <HugeiconsIcon
-                          icon={ArrowRight01Icon}
-                          strokeWidth={2.0}
-                          className="size-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-500"
-                        />
-                      </Suggestion>
-                    ))}
-                  </SuggestionList>
-                </Suggestions>
-              </SuggestionPanelContent>
-            </>
-          )}
-        </SuggestionPanel>
+                      </SuggestionList>
+                    </Suggestions>
+                  </SuggestionPanelContent>
+                </>
+              )}
+            </SuggestionPanel>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
