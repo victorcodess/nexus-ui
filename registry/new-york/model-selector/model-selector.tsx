@@ -124,7 +124,7 @@ function ModelSelectorTrigger({
         className="flex items-center gap-1"
       >
         {selected?.icon && <selected.icon className="size-4 shrink-0" />}
-        <span data-slot="model-selector-trigger-title" className="truncate">
+        <span data-slot="model-selector-trigger-title" className="truncate text-sm">
           {selected?.title ?? value}
         </span>
       </span>
