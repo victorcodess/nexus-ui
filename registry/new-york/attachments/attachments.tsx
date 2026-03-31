@@ -27,8 +27,18 @@ export interface AttachmentMeta {
   size?: number;
   width?: number;
   height?: number;
-  data?: Buffer | Blob;
+  /** Binary payload when not using `url` (browser-friendly; prefer `Blob`). */
+  data?: Blob | ArrayBuffer;
 }
+
+/** Files not appended by the picker: oversized, over `maxFiles`, or extra when `multiple` is false. */
+export type AttachmentsRejectedFiles = {
+  tooLarge: File[];
+  /** Within size but did not fit under `maxFiles`. */
+  overMaxFiles: File[];
+  /** Ignored because `multiple` is false. */
+  truncatedByMultiple: File[];
+};
 
 export function toAttachmentMeta(
   file: File,
@@ -47,6 +57,18 @@ export function toAttachmentMeta(
     mimeType: file.type || undefined,
     size: file.size,
   };
+}
+
+function previewObjectUrlForFile(file: File): string | undefined {
+  const mime = file.type?.toLowerCase() ?? "";
+  if (
+    mime.startsWith("image/") ||
+    mime.startsWith("video/") ||
+    mime.startsWith("audio/")
+  ) {
+    return URL.createObjectURL(file);
+  }
+  return undefined;
 }
 
 function formatBytes(bytes?: number): string | undefined {
@@ -141,7 +163,8 @@ function attachmentShellClass(
   if (variant === "compact") {
     const hasRasterPreview =
       Boolean(attachment.thumbnailUrl) ||
-      (attachment.type === "image" && Boolean(attachment.url));
+      (attachment.type === "image" && Boolean(attachment.url)) ||
+      (attachment.type === "video" && Boolean(attachment.url));
     if (hasRasterPreview) return "";
     return "bg-gray-100 dark:bg-gray-700";
   }
@@ -203,6 +226,10 @@ export type AttachmentsProps = {
   disabled?: boolean;
   /** Fires after the internal file handler (same event; `target.files` still available). */
   onFileInputChange?: React.ChangeEventHandler<HTMLInputElement>;
+  /**
+   * Called when some selected files are not appended (oversized, over `maxFiles`, or trimmed because `multiple` is false).
+   */
+  onFilesRejected?: (detail: AttachmentsRejectedFiles) => void;
   children?: React.ReactNode;
 };
 
@@ -215,9 +242,35 @@ function Attachments({
   maxSize,
   disabled = false,
   onFileInputChange,
+  onFilesRejected,
   children,
 }: AttachmentsProps) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const managedBlobUrlsRef = React.useRef<Set<string>>(new Set());
+
+  React.useLayoutEffect(() => {
+    const inUse = new Set<string>();
+    for (const a of attachments) {
+      if (a.url) inUse.add(a.url);
+      if (a.thumbnailUrl) inUse.add(a.thumbnailUrl);
+    }
+    for (const url of [...managedBlobUrlsRef.current]) {
+      if (!inUse.has(url)) {
+        URL.revokeObjectURL(url);
+        managedBlobUrlsRef.current.delete(url);
+      }
+    }
+  }, [attachments]);
+
+  React.useEffect(() => {
+    return () => {
+      for (const url of managedBlobUrlsRef.current) {
+        URL.revokeObjectURL(url);
+      }
+      managedBlobUrlsRef.current.clear();
+    };
+  }, []);
+
   const openPicker = React.useCallback(() => {
     if (disabled) return;
     inputRef.current?.click();
@@ -233,9 +286,16 @@ function Attachments({
       }
 
       let incoming = Array.from(list);
-      if (!multiple) {
+      let truncatedByMultiple: File[] = [];
+      if (!multiple && incoming.length > 1) {
+        truncatedByMultiple = incoming.slice(1);
         incoming = incoming.slice(0, 1);
       }
+
+      const tooLarge =
+        maxSize != null
+          ? incoming.filter((f) => f.size > maxSize)
+          : [];
 
       const withinSize =
         maxSize != null ? incoming.filter((f) => f.size <= maxSize) : incoming;
@@ -250,13 +310,26 @@ function Attachments({
           ? withinSize
           : withinSize.slice(0, room);
 
-      const newMetas = take.map((file) =>
-        toAttachmentMeta(file, {
-          objectUrl: file.type.startsWith("image/")
-            ? URL.createObjectURL(file)
-            : undefined,
-        }),
-      );
+      const overMaxFiles =
+        room === Number.POSITIVE_INFINITY ? [] : withinSize.slice(room);
+
+      if (
+        tooLarge.length > 0 ||
+        overMaxFiles.length > 0 ||
+        truncatedByMultiple.length > 0
+      ) {
+        onFilesRejected?.({
+          tooLarge,
+          overMaxFiles,
+          truncatedByMultiple,
+        });
+      }
+
+      const newMetas = take.map((file) => {
+        const objectUrl = previewObjectUrlForFile(file);
+        if (objectUrl) managedBlobUrlsRef.current.add(objectUrl);
+        return toAttachmentMeta(file, { objectUrl });
+      });
 
       if (newMetas.length > 0) {
         onAttachmentsChange([...attachments, ...newMetas]);
@@ -273,6 +346,7 @@ function Attachments({
       attachments,
       onAttachmentsChange,
       onFileInputChange,
+      onFilesRejected,
     ],
   );
 
@@ -330,15 +404,14 @@ function AttachmentTrigger({
   onClick,
   ...props
 }: AttachmentTriggerProps) {
-  const { inputRef, disabled } = useAttachmentsContext("AttachmentTrigger");
+  const { openPicker } = useAttachmentsContext("AttachmentTrigger");
 
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e);
-      if (disabled) return;
-      inputRef.current?.click();
+      openPicker();
     },
-    [onClick, inputRef, disabled],
+    [onClick, openPicker],
   );
 
   if (asChild) {
@@ -531,9 +604,16 @@ function AttachmentPreview({
     (attachment.type === "image" && attachment.url
       ? attachment.url
       : undefined);
+  const videoSrc =
+    !attachment.thumbnailUrl &&
+    attachment.type === "video" &&
+    attachment.url
+      ? attachment.url
+      : undefined;
   const showRaster = Boolean(rasterSrc);
+  const showVideo = Boolean(videoSrc);
   const inlinePlainIcon =
-    v === "inline" && !showRaster
+    v === "inline" && !showRaster && !showVideo
       ? "border-0 bg-transparent dark:bg-transparent"
       : "";
 
@@ -547,6 +627,21 @@ function AttachmentPreview({
           <img
             src={rasterSrc}
             alt=""
+            className="relative z-1 size-full object-cover"
+          />
+        </>
+      );
+    }
+    if (videoSrc) {
+      return (
+        <>
+          <div className="absolute inset-0 z-0 size-full animate-pulse bg-gray-200 dark:bg-gray-900" />
+          <video
+            src={videoSrc}
+            muted
+            playsInline
+            preload="metadata"
+            aria-hidden
             className="relative z-1 size-full object-cover"
           />
         </>

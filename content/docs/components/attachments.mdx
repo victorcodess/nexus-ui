@@ -303,6 +303,8 @@ The AI SDK [attachments guide](https://ai-sdk.dev/docs/ai-sdk-ui/chatbot#attachm
 
 Controlled root: holds **`AttachmentMeta[]`**, wires **`onAttachmentsChange`**, renders a screen-reader-only **`input type="file"`**, and exposes context for **`AttachmentTrigger`**. Renders the input first, then **`children`**. Must wrap every **`AttachmentTrigger`** that opens its picker.
 
+Object URLs created by this picker (**`URL.createObjectURL`** for image, video, and audio **`File`**s) are tracked and **`URL.revokeObjectURL`** when an attachment leaves the list or when **`Attachments`** unmounts. Blob URLs you attach yourself (outside this flow) are not revoked by the component.
+
 <TypeTable
   type={{
     attachments: {
@@ -341,12 +343,25 @@ Controlled root: holds **`AttachmentMeta[]`**, wires **`onAttachmentsChange`**, 
       description:
         "Optional. Fires after the internal change handler; the event still reflects selected files until the input value is cleared.",
     },
+    onFilesRejected: {
+      type: "(detail: AttachmentsRejectedFiles) => void",
+      description:
+        "Optional. When the user selects files that are not all appended: oversize (`tooLarge`), over `maxFiles` (`overMaxFiles`), or extra files when `multiple` is false (`truncatedByMultiple`).",
+    },
     children: {
       type: "React.ReactNode",
       description: "Triggers, lists, and surrounding layout (for example prompt chrome).",
     },
   }}
 />
+
+```ts
+export type AttachmentsRejectedFiles = {
+  tooLarge: File[];
+  overMaxFiles: File[];
+  truncatedByMultiple: File[];
+};
+```
 
 ### AttachmentTrigger
 
@@ -541,13 +556,13 @@ export interface AttachmentMeta {
   size?: number;
   width?: number;
   height?: number;
-  data?: Buffer | Blob;
+  data?: Blob | ArrayBuffer;
 }
 ```
 
 ### toAttachmentMeta
 
-Maps a browser **`File`** to **`AttachmentMeta`**. Sets **`type`** from **`file.type`**, and sets **`url`** from **`options.objectUrl`** when provided (typical for image **`URL.createObjectURL`** previews).
+Maps a browser **`File`** to **`AttachmentMeta`**. Sets **`type`** from **`file.type`**, and sets **`url`** from **`options.objectUrl`** when provided. The **`Attachments`** picker supplies object URLs for image, video, and audio files (video previews use a muted **`video`** element in tile layouts).
 
 ```ts
 export function toAttachmentMeta(
