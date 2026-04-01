@@ -309,7 +309,8 @@ Object URLs created by this picker (**`URL.createObjectURL`** for every **`File`
   type={{
     attachments: {
       type: "AttachmentMeta[]",
-      description: "Controlled list of attachment metadata shown in the UI and updated when the user picks files.",
+      description:
+        "Controlled list of attachment metadata shown in the UI and updated when the user picks files.",
     },
     onAttachmentsChange: {
       type: "(attachments: AttachmentMeta[]) => void",
@@ -336,7 +337,8 @@ Object URLs created by this picker (**`URL.createObjectURL`** for every **`File`
     disabled: {
       type: "boolean",
       default: "false",
-      description: "Disables the file input and prevents `AttachmentTrigger` from opening the dialog.",
+      description:
+        "Disables the file input and prevents `AttachmentTrigger` from opening the dialog.",
     },
     onFileInputChange: {
       type: "React.ChangeEventHandler<HTMLInputElement>",
@@ -350,7 +352,8 @@ Object URLs created by this picker (**`URL.createObjectURL`** for every **`File`
     },
     children: {
       type: "React.ReactNode",
-      description: "Triggers, lists, and surrounding layout (for example prompt chrome).",
+      description:
+        "Triggers, lists, and surrounding layout (for example prompt chrome).",
     },
   }}
 />
@@ -372,7 +375,8 @@ Button (or slotted child) that opens the **`Attachments`** file dialog. Extends 
     asChild: {
       type: "boolean",
       default: "false",
-      description: "Merge behavior onto the child element instead of rendering a `button`.",
+      description:
+        "Merge behavior onto the child element instead of rendering a `button`.",
     },
     className: {
       type: "string",
@@ -380,7 +384,8 @@ Button (or slotted child) that opens the **`Attachments`** file dialog. Extends 
     },
     disabled: {
       type: "boolean",
-      description: "Native disabled attribute; combine with root `disabled` for full picker lockout.",
+      description:
+        "Native disabled attribute; combine with root `disabled` for full picker lockout.",
     },
     type: {
       type: '"button" | "submit" | "reset"',
@@ -398,7 +403,8 @@ Horizontal, scrollable row for attachment tiles. Sets **`role="list"`** by defau
   type={{
     className: {
       type: "string",
-      description: "Additional CSS classes (for example padding inside a prompt).",
+      description:
+        "Additional CSS classes (for example padding inside a prompt).",
     },
     role: {
       type: "string",
@@ -439,7 +445,8 @@ One attachment tile. Chooses a default layout from **`variant`** unless **`child
     },
     children: {
       type: "React.ReactNode",
-      description: "Replaces the default layout when provided (custom composition).",
+      description:
+        "Replaces the default layout when provided (custom composition).",
     },
     className: {
       type: "string",
@@ -475,7 +482,8 @@ Remove control for the current attachment. Default **`aria-label`** uses **`atta
     asChild: {
       type: "boolean",
       default: "false",
-      description: "Merge onto the child element instead of rendering a `button`.",
+      description:
+        "Merge onto the child element instead of rendering a `button`.",
     },
     position: {
       type: '"corner" | "center-end"',
@@ -488,7 +496,8 @@ Remove control for the current attachment. Default **`aria-label`** uses **`atta
     },
     "aria-label": {
       type: "string",
-      description: "Accessible label; falls back to `Remove ${attachment.name}`.",
+      description:
+        "Accessible label; falls back to `Remove ${attachment.name}`.",
     },
   }}
 />

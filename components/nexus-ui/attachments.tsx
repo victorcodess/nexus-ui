@@ -135,6 +135,8 @@ type AttachmentVariant = NonNullable<
 
 type AttachmentsContextValue = {
   inputRef: React.RefObject<HTMLInputElement | null>;
+  /** Stable id on the hidden file input (labels, tests, or custom `aria-*`). */
+  inputId: string;
   openPicker: () => void;
   attachments: AttachmentMeta[];
   onAttachmentsChange: (next: AttachmentMeta[]) => void;
@@ -206,6 +208,7 @@ function Attachments({
   children,
 }: AttachmentsProps) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const inputId = React.useId();
   const managedBlobUrlsRef = React.useRef<Set<string>>(new Set());
 
   React.useLayoutEffect(() => {
@@ -311,6 +314,7 @@ function Attachments({
   const value = React.useMemo<AttachmentsContextValue>(
     () => ({
       inputRef,
+      inputId,
       openPicker,
       attachments,
       onAttachmentsChange,
@@ -321,6 +325,7 @@ function Attachments({
       disabled,
     }),
     [
+      inputId,
       attachments,
       onAttachmentsChange,
       accept,
@@ -336,6 +341,7 @@ function Attachments({
     <AttachmentsContext.Provider value={value}>
       <input
         ref={inputRef}
+        id={inputId}
         type="file"
         data-slot="attachments-input"
         className="sr-only"
@@ -360,24 +366,35 @@ function AttachmentTrigger({
   className,
   children,
   onClick,
+  disabled: disabledProp,
   ...props
 }: AttachmentTriggerProps) {
-  const { openPicker } = useAttachmentsContext("AttachmentTrigger");
+  const { openPicker, disabled: rootDisabled } =
+    useAttachmentsContext("AttachmentTrigger");
+  const disabled = Boolean(rootDisabled || disabledProp);
 
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled) return;
       onClick?.(e);
       openPicker();
     },
-    [onClick, openPicker],
+    [disabled, onClick, openPicker],
+  );
+
+  const triggerClassName = cn(
+    disabled && "cursor-not-allowed opacity-50",
+    className,
   );
 
   if (asChild) {
     return (
       <Slot
-        className={className}
-        onClick={handleClick as React.MouseEventHandler<HTMLElement>}
         {...props}
+        data-slot="attachment-trigger"
+        className={triggerClassName}
+        aria-disabled={disabled}
+        onClick={handleClick as React.MouseEventHandler<HTMLElement>}
       >
         {children}
       </Slot>
@@ -386,11 +403,12 @@ function AttachmentTrigger({
 
   return (
     <button
+      {...props}
       type="button"
       data-slot="attachment-trigger"
-      className={cn(className)}
+      className={triggerClassName}
+      disabled={disabled}
       onClick={handleClick}
-      {...props}
     >
       {children}
     </button>
@@ -607,6 +625,7 @@ function AttachmentPreview({
         icon={iconForAttachmentType(attachment.type)}
         strokeWidth={1.5}
         className={iconClass}
+        aria-hidden
       />
     );
   })();
@@ -700,6 +719,7 @@ function AttachmentRemove({
           icon={Cancel01Icon}
           strokeWidth={2.5}
           className="size-3"
+          aria-hidden
         />
       )}
     </button>
