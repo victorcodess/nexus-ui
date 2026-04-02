@@ -678,7 +678,7 @@ function AttachmentOverflowFadeLayer({
       aria-hidden
       data-slot="attachment-overflow-fade"
       className={cn(
-        "pointer-events-none absolute top-1/2 right-0 w-10 -translate-y-1/2 bg-linear-to-l from-gray-100 from-65% to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-gray-700",
+        "pointer-events-none absolute top-1/2 right-0 w-10 -translate-y-1/2 bg-linear-to-l from-gray-100 from-65% to-transparent transition-opacity group-hover:opacity-100 sm:opacity-0 dark:from-gray-700",
         variant === "detailed" ? "h-15" : "h-8",
         className,
       )}
