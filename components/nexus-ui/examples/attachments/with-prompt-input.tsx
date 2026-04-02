@@ -27,15 +27,18 @@ import PromptInput, {
 import { Button } from "@/components/ui/button";
 
 function attachmentKey(a: AttachmentMeta) {
-  return `${a.name ?? ""}-${a.size ?? ""}-${a.mimeType ?? ""}-${a.url ?? ""}`;
+  return `${a.name ?? ""}-${a.size ?? ""}-${a.mimeType ?? ""}-${a.source ?? ""}-${a.url ?? ""}`;
 }
 
 type InputStatus = "idle" | "loading" | "error" | "submitted";
 
 const maxAttachmentSize = 500 * 1024 * 1024;
 
+/** Plain-text paste longer than this becomes a **`source: "paste"`** attachment (`variant="pasted"`). */
+const pasteTextAsFileMinChars = 2000;
+
 /** Must render under **`Attachments`** — uses **`appendFiles`** from context. */
-function PromptInputTextareaWithImagePaste(
+function PromptInputTextareaWithPaste(
   props: React.ComponentProps<typeof PromptInputTextarea>,
 ) {
   const { appendFiles, disabled } = useAttachments();
@@ -44,13 +47,25 @@ function PromptInputTextareaWithImagePaste(
   const handlePaste = React.useCallback(
     (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
       onPaste?.(e);
-      if (e.defaultPrevented) return;
-      const images = filesFromDataTransfer(e.clipboardData).filter((f) =>
+      if (e.defaultPrevented || disabled) return;
+
+      const imageFiles = filesFromDataTransfer(e.clipboardData).filter((f) =>
         f.type.startsWith("image/"),
       );
-      if (images.length === 0 || disabled) return;
-      e.preventDefault();
-      appendFiles(images);
+      if (imageFiles.length > 0) {
+        e.preventDefault();
+        appendFiles(imageFiles);
+        return;
+      }
+
+      const text = e.clipboardData.getData("text/plain");
+      if (text.length >= pasteTextAsFileMinChars) {
+        e.preventDefault();
+        appendFiles(
+          [new File([text], "pasted-text.txt", { type: "text/plain" })],
+          { paste: true },
+        );
+      }
     },
     [appendFiles, disabled, onPaste],
   );
@@ -128,6 +143,9 @@ function AttachmentsWithPromptInput() {
     );
 
     for (const key of newKeys) {
+      const added = attachments.find((a) => attachmentKey(a) === key);
+      if (added?.source === "paste") continue;
+
       clearKeyTimers(key);
 
       setProgressByKey((p) => ({ ...p, [key]: 0 }));
@@ -238,19 +256,20 @@ function AttachmentsWithPromptInput() {
               {attachments.map((item) => {
                 const key = attachmentKey(item);
                 const progress = progressByKey[key];
+                const isPasted = item.source === "paste";
                 return (
                   <Attachment
                     key={key}
-                    variant="detailed"
+                    variant={isPasted ? "pasted" : "detailed"}
                     attachment={item}
-                    progress={progress}
+                    progress={isPasted ? undefined : progress}
                     onRemove={() => removeAttachment(item)}
                   />
                 );
               })}
             </AttachmentList>
           ) : null}
-          <PromptInputTextareaWithImagePaste
+          <PromptInputTextareaWithPaste
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Message with attachments…"

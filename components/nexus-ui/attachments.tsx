@@ -31,6 +31,10 @@ export interface AttachmentMeta {
   height?: number;
   /** Binary payload when not using `url` (browser-friendly; prefer `Blob`). */
   data?: Blob | ArrayBuffer;
+  /**
+   * **`"paste"`** when created from clipboard (e.g. long text → **`File`**). Use with **`Attachment`** **`variant="pasted"`**.
+   */
+  source?: "paste";
 }
 
 /** Files not appended by the picker: oversized, over `maxFiles`, extra when `multiple` is false, or outside `accept`. */
@@ -46,7 +50,7 @@ export type AttachmentsRejectedFiles = {
 
 export function toAttachmentMeta(
   file: File,
-  options?: { objectUrl?: string },
+  options?: { objectUrl?: string; source?: AttachmentMeta["source"] },
 ): AttachmentMeta {
   const mime = file.type?.toLowerCase() ?? "";
   let kind: AttachmentMeta["type"] = "file";
@@ -60,8 +64,15 @@ export function toAttachmentMeta(
     url: options?.objectUrl,
     mimeType: file.type || undefined,
     size: file.size,
+    ...(options?.source != null ? { source: options.source } : {}),
   };
 }
+
+/** Optional second argument to **`appendFiles`** (from **`useAttachments`**). */
+export type AppendFilesOptions = {
+  /** Sets **`AttachmentMeta.source`** to **`"paste"`** for every appended item. */
+  paste?: boolean;
+};
 
 /**
  * `File`s from a `DataTransfer` (paste **`clipboardData`** or drop **`dataTransfer`**).
@@ -174,6 +185,8 @@ const attachmentVariants = cva(
           "relative flex h-8 w-auto min-w-0 max-w-[200px] shrink-0 items-center justify-start p-1 pr-2",
         detailed:
           "relative flex h-15 w-auto min-w-[200px] max-w-[250px] shrink-0 items-center justify-start p-2 pr-3",
+        pasted:
+          "relative flex w-[156px] h-[144px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[6px] p-2 gap-2",
       },
     },
     defaultVariants: {
@@ -198,7 +211,7 @@ export type AttachmentsContextValue = {
    * Append files with the same limits and `onFilesRejected` behavior as the native picker.
    * For drag-and-drop or paste, call this from your handler.
    */
-  appendFiles: (files: File[]) => void;
+  appendFiles: (files: File[], options?: AppendFilesOptions) => void;
   /** True while a file drag is active over the document (when `windowDrop` is enabled). */
   isDraggingFile: boolean;
   attachments: AttachmentMeta[];
@@ -311,7 +324,7 @@ function Attachments({
   }, [disabled]);
 
   const appendFilesFromList = React.useCallback(
-    (rawFiles: File[]) => {
+    (rawFiles: File[], appendOptions?: AppendFilesOptions) => {
       if (disabled || rawFiles.length === 0) return;
 
       let incoming = [...rawFiles];
@@ -365,7 +378,10 @@ function Attachments({
       const newMetas = take.map((file) => {
         const objectUrl = URL.createObjectURL(file);
         managedBlobUrlsRef.current.add(objectUrl);
-        return toAttachmentMeta(file, { objectUrl });
+        return toAttachmentMeta(file, {
+          objectUrl,
+          source: appendOptions?.paste ? "paste" : undefined,
+        });
       });
 
       if (newMetas.length > 0) {
@@ -703,6 +719,11 @@ type AttachmentProps = Omit<
    * When set, replaces the default layout.
    */
   children?: React.ReactNode;
+  /**
+   * `pasted` only: maximum characters in the preview line (remainder as ellipsis).
+   * @default 220
+   */
+  pastedExcerptMaxChars?: number;
 };
 
 function Attachment({
@@ -712,6 +733,7 @@ function Attachment({
   progress,
   onRemove,
   detailedSubtitle: detailedSubtitleProp,
+  pastedExcerptMaxChars = 220,
   children,
   ...props
 }: AttachmentProps) {
@@ -728,7 +750,21 @@ function Attachment({
   const showProgress = progress != null && Number.isFinite(progress);
 
   const defaultLayout =
-    variant === "compact" ? (
+    variant === "pasted" ? (
+      <>
+        <AttachmentPreview pastedExcerptMaxChars={pastedExcerptMaxChars} />
+
+        <div className="flex h-6 w-full items-center justify-between gap-2 rounded-[6px] bg-white pr-1 pl-2 dark:bg-gray-950/50">
+          <span className="text-xs leading-4 font-[350] text-gray-500 uppercase dark:text-gray-400">
+            Pasted
+          </span>
+          <AttachmentRemove
+            position="inline"
+            className="bg-transparent text-gray-500 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-gray-700"
+          />
+        </div>
+      </>
+    ) : variant === "compact" ? (
       <>
         <AttachmentRemove />
         <AttachmentPreview />
@@ -769,7 +805,9 @@ function Attachment({
           <AttachmentOverflowFadeLayer variant={variant} />
         ) : null}
         {children ?? defaultLayout}
-        {showProgress ? <AttachmentProgress value={progress} /> : null}
+        {showProgress && variant !== "pasted" ? (
+          <AttachmentProgress value={progress} />
+        ) : null}
       </div>
     </AttachmentItemContext.Provider>
   );
@@ -786,6 +824,8 @@ const attachmentPreviewVariants = cva(
           "size-6 rounded-[4px] border border-gray-200 dark:border-gray-600",
         detailed:
           "size-11 rounded-[6px] border border-gray-200 dark:border-gray-600",
+        pasted:
+          "min-h-0 w-full flex-1 shrink self-stretch items-start justify-start border-0 bg-transparent p-0 dark:bg-transparent",
       },
     },
     defaultVariants: {
@@ -798,15 +838,68 @@ type AttachmentPreviewProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > &
-  Partial<VariantProps<typeof attachmentPreviewVariants>>;
+  Partial<VariantProps<typeof attachmentPreviewVariants>> & {
+    /**
+     * `pasted` only: max characters before ellipsis (from **`Attachment`** **`pastedExcerptMaxChars`**).
+     * @default 220
+     */
+    pastedExcerptMaxChars?: number;
+  };
 
 function AttachmentPreview({
   className,
   variant: variantProp,
+  pastedExcerptMaxChars = 220,
   ...props
 }: AttachmentPreviewProps) {
   const { variant, attachment } = useAttachmentItemContext("AttachmentPreview");
   const v = variantProp ?? variant;
+  const [pastedRawText, setPastedRawText] = React.useState("");
+
+  React.useEffect(() => {
+    if (v !== "pasted") return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      if (attachment.data instanceof Blob) {
+        const t = await attachment.data.text();
+        if (!cancelled) setPastedRawText(t);
+        return;
+      }
+      if (attachment.data instanceof ArrayBuffer) {
+        const t = new TextDecoder().decode(attachment.data);
+        if (!cancelled) setPastedRawText(t);
+        return;
+      }
+      const url = attachment.url;
+      if (url?.startsWith("blob:") || url?.startsWith("data:")) {
+        try {
+          const res = await fetch(url);
+          const t = await res.text();
+          if (!cancelled) setPastedRawText(t);
+        } catch {
+          if (!cancelled) setPastedRawText("");
+        }
+        return;
+      }
+      if (!cancelled) setPastedRawText("");
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [v, attachment.data, attachment.url]);
+
+  const pastedExcerpt = React.useMemo(() => {
+    if (v !== "pasted") return "";
+    const normalized = pastedRawText.replace(/\s+/g, " ").trim();
+    const max = pastedExcerptMaxChars;
+    if (normalized.length <= max) return normalized;
+    return `${normalized.slice(0, max).trimEnd()}…`;
+  }, [v, pastedRawText, pastedExcerptMaxChars]);
+
   const rasterSrc =
     attachment.thumbnailUrl ??
     (attachment.type === "image" && attachment.url
@@ -826,6 +919,16 @@ function AttachmentPreview({
   const iconClass = v === "inline" ? "size-5" : "size-7";
 
   const content = (() => {
+    if (v === "pasted") {
+      return (
+        <p
+          data-slot="attachment-preview-excerpt"
+          className="my-0! line-clamp-6 text-xs leading-4 font-[350] text-gray-400 dark:text-gray-400"
+        >
+          {pastedExcerpt.length > 0 ? pastedExcerpt : "\u00a0"}
+        </p>
+      );
+    }
     if (rasterSrc) {
       return (
         <>
@@ -869,8 +972,8 @@ function AttachmentPreview({
       className={cn(
         attachmentPreviewVariants({ variant: v }),
         inlinePlainIcon,
+        v !== "pasted" && "relative",
         className,
-        "relative",
       )}
       {...props}
     >
@@ -886,6 +989,8 @@ const removeButtonVariants = cva(
       position: {
         corner: "absolute top-1 right-1",
         "center-end": "absolute top-1/2 right-1 -translate-y-1/2",
+        /** Inline footer (e.g. **`variant="pasted"`**): always visible. */
+        inline: "relative shrink-0 opacity-100 sm:opacity-100",
       },
     },
     defaultVariants: {

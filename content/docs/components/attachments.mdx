@@ -6,10 +6,11 @@ description: Composable file attachments for chat inputs and messages with previ
 import AttachmentsDefault from "@/components/nexus-ui/examples/attachments/default";
 import AttachmentsVariantDetailed from "@/components/nexus-ui/examples/attachments/variant-detailed";
 import AttachmentsVariantInline from "@/components/nexus-ui/examples/attachments/variant-inline";
+import AttachmentsVariantPasted from "@/components/nexus-ui/examples/attachments/variant-pasted";
 import AttachmentsWithPromptInput from "@/components/nexus-ui/examples/attachments/with-prompt-input";
 import AttachmentsWithProgress from "@/components/nexus-ui/examples/attachments/with-progress";
 
-Composable attachment UI for chat and messaging: thumbnails or type icons, remove actions, optional upload progress, and a controlled `Attachments` root that owns the hidden file input and pairs with `AttachmentTrigger`. The demo above uses the default **`compact`** (square) variant; **inline** and **detailed** layouts are shown below.
+Composable attachment UI for chat and messaging: thumbnails or type icons, remove actions, optional upload progress, and a controlled `Attachments` root that owns the hidden file input and pairs with `AttachmentTrigger`. The demo above uses the default **`compact`** (square) variant; **inline**, **detailed**, and **pasted** (long clipboard text) layouts are shown below.
 
 <DemoWithCode src="components/nexus-ui/examples/attachments/default.tsx">
   <AttachmentsDefault />
@@ -115,6 +116,14 @@ Compact horizontal chip with thumbnail and file name. A hover fade sits over the
   <AttachmentsVariantInline />
 </DemoWithCode>
 
+### Pasted text variant
+
+For **large pasted plain text** (e.g. from **`appendFiles([file], { paste: true })`** after **`⌘V`** in your prompt), use **`variant="pasted"`** with **`AttachmentMeta.source === "paste"`**. The tile shows a short excerpt and a **Pasted** footer with remove.
+
+<DemoWithCode src="components/nexus-ui/examples/attachments/variant-pasted.tsx">
+  <AttachmentsVariantPasted />
+</DemoWithCode>
+
 ### Upload progress
 
 Pass **`progress`** (`0`–`100`) on **`Attachment`** to show a thin bar along the bottom of the tile. Omit it when the upload finishes.
@@ -125,7 +134,7 @@ Pass **`progress`** (`0`–`100`) on **`Attachment`** to show a thin bar along t
 
 ### With Prompt Input
 
-Wrap **[Prompt Input](/docs/components/prompt-input) with `Attachments`** (not the other way around) so **`AttachmentTrigger`**, the list, and the textarea stay in one **`Attachments`** tree. Enable **`windowDrop`** for page-level drag-and-drop (same validation as the picker: **`accept`**, **`maxFiles`**, **`maxSize`**, **`onFilesRejected`**). This example turns that on and adds **`AttachmentsDropOverlay`** (default **`fullscreen`**) for drag feedback—use **`variant="contained"`** inside a **`relative`** shell for in-box chrome only. Pasting images into the prompt is wired with **`onPaste`** on the textarea: **`filesFromDataTransfer(e.clipboardData)`** and **`useAttachments().appendFiles`** (see **`with-prompt-input.tsx`**).
+Wrap **[Prompt Input](/docs/components/prompt-input) with `Attachments`** (not the other way around) so **`AttachmentTrigger`**, the list, and the textarea stay in one **`Attachments`** tree. Enable **`windowDrop`** for page-level drag-and-drop (same validation as the picker: **`accept`**, **`maxFiles`**, **`maxSize`**, **`onFilesRejected`**). This example turns that on and adds **`AttachmentsDropOverlay`** (default **`fullscreen`**) for drag feedback—use **`variant="contained"`** inside a **`relative`** shell for in-box chrome only. Pasting **images** uses **`filesFromDataTransfer`**. Long **text** over a threshold becomes a **`text/plain`** file with **`appendFiles([file], { paste: true })`** so **`source: "paste"`** is set and the **`pasted`** tile is used (see **`with-prompt-input.tsx`**).
 
 <DemoWithCode src="components/nexus-ui/examples/attachments/with-prompt-input.tsx">
   <AttachmentsWithPromptInput />
@@ -458,10 +467,10 @@ One attachment tile. Chooses a default layout from **`variant`** unless **`child
 <TypeTable
   type={{
     variant: {
-      type: '"compact" | "inline" | "detailed"',
+      type: '"compact" | "inline" | "detailed" | "pasted"',
       default: '"compact"',
       description:
-        "`compact`: square preview; `inline`: horizontal chip with optional fade for long names; `detailed`: row with metadata.",
+        "`compact`: square preview; `inline`: horizontal chip with optional fade for long names; `detailed`: row with metadata; `pasted`: excerpt + Pasted footer for clipboard long-text (`AttachmentMeta.source: 'paste'`).",
     },
     attachment: {
       type: "AttachmentMeta",
@@ -489,19 +498,29 @@ One attachment tile. Chooses a default layout from **`variant`** unless **`child
       type: "string",
       description: "Additional CSS classes on the tile root.",
     },
+    pastedExcerptMaxChars: {
+      type: "number",
+      default: "220",
+      description: "`pasted` only: excerpt length before an ellipsis.",
+    },
   }}
 />
 
 ### AttachmentPreview
 
-Preview region inside an **`Attachment`**: raster image when **`thumbnailUrl`** or an image **`url`** exists, otherwise the type icon for **`attachment.type`**. Reads **`variant`** and **`attachment`** from **`Attachment`** context. Can override the visual **`variant`** for the preview shell only.
+Preview region inside an **`Attachment`**: raster image when **`thumbnailUrl`** or an image **`url`** exists, otherwise the type icon for **`attachment.type`**. For **`variant="pasted"`**, the preview is a multi-line **text excerpt** (from blob / **`data`** / **`url`** content) instead of an icon. Reads **`variant`** and **`attachment`** from context.
 
 <TypeTable
   type={{
     variant: {
-      type: '"compact" | "inline" | "detailed"',
+      type: '"compact" | "inline" | "detailed" | "pasted"',
       description:
         "Optional override for preview framing; defaults to the parent `Attachment` variant.",
+    },
+    pastedExcerptMaxChars: {
+      type: "number",
+      default: "220",
+      description: "`pasted` only: excerpt length before an ellipsis.",
     },
     className: {
       type: "string",
@@ -523,9 +542,9 @@ Remove control for the current attachment. Default **`aria-label`** uses **`atta
         "Merge onto the child element instead of rendering a `button`.",
     },
     position: {
-      type: '"corner" | "center-end"',
+      type: '"corner" | "center-end" | "inline"',
       description:
-        "Icon position; defaults to `corner` for `compact` and `detailed`, and `center-end` for `inline`.",
+        "Icon position; defaults to `corner` for `compact` and `detailed`, and `center-end` for `inline`. Use `inline` for footer rows (e.g. `variant: 'pasted'`).",
     },
     className: {
       type: "string",
@@ -603,6 +622,7 @@ export interface AttachmentMeta {
   width?: number;
   height?: number;
   data?: Blob | ArrayBuffer;
+  source?: "paste";
 }
 ```
 
@@ -611,11 +631,15 @@ export interface AttachmentMeta {
 Returns the full **`Attachments`** context (same source as internal primitives). Use **`isDraggingFile`** for custom drag chrome when **`windowDrop`** is on, **`appendFiles`** for custom drop targets (or your own **`onDrop`** handlers), **`openPicker`** / **`inputRef`** for advanced wiring. Throws if used outside **`Attachments`**.
 
 ```ts
+export type AppendFilesOptions = {
+  paste?: boolean;
+};
+
 export type AttachmentsContextValue = {
   inputRef: React.RefObject<HTMLInputElement | null>;
   inputId: string;
   openPicker: () => void;
-  appendFiles: (files: File[]) => void;
+  appendFiles: (files: File[], options?: AppendFilesOptions) => void;
   isDraggingFile: boolean;
   attachments: AttachmentMeta[];
   onAttachmentsChange: (next: AttachmentMeta[]) => void;
