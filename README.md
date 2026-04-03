@@ -12,7 +12,8 @@
   <a href="https://nexus-ui.dev">Documentation</a> ·
   <a href="https://nexus-ui.dev/docs/components/prompt-input">Prompt Input</a> ·
   <a href="https://nexus-ui.dev/docs/components/model-selector">Model Selector</a> ·
-  <a href="https://nexus-ui.dev/docs/components/suggestions">Suggestions</a>
+  <a href="https://nexus-ui.dev/docs/components/suggestions">Suggestions</a> ·
+  <a href="https://nexus-ui.dev/docs/components/attachments">Attachments</a>
 </p>
 
 ---
@@ -32,8 +33,9 @@ Copy-paste components into your project. You own the code.
 | Component       | Description                                                                 |
 | --------------- | --------------------------------------------------------------------------- |
 | `PromptInput`   | Composable chat input with auto-resizing textarea and action slots          |
-| `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and items     |
-| `Suggestions`   | Prompt suggestion chips for guiding user input                              |
+| `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and items    |
+| `Suggestions`   | Prompt suggestion chips for guiding user input                               |
+| `Attachments`   | File-attachment UI for inputs and messages (compact, inline, detailed, pasted) |
 
 ## Quick Start
 
@@ -53,6 +55,7 @@ Nexus UI is in the [shadcn registry](https://ui.shadcn.com/registry). No config 
 npx shadcn@latest add @nexus-ui/prompt-input
 npx shadcn@latest add @nexus-ui/model-selector
 npx shadcn@latest add @nexus-ui/suggestions
+npx shadcn@latest add @nexus-ui/attachments
 ```
 
 **Option 2: Direct URL**
@@ -66,7 +69,7 @@ npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```bash
 npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui-cli@latest add prompt-input model-selector suggestions
+npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments
 ```
 
 To use the `@nexus-ui` scope with a custom registry, add to your `components.json`:
