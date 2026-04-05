@@ -9,7 +9,9 @@
     "@hugeicons/react",
     "@hugeicons/core-free-icons"
   ],
-  "registryDependencies": [],
+  "registryDependencies": [
+    "nexus-ui-theme"
+  ],
   "files": [
     {
       "path": "registry/new-york/attachments/attachments.tsx",
