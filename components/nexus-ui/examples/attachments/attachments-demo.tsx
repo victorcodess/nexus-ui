@@ -55,6 +55,7 @@ import ChatgptIcon from "@/components/svgs/chatgpt";
 import { ClaudeIcon2 } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
 import { cn } from "@/lib/utils";
+import ModelSelectorWithSearch from "../model-selector/with-search";
 
 function attachmentKey(a: AttachmentMeta) {
   return `${a.name ?? ""}-${a.size ?? ""}-${a.mimeType ?? ""}-${a.source ?? ""}-${a.url ?? ""}`;
@@ -663,37 +664,7 @@ function AttachmentsDemo() {
                       </AttachmentTrigger>
                     </PromptInputAction>
                     <PromptInputAction asChild>
-                      <ModelSelector
-                        value={model}
-                        onValueChange={setModel}
-                        items={models}
-                      >
-                        <ModelSelectorTrigger variant="ghost" />
-                        <ModelSelectorContent
-                          className="w-[264px]"
-                          align="start"
-                        >
-                          <ModelSelectorGroup>
-                            <ModelSelectorLabel>
-                              Select model
-                            </ModelSelectorLabel>
-                            <ModelSelectorRadioGroup
-                              value={model}
-                              onValueChange={setModel}
-                            >
-                              {models.map((m) => (
-                                <ModelSelectorRadioItem
-                                  key={m.value}
-                                  value={m.value}
-                                  icon={m.icon}
-                                  title={m.title}
-                                  description={m.description}
-                                />
-                              ))}
-                            </ModelSelectorRadioGroup>
-                          </ModelSelectorGroup>
-                        </ModelSelectorContent>
-                      </ModelSelector>
+                    <ModelSelectorWithSearch />
                     </PromptInputAction>
                   </PromptInputActionGroup>
                   <PromptInputActionGroup>
