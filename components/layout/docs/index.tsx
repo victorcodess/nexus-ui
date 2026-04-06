@@ -1,7 +1,13 @@
 'use client';
 
 import type * as PageTree from 'fumadocs-core/page-tree';
-import { type ComponentProps, type HTMLAttributes, type ReactNode, useMemo } from 'react';
+import {
+  Fragment,
+  type ComponentProps,
+  type HTMLAttributes,
+  type ReactNode,
+  useMemo,
+} from 'react';
 import { LanguageCircleIcon, PanelRightIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { cn } from '../../../lib/cn';
@@ -222,43 +228,47 @@ export function DocsLayout({
       <LayoutContextProvider navTransparentMode={transparentMode}>
         <Sidebar defaultOpenLevel={defaultOpenLevel} prefetch={prefetch}>
           <LayoutBody {...props.containerProps}>
-            {nav.enabled !== false &&
-              (nav.component ?? (
-                <LayoutHeader
-                  id="nd-subnav"
-                  className="[grid-area:header] sticky top-(--fd-docs-row-1) z-30 flex items-center ps-4 pe-2.5 border-b transition-colors backdrop-blur-sm h-(--fd-header-height) md:hidden max-md:layout:[--fd-header-height:--spacing(14)] data-[transparent=false]:bg-fd-background/80"
-                >
-                  {renderTitleNav(nav, {
-                    className: 'inline-flex items-center gap-2.5 font-semibold',
-                  })}
-                  <div className="flex-1">{nav.children}</div>
-                  {searchToggle.enabled !== false &&
-                    (searchToggle.components?.sm ?? (
-                      <SearchToggle className="p-2" hideIfDisabled />
-                    ))}
-                  {sidebarEnabled && (
-                    <SidebarTrigger
-                      className={cn(
-                        buttonVariants({
-                          variant: 'ghost',
-                          size: 'icon-sm',
-                          className: 'p-2',
-                        }),
-                      )}
-                    >
-                      <HugeiconsIcon icon={PanelRightIcon} strokeWidth={2.5} className="size-4.5" />
-                    </SidebarTrigger>
-                  )}
-                </LayoutHeader>
-              ))}
-            {sidebarEnabled && sidebar()}
-            {tabMode === 'top' && tabs.length > 0 && (
+            {nav.enabled !== false ? (
+              <Fragment key="nd-header">
+                {nav.component ?? (
+                  <LayoutHeader
+                    id="nd-subnav"
+                    className="[grid-area:header] sticky top-(--fd-docs-row-1) z-30 flex items-center ps-4 pe-2.5 border-b transition-colors backdrop-blur-sm h-(--fd-header-height) md:hidden max-md:layout:[--fd-header-height:--spacing(14)] data-[transparent=false]:bg-fd-background/80"
+                  >
+                    {renderTitleNav(nav, {
+                      className: 'inline-flex items-center gap-2.5 font-semibold',
+                    })}
+                    <div className="flex-1">{nav.children}</div>
+                    {searchToggle.enabled !== false &&
+                      (searchToggle.components?.sm ?? (
+                        <SearchToggle className="p-2" hideIfDisabled />
+                      ))}
+                    {sidebarEnabled && (
+                      <SidebarTrigger
+                        className={cn(
+                          buttonVariants({
+                            variant: 'ghost',
+                            size: 'icon-sm',
+                            className: 'p-2',
+                          }),
+                        )}
+                      >
+                        <HugeiconsIcon icon={PanelRightIcon} strokeWidth={2.5} className="size-4.5" />
+                      </SidebarTrigger>
+                    )}
+                  </LayoutHeader>
+                )}
+              </Fragment>
+            ) : null}
+            {sidebarEnabled ? <Fragment key="nd-sidebar">{sidebar()}</Fragment> : null}
+            {tabMode === 'top' && tabs.length > 0 ? (
               <LayoutTabs
+                key="nd-tabs"
                 options={tabs}
                 className="z-10 bg-fd-background border-b px-6 pt-3 xl:px-8 max-md:hidden"
               />
-            )}
-            {children}
+            ) : null}
+            <Fragment key="nd-main">{children}</Fragment>
           </LayoutBody>
         </Sidebar>
       </LayoutContextProvider>
