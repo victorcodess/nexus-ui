@@ -28,6 +28,10 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@shikijs/transformers": "^3.22.0",
+    "@streamdown/cjk": "^1.0.3",
+    "@streamdown/code": "^1.1.1",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/mermaid": "^1.0.2",
     "@vercel/analytics": "^2.0.1",
     "ai": "^6.0.116",
     "class-variance-authority": "^0.7.1",
@@ -44,6 +48,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "scroll-into-view-if-needed": "^3.1.0",
+    "streamdown": "^2.5.0",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
