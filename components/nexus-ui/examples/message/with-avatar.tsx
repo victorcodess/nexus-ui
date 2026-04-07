@@ -3,8 +3,6 @@
 import {
   Message,
   MessageAvatar,
-  MessageAvatarFallback,
-  MessageAvatarImage,
   MessageContent,
   MessageMarkdown,
   MessageStack,
@@ -24,17 +22,11 @@ const MessageWithAvatar = () => {
             <MessageMarkdown>Hello — can you help me draft an email?</MessageMarkdown>
           </MessageContent>
         </MessageStack>
-        <MessageAvatar>
-          <MessageAvatarImage src={imgUser} alt="" />
-          <MessageAvatarFallback>U</MessageAvatarFallback>
-        </MessageAvatar>
+        <MessageAvatar src={imgUser} alt="" fallback="U" />
       </Message>
 
       <Message from="assistant">
-        <MessageAvatar>
-          <MessageAvatarImage src={imgAssistant} alt="" />
-          <MessageAvatarFallback>A</MessageAvatarFallback>
-        </MessageAvatar>
+        <MessageAvatar src={imgAssistant} alt="" fallback="A" />
         <MessageStack>
           <MessageContent>
             <MessageMarkdown>

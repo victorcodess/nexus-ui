@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { Streamdown, type PluginConfig } from "streamdown";
+import { Streamdown } from "streamdown";
 import { cjk } from "@streamdown/cjk";
 import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
@@ -34,13 +34,6 @@ const messageMarkdownProseClasses = [
   "prose-li:my-[-0.5px] prose-li:marker:text-gray-200 dark:prose-li:marker:text-gray-700",
 ] as const;
 
-const messageMarkdownDefaultPlugins: PluginConfig = {
-  code,
-  cjk,
-  math,
-  mermaid,
-};
-
 type MessageFrom = "user" | "assistant";
 
 type MessageContextValue = {
@@ -62,15 +55,13 @@ function Message({ className, from, children, ...props }: MessageProps) {
     <MessageContext.Provider value={{ from }}>
       <div
         className={cn(
-          "flex w-full",
-          from === "user" ? "justify-end" : "justify-start",
+          "flex w-auto max-w-[90%] items-start gap-2",
+          from === "user" ? "ml-auto" : "mr-auto",
           className,
         )}
         {...props}
       >
-        <div className="flex w-auto max-w-[90%] items-start gap-2">
-          {children}
-        </div>
+        {children}
       </div>
     </MessageContext.Provider>
   );
@@ -94,23 +85,19 @@ function MessageStack({ className, ...props }: MessageStackProps) {
   );
 }
 
-type MessageContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  from?: MessageFrom;
-};
+type MessageContentProps = React.HTMLAttributes<HTMLDivElement>;
 
-function MessageContent({
-  className,
-  from: fromProp,
-  ...props
-}: MessageContentProps) {
+function MessageContent({ className, ...props }: MessageContentProps) {
   const ctx = useMessageContext();
-  const from = fromProp ?? ctx?.from ?? "assistant";
+  const from = ctx?.from ?? "assistant";
 
   return (
     <div
       className={cn(
         "min-h-10 w-fit rounded-[20px] text-sm leading-6 text-gray-900",
-        from === "user" ? "bg-gray-100 dark:bg-gray-700 px-4 py-2" : "bg-transparent px-2",
+        from === "user"
+          ? "bg-gray-100 px-4 py-2 dark:bg-gray-700"
+          : "bg-transparent px-2",
         className,
       )}
       {...props}
@@ -120,11 +107,7 @@ function MessageContent({
 
 type MessageMarkdownProps = React.ComponentProps<typeof Streamdown>;
 
-function MessageMarkdown({
-  className,
-  plugins,
-  ...props
-}: MessageMarkdownProps) {
+function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
   return (
     <Streamdown
       className={cn(
@@ -132,23 +115,60 @@ function MessageMarkdown({
         "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className,
       )}
-      plugins={{ ...messageMarkdownDefaultPlugins, ...plugins }}
+      controls={{
+        table: {
+          copy: false,
+          download: false,
+          fullscreen: false,
+        },
+        code: {
+          copy: false,
+          download: false,
+        },
+      }}
+      components={{
+        table: (props) => (
+          <div
+            className={[
+              "my-6 prose-no-margin overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-950",
+              "[&_tbody_tr:first-child_td:first-child]:rounded-tl-xl",
+              "[&_tbody_tr:first-child_td:last-child]:rounded-tr-xl",
+              "[&_tbody_tr:last-child_td:first-child]:rounded-bl-xl",
+              "[&_tbody_tr:last-child_td:last-child]:rounded-br-xl",
+            ].join(" ")}
+          >
+            <table
+              className="w-full border-separate border-spacing-0 border-none bg-gray-100 text-sm dark:bg-gray-950"
+              {...props}
+            />
+          </div>
+        ),
+        th: (props) => (
+          <th
+            className="border-none px-6 py-2.5 text-left text-[14px] font-normal! text-gray-400! dark:bg-gray-950 dark:text-gray-500!"
+            {...props}
+          />
+        ),
+        td: (props) => (
+          <td
+            className="border-0 border-gray-100 bg-white px-6 py-3.5 text-[14px] text-gray-900 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 [tr:not(:first-child)_&]:border-t"
+            {...props}
+          />
+        ),
+        
+      }}
+      shikiTheme={["github-light", "github-dark"]}
+      plugins={{ cjk, code, math, mermaid }}
       {...props}
     />
   );
 }
 
-type MessageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
-  from?: MessageFrom;
-};
+type MessageActionsProps = React.HTMLAttributes<HTMLDivElement>;
 
-function MessageActions({
-  className,
-  from: fromProp,
-  ...props
-}: MessageActionsProps) {
+function MessageActions({ className, ...props }: MessageActionsProps) {
   const ctx = useMessageContext();
-  const from = fromProp ?? ctx?.from ?? "assistant";
+  const from = ctx?.from ?? "assistant";
 
   return (
     <div
@@ -178,26 +198,31 @@ function MessageAction({ asChild = false, ...props }: MessageActionProps) {
   return <Comp {...props} />;
 }
 
+export type MessageAvatarProps = {
+  src: string;
+  alt?: string;
+  /** Shown while the image loads and when it fails to load. */
+  fallback?: React.ReactNode;
+  delayMs?: React.ComponentProps<typeof AvatarFallback>["delayMs"];
+  size?: React.ComponentProps<typeof Avatar>["size"];
+  className?: string;
+};
+
 function MessageAvatar({
+  src,
+  alt = "",
+  fallback,
+  delayMs,
+  size,
   className,
-  ...props
-}: React.ComponentProps<typeof Avatar>) {
-  return <Avatar className={cn("shrink-0", className)} {...props} />;
-}
-
-function MessageAvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarImage>) {
-  return <AvatarImage className={cn("my-0!", className)} {...props} />;
-}
-
-function MessageAvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarFallback>) {
+}: MessageAvatarProps) {
   return (
-    <AvatarFallback className={cn("my-0! shrink-0", className)} {...props} />
+    <Avatar size={size} className={cn("shrink-0", className)}>
+      <AvatarImage src={src} alt={alt} className="my-0!" />
+      <AvatarFallback delayMs={delayMs} className="my-0! shrink-0">
+        {fallback}
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -210,6 +235,4 @@ export {
   MessageActionGroup,
   MessageAction,
   MessageAvatar,
-  MessageAvatarImage,
-  MessageAvatarFallback,
 };

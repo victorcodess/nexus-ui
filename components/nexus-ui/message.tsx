@@ -55,15 +55,13 @@ function Message({ className, from, children, ...props }: MessageProps) {
     <MessageContext.Provider value={{ from }}>
       <div
         className={cn(
-          "flex w-full",
-          from === "user" ? "justify-end" : "justify-start",
+          "flex w-auto max-w-[90%] items-start gap-2",
+          from === "user" ? "ml-auto" : "mr-auto",
           className,
         )}
         {...props}
       >
-        <div className="flex w-auto max-w-[90%] items-start gap-2">
-          {children}
-        </div>
+        {children}
       </div>
     </MessageContext.Provider>
   );
@@ -87,17 +85,11 @@ function MessageStack({ className, ...props }: MessageStackProps) {
   );
 }
 
-type MessageContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  from?: MessageFrom;
-};
+type MessageContentProps = React.HTMLAttributes<HTMLDivElement>;
 
-function MessageContent({
-  className,
-  from: fromProp,
-  ...props
-}: MessageContentProps) {
+function MessageContent({ className, ...props }: MessageContentProps) {
   const ctx = useMessageContext();
-  const from = fromProp ?? ctx?.from ?? "assistant";
+  const from = ctx?.from ?? "assistant";
 
   return (
     <div
@@ -172,17 +164,11 @@ function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
   );
 }
 
-type MessageActionsProps = React.HTMLAttributes<HTMLDivElement> & {
-  from?: MessageFrom;
-};
+type MessageActionsProps = React.HTMLAttributes<HTMLDivElement>;
 
-function MessageActions({
-  className,
-  from: fromProp,
-  ...props
-}: MessageActionsProps) {
+function MessageActions({ className, ...props }: MessageActionsProps) {
   const ctx = useMessageContext();
-  const from = fromProp ?? ctx?.from ?? "assistant";
+  const from = ctx?.from ?? "assistant";
 
   return (
     <div
@@ -212,26 +198,31 @@ function MessageAction({ asChild = false, ...props }: MessageActionProps) {
   return <Comp {...props} />;
 }
 
+export type MessageAvatarProps = {
+  src: string;
+  alt?: string;
+  /** Shown while the image loads and when it fails to load. */
+  fallback?: React.ReactNode;
+  delayMs?: React.ComponentProps<typeof AvatarFallback>["delayMs"];
+  size?: React.ComponentProps<typeof Avatar>["size"];
+  className?: string;
+};
+
 function MessageAvatar({
+  src,
+  alt = "",
+  fallback,
+  delayMs,
+  size,
   className,
-  ...props
-}: React.ComponentProps<typeof Avatar>) {
-  return <Avatar className={cn("shrink-0", className)} {...props} />;
-}
-
-function MessageAvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarImage>) {
-  return <AvatarImage className={cn("my-0!", className)} {...props} />;
-}
-
-function MessageAvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarFallback>) {
+}: MessageAvatarProps) {
   return (
-    <AvatarFallback className={cn("my-0! shrink-0", className)} {...props} />
+    <Avatar size={size} className={cn("shrink-0", className)}>
+      <AvatarImage src={src} alt={alt} className="my-0!" />
+      <AvatarFallback delayMs={delayMs} className="my-0! shrink-0">
+        {fallback}
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -244,6 +235,4 @@ export {
   MessageActionGroup,
   MessageAction,
   MessageAvatar,
-  MessageAvatarImage,
-  MessageAvatarFallback,
 };

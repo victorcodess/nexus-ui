@@ -9,7 +9,7 @@ import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avata
 import MessageWithAttachments from "@/components/nexus-ui/examples/message/with-attachments";
 import MessageRichText from "@/components/nexus-ui/examples/message/rich-text";
 
-Composable primitives for rendering **user** and **assistant** turns in a chat UI: alignment, bubble chrome, **[Streamdown](https://github.com/vercel/streamdown)**-powered markdown via **`MessageMarkdown`**, optional **`MessageAvatar`** (shadcn **Avatar** wrappers), **`MessageActions`** for icon buttons, and **[Attachments](/docs/components/attachments)** for file chips above the bubble.
+Composable primitives for rendering **user** and **assistant** turns in a chat UI: a single **`Message`** row (**`w-auto max-w-[90%]`**, **`ml-auto`** for users), bubble chrome, **[Streamdown](https://github.com/vercel/streamdown)**-powered markdown via **`MessageMarkdown`**, optional **`MessageAvatar`** (**`src` / `alt` / `fallback`** on shadcn **Avatar**), **`MessageActions`** for icon buttons, and **[Attachments](/docs/components/attachments)** for file chips above the bubble.
 
 <DemoWithCode src="components/nexus-ui/examples/message/default.tsx">
   <MessageDefault />
@@ -68,8 +68,6 @@ import {
   MessageActionGroup,
   MessageAction,
   MessageAvatar,
-  MessageAvatarImage,
-  MessageAvatarFallback,
 } from "@/components/nexus-ui/message";
 ```
 
@@ -80,6 +78,7 @@ import {
       <MessageMarkdown>Hello</MessageMarkdown>
     </MessageContent>
   </MessageStack>
+  <MessageAvatar src="/avatar.png" alt="You" fallback="Y" />
 </Message>
 ```
 
@@ -95,7 +94,7 @@ Use **`MessageActions`** and **`MessageActionGroup`** for a row of controls. **`
 
 ### With avatar
 
-**`MessageAvatar`**, **`MessageAvatarImage`**, and **`MessageAvatarFallback`** wrap the shadcn **Avatar** primitives. Place the avatar **after** **`MessageStack`** for **`from="user"`**, and **before** **`MessageStack`** for **`from="assistant"`**.
+**`MessageAvatar`** composes shadcn **Avatar** / **AvatarImage** / **AvatarFallback** — pass **`src`**, **`alt`**, and optional **`fallback`** (and **`delayMs`** if needed). Place the avatar **after** **`MessageStack`** for **`from="user"`**, and **before** **`MessageStack`** for **`from="assistant"`**.
 
 <DemoWithCode src="components/nexus-ui/examples/message/with-avatar.tsx">
   <MessageWithAvatar />
@@ -113,7 +112,10 @@ Render **`AttachmentList`** / **`Attachment`** inside **`MessageStack`** above *
 
 **`MessageMarkdown`** renders markdown with **Streamdown** and shared prose-style classes. Pass a string as **`children`** (or a template literal) for headings, lists, code blocks, and links.
 
-<DemoWithCode previewClassName="h-[600px] justify-start overflow-y-auto" src="components/nexus-ui/examples/message/rich-text.tsx">
+<DemoWithCode
+  previewClassName="h-[600px] justify-start overflow-y-auto"
+  src="components/nexus-ui/examples/message/rich-text.tsx"
+>
   <MessageRichText />
 </DemoWithCode>
 
@@ -121,18 +123,18 @@ Render **`AttachmentList`** / **`Attachment`** inside **`MessageStack`** above *
 
 ### Message
 
-Root row: **`justify-end`** for **`from="user"`**, **`justify-start`** for **`from="assistant"`**. Wraps children in a **`max-w-[90%]`** flex row. Provides context for nested primitives.
+Single flex row: **`w-auto max-w-[90%] items-start gap-2`**. For **`from="user"`**, adds **`ml-auto`** so the cluster (stack + avatar) sits on the right; assistant rows stay start-aligned. Provides context for nested primitives.
 
 <TypeTable
   type={{
     from: {
       type: '"user" | "assistant"',
       description:
-        "Controls horizontal alignment and is read by MessageStack, MessageContent, and MessageActions when their own from prop is omitted.",
+        "User messages get ml-auto; read by MessageStack, MessageContent, and MessageActions via context.",
     },
     className: {
       type: "string",
-      description: "Merged onto the outer flex container.",
+      description: "Additional CSS classes to apply to the message row.",
     },
   }}
 />
@@ -145,25 +147,20 @@ Vertical **`gap-2`** column; **`items-end`** for user, **`items-start`** for ass
   type={{
     className: {
       type: "string",
-      description: "Merged onto the stack container.",
+      description: "Additional CSS classes to apply to the stack container.",
     },
   }}
 />
 
 ### MessageContent
 
-Bubble wrapper: gray background and padding for **user**; transparent for **assistant**. **`from`** overrides context when needed.
+Bubble wrapper: gray background and padding for **user**; transparent for **assistant** (from **`Message`** context).
 
 <TypeTable
   type={{
-    from: {
-      type: '"user" | "assistant" (optional)',
-      description:
-        "Overrides Message context for this bubble only.",
-    },
     className: {
       type: "string",
-      description: "Merged onto the bubble.",
+      description: "Additional CSS classes to apply to the bubble.",
     },
   }}
 />
@@ -176,7 +173,8 @@ Wrapper around **Streamdown** with default typography classes and edge margin re
   type={{
     className: {
       type: "string",
-      description: "Merged with built-in prose classes.",
+      description:
+        "Additional CSS classes to apply to the Streamdown root element.",
     },
     children: {
       type: "string",
@@ -187,28 +185,35 @@ Wrapper around **Streamdown** with default typography classes and edge margin re
 
 ### MessageActions
 
-Row aligned to the end for **user** and to the start for **assistant**. Optional **`from`** override.
+A flex container for action buttons. Default **`justify-end`** (user) or **`justify-start`** (assistant); override with **`className`** (e.g. **`justify-between`**) for multiple groups.
 
 <TypeTable
   type={{
-    from: {
-      type: '"user" | "assistant" (optional)',
-      description: "Overrides alignment when not nested under Message.",
-    },
     className: {
       type: "string",
-      description: "Merged onto the actions row.",
+      description:
+        "Additional CSS classes to apply to the actions container.",
     },
   }}
 />
 
 ### MessageActionGroup
 
-Horizontal **`gap-1`** group for action buttons.
+Groups related action buttons together with a horizontal layout.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description:
+        "Additional CSS classes to apply to the group container.",
+    },
+  }}
+/>
 
 ### MessageAction
 
-Defaults to a **`div`**; with **`asChild`**, merges props onto the child (**Radix Slot**). Use with **`Button`** **`variant="ghost"`** **`size="icon-sm"`** for icon-only controls.
+A wrapper for individual action buttons. Supports polymorphism via `asChild`.
 
 <TypeTable
   type={{
@@ -219,11 +224,45 @@ Defaults to a **`div`**; with **`asChild`**, merges props onto the child (**Radi
     },
     className: {
       type: "string",
-      description: "Merged onto the root.",
+      description:
+        "Additional CSS classes to apply to the action.",
     },
   }}
 />
 
-### MessageAvatar   
+### MessageAvatar
 
-`MessageAvatar`, `MessageAvatarImage`, and `MessageAvatarFallback` accept the same props as their shadcn Avatar counterparts. See the [shadcn Avatar documentation](https://ui.shadcn.com/docs/components/avatar) for more details.
+**shadcn** [**Avatar**](https://ui.shadcn.com/docs/components/avatar) with **`src`** / **`alt`** / optional **`fallback`**. Sibling to **`MessageStack`** in **`Message`**: after the stack for **user**, before for **assistant**.
+
+<TypeTable
+  type={{
+    src: {
+      type: "string",
+      description: "Image URL passed to AvatarImage.",
+    },
+    alt: {
+      type: "string",
+      default: '""',
+      description: "AvatarImage alt text.",
+    },
+    fallback: {
+      type: "React.ReactNode",
+      description:
+        "Optional. Shown inside AvatarFallback while loading or if the image errors.",
+    },
+    delayMs: {
+      type: "number",
+      description:
+        "Optional. Passed to AvatarFallback (Radix delay before showing fallback).",
+    },
+    size: {
+      type: '"default" | "sm" | "lg"',
+      description: "Optional. shadcn Avatar size.",
+    },
+    className: {
+      type: "string",
+      description:
+        "Additional CSS classes to apply to the Avatar root.",
+    },
+  }}
+/>
