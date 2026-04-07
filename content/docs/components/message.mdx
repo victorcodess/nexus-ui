@@ -9,7 +9,7 @@ import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avata
 import MessageWithAttachments from "@/components/nexus-ui/examples/message/with-attachments";
 import MessageRichText from "@/components/nexus-ui/examples/message/rich-text";
 
-Composable primitives for rendering **user** and **assistant** turns in a chat UI: a single **`Message`** row (**`w-auto max-w-[90%]`**, **`ml-auto`** for users), bubble chrome, **[Streamdown](https://github.com/vercel/streamdown)**-powered markdown via **`MessageMarkdown`**, optional **`MessageAvatar`** (**`src` / `alt` / `fallback`** on shadcn **Avatar**), **`MessageActions`** for icon buttons, and **[Attachments](/docs/components/attachments)** for file chips above the bubble.
+Composable **user** and **assistant** chat turns via **`Message`**, **`MessageContent`**, **`MessageMarkdown`** ([Streamdown](https://github.com/vercel/streamdown)), **`MessageAvatar`**, **`MessageActions`**, and **[Attachments](/docs/components/attachments)**.
 
 <DemoWithCode src="components/nexus-ui/examples/message/default.tsx">
   <MessageDefault />
@@ -123,14 +123,14 @@ Render **`AttachmentList`** / **`Attachment`** inside **`MessageStack`** above *
 
 ### Message
 
-Single flex row: **`w-auto max-w-[90%] items-start gap-2`**. For **`from="user"`**, adds **`ml-auto`** so the cluster (stack + avatar) sits on the right; assistant rows stay start-aligned. Provides context for nested primitives.
+Root of one chat turn: row for stack, avatar, and siblings; **`from`** sets alignment and is provided in context to **`MessageStack`**, **`MessageContent`**, and **`MessageActions`**.
 
 <TypeTable
   type={{
     from: {
       type: '"user" | "assistant"',
       description:
-        "User messages get ml-auto; read by MessageStack, MessageContent, and MessageActions via context.",
+        "User vs assistant; alignment on Message and nested layout/styles via context.",
     },
     className: {
       type: "string",
@@ -141,7 +141,7 @@ Single flex row: **`w-auto max-w-[90%] items-start gap-2`**. For **`from="user"`
 
 ### MessageStack
 
-Vertical **`gap-2`** column; **`items-end`** for user, **`items-start`** for assistant (from context).
+Stacks bubble, attachments, and actions in a column; cross-axis alignment follows **`from`** on **`Message`** (user vs assistant).
 
 <TypeTable
   type={{
@@ -154,7 +154,7 @@ Vertical **`gap-2`** column; **`items-end`** for user, **`items-start`** for ass
 
 ### MessageContent
 
-Bubble wrapper: gray background and padding for **user**; transparent for **assistant** (from **`Message`** context).
+Wraps the message body (e.g. markdown inside). **User** turns get a filled bubble; **assistant** turns stay visually light on the thread—both follow **`from`** on **`Message`**.
 
 <TypeTable
   type={{
@@ -167,21 +167,65 @@ Bubble wrapper: gray background and padding for **user**; transparent for **assi
 
 ### MessageMarkdown
 
-Wrapper around **Streamdown** with default typography classes and edge margin resets (**`[&>*:first-child]:mt-0`**, etc.). Accepts **Streamdown** props (e.g. **`children`** as markdown string).
+Renders **markdown** with **[Streamdown](https://github.com/vercel/streamdown)**. Props are forwarded to **`Streamdown`**; values you pass replace the same keys on the underlying component (e.g. a new **`plugins`** object replaces the default bundle).
+
+Commonly used options:
 
 <TypeTable
   type={{
+    children: {
+      type: "string",
+      description: "Markdown source to render.",
+    },
     className: {
       type: "string",
       description:
         "Additional CSS classes to apply to the Streamdown root element.",
     },
-    children: {
-      type: "string",
-      description: "Markdown source to render.",
+    mode: {
+      type: '"streaming" | "static"',
+      default: '"streaming"',
+      description:
+        "`streaming` for live token flow; `static` for finished content.",
+    },
+    isAnimating: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Whether content is actively streaming (e.g. disables some controls).",
+    },
+    parseIncompleteMarkdown: {
+      type: "boolean",
+      default: "true",
+      description:
+        "Use the remend preprocessor for unfinished markdown while streaming.",
+    },
+    plugins: {
+      type: "PluginConfig",
+      description:
+        "Math, Mermaid, Shiki, and CJK plugins. Replaces **MessageMarkdown** defaults when set.",
+    },
+    controls: {
+      type: "ControlsConfig | boolean",
+      description:
+        "Show or hide table/code/Mermaid control buttons. Replaces **MessageMarkdown** defaults when set.",
+    },
+    components: {
+      type: "Components",
+      description:
+        "Map markdown nodes to custom React elements. Replaces **MessageMarkdown** defaults when set.",
+    },
+    shikiTheme: {
+      type: "[ThemeInput, ThemeInput]",
+      default: "['github-light', 'github-dark']",
+      description:
+        "Light and dark syntax-highlighting themes for fenced code blocks.",
     },
   }}
 />
+
+For **`remend`**, **`remarkPlugins`**, **`rehypePlugins`**, **`linkSafety`**, **`animated`**, **`caret`**, and the full prop list, see the [Streamdown configuration docs](https://streamdown.ai/docs/configuration).
+
 
 ### MessageActions
 
