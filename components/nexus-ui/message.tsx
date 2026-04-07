@@ -50,13 +50,32 @@ type MessageProps = React.HTMLAttributes<HTMLDivElement> & {
   from: MessageFrom;
 };
 
-function Message({ className, from, children, ...props }: MessageProps) {
+function Message({
+  className,
+  from,
+  children,
+  "aria-label": ariaLabelProp,
+  "aria-labelledby": ariaLabelledBy,
+  ...props
+}: MessageProps) {
+  const ariaLabel =
+    ariaLabelProp ??
+    (ariaLabelledBy == null
+      ? from === "user"
+        ? "User message"
+        : "Assistant message"
+      : undefined);
+
   return (
     <MessageContext.Provider value={{ from }}>
       <div
+        data-slot="message"
+        role="article"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
         className={cn(
           "flex w-auto max-w-[90%] items-start gap-2",
-          from === "user" ? "ml-auto" : "mr-auto",
+          from === "user" ? "ms-auto" : "me-auto",
           className,
         )}
         {...props}
@@ -75,6 +94,7 @@ function MessageStack({ className, ...props }: MessageStackProps) {
 
   return (
     <div
+      data-slot="message-stack"
       className={cn(
         "flex w-auto flex-col gap-2",
         from === "user" ? "items-end" : "items-start",
@@ -93,6 +113,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
 
   return (
     <div
+      data-slot="message-content"
       className={cn(
         "min-h-10 w-fit rounded-[20px] text-sm leading-6 text-gray-900",
         from === "user"
@@ -110,6 +131,7 @@ type MessageMarkdownProps = React.ComponentProps<typeof Streamdown>;
 function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
   return (
     <Streamdown
+      data-slot="message-markdown"
       className={cn(
         ...messageMarkdownProseClasses,
         "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
@@ -129,15 +151,17 @@ function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
       components={{
         table: (props) => (
           <div
+            data-slot="message-markdown-table-wrap"
             className={[
               "my-6 prose-no-margin overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-950",
-              "[&_tbody_tr:first-child_td:first-child]:rounded-tl-xl",
-              "[&_tbody_tr:first-child_td:last-child]:rounded-tr-xl",
-              "[&_tbody_tr:last-child_td:first-child]:rounded-bl-xl",
-              "[&_tbody_tr:last-child_td:last-child]:rounded-br-xl",
+              "[&_tbody_tr:first-child_td:first-child]:rounded-ss-xl",
+              "[&_tbody_tr:first-child_td:last-child]:rounded-se-xl",
+              "[&_tbody_tr:last-child_td:first-child]:rounded-es-xl",
+              "[&_tbody_tr:last-child_td:last-child]:rounded-ee-xl",
             ].join(" ")}
           >
             <table
+              data-slot="message-markdown-table"
               className="w-full border-separate border-spacing-0 border-none bg-gray-100 text-sm dark:bg-gray-950"
               {...props}
             />
@@ -145,17 +169,18 @@ function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
         ),
         th: (props) => (
           <th
-            className="border-none px-6 py-2.5 text-left text-[14px] font-normal! text-gray-400! dark:bg-gray-950 dark:text-gray-500!"
+            data-slot="message-markdown-th"
+            className="border-none px-6 py-2.5 text-start text-[14px] font-normal! text-gray-400! dark:bg-gray-950 dark:text-gray-500!"
             {...props}
           />
         ),
         td: (props) => (
           <td
+            data-slot="message-markdown-td"
             className="border-0 border-gray-100 bg-white px-6 py-3.5 text-[14px] text-gray-900 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 [tr:not(:first-child)_&]:border-t"
             {...props}
           />
         ),
-        
       }}
       shikiTheme={["github-light", "github-dark"]}
       plugins={{ cjk, code, math, mermaid }}
@@ -172,6 +197,7 @@ function MessageActions({ className, ...props }: MessageActionsProps) {
 
   return (
     <div
+      data-slot="message-actions"
       className={cn(
         "flex w-full",
         from === "user" ? "justify-end" : "justify-start",
@@ -185,7 +211,13 @@ function MessageActions({ className, ...props }: MessageActionsProps) {
 type MessageActionGroupProps = React.HTMLAttributes<HTMLDivElement>;
 
 function MessageActionGroup({ className, ...props }: MessageActionGroupProps) {
-  return <div className={cn("flex gap-1", className)} {...props} />;
+  return (
+    <div
+      data-slot="message-action-group"
+      className={cn("flex gap-1", className)}
+      {...props}
+    />
+  );
 }
 
 type MessageActionProps = React.HTMLAttributes<HTMLDivElement> & {
@@ -195,7 +227,7 @@ type MessageActionProps = React.HTMLAttributes<HTMLDivElement> & {
 function MessageAction({ asChild = false, ...props }: MessageActionProps) {
   const Comp = asChild ? Slot : "div";
 
-  return <Comp {...props} />;
+  return <Comp data-slot="message-action" {...props} />;
 }
 
 export type MessageAvatarProps = {
@@ -217,9 +249,22 @@ function MessageAvatar({
   className,
 }: MessageAvatarProps) {
   return (
-    <Avatar size={size} className={cn("shrink-0 size-7", className)}>
-      <AvatarImage src={src} alt={alt} className="my-0!" />
-      <AvatarFallback delayMs={delayMs} className="my-0! shrink-0">
+    <Avatar
+      data-slot="message-avatar"
+      size={size}
+      className={cn("size-7 shrink-0", className)}
+    >
+      <AvatarImage
+        data-slot="message-avatar-image"
+        src={src}
+        alt={alt}
+        className="my-0!"
+      />
+      <AvatarFallback
+        data-slot="message-avatar-fallback"
+        delayMs={delayMs}
+        className="my-0! shrink-0"
+      >
         {fallback}
       </AvatarFallback>
     </Avatar>

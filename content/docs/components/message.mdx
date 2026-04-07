@@ -216,6 +216,16 @@ Root of one chat turn: row for stack, avatar, and siblings; **`from`** sets alig
       description:
         "User vs assistant; alignment on Message and nested layout/styles via context.",
     },
+    "aria-label": {
+      type: "string",
+      description:
+        "Accessible name for the turn. Defaults to User message / Assistant message unless aria-labelledby is set.",
+    },
+    "aria-labelledby": {
+      type: "string",
+      description:
+        "Optional id(s) of visible labels; when set, a default aria-label is not applied.",
+    },
     className: {
       type: "string",
       description: "Additional CSS classes to apply to the message row.",
@@ -287,17 +297,17 @@ Commonly used options:
     plugins: {
       type: "PluginConfig",
       description:
-        "Math, Mermaid, Shiki, and CJK plugins. Replaces **MessageMarkdown** defaults when set.",
+        "Math, Mermaid, Shiki, and CJK plugins. Replaces MessageMarkdown defaults when set.",
     },
     controls: {
       type: "ControlsConfig | boolean",
       description:
-        "Show or hide table/code/Mermaid control buttons. Replaces **MessageMarkdown** defaults when set.",
+        "Show or hide table/code/Mermaid control buttons. Replaces MessageMarkdown defaults when set.",
     },
     components: {
       type: "Components",
       description:
-        "Map markdown nodes to custom React elements. Replaces **MessageMarkdown** defaults when set.",
+        "Map markdown nodes to custom React elements. Replaces MessageMarkdown defaults when set.",
     },
     shikiTheme: {
       type: "[ThemeInput, ThemeInput]",
