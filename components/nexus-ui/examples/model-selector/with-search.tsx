@@ -107,7 +107,7 @@ export default function ModelSelectorWithSearch() {
 
   return (
     <ModelSelector value={model} onValueChange={setModel} items={models}>
-      <ModelSelectorTrigger variant="ghost" />
+      <ModelSelectorTrigger variant="filled" />
       <ModelSelectorContent className="w-[264px] pt-0 [--model-selector-content-max-height:311px]" align="start">
         <ModelSelectorSearch
           placeholder="Search models"

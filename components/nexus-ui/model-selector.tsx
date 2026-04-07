@@ -258,7 +258,7 @@ const ModelSelectorSearch = React.forwardRef<
     >
       <HugeiconsIcon
         icon={Search01Icon}
-        className="absolute top-1/2 left-2.75 -mt-0.5 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-400"
+        className="absolute top-1/2 left-2.75 -mb-0.25 size-4 -translate-y-1/2 text-gray-500 dark:text-gray-400"
         strokeWidth={2}
       />
       <input
