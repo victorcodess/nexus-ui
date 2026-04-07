@@ -239,6 +239,8 @@ type AttachmentItemContextValue = {
   variant: AttachmentVariant;
   attachment: AttachmentMeta;
   onRemove?: () => void;
+  /** When true, remove controls are hidden (see `Attachment` `readOnly`). */
+  readOnly?: boolean;
 };
 
 const AttachmentItemContext =
@@ -713,6 +715,11 @@ type AttachmentProps = Omit<
   /** Upload progress 0–100; shows a bottom bar when set */
   progress?: number;
   onRemove?: () => void;
+  /**
+   * When true, hides remove controls and the progress bar (e.g. message history).
+   * @default false
+   */
+  readOnly?: boolean;
   /** Detailed layout: second line; inferred from `attachment.size` when omitted. */
   detailedSubtitle?: "size" | "kind";
   /**
@@ -732,6 +739,7 @@ function Attachment({
   attachment,
   progress,
   onRemove,
+  readOnly = false,
   detailedSubtitle: detailedSubtitleProp,
   pastedExcerptMaxChars = 220,
   children,
@@ -743,26 +751,34 @@ function Attachment({
       : undefined;
 
   const ctxValue = React.useMemo<AttachmentItemContextValue>(
-    () => ({ variant: variant ?? "compact", attachment, onRemove }),
-    [variant, attachment, onRemove],
+    () => ({
+      variant: variant ?? "compact",
+      attachment,
+      onRemove,
+      readOnly,
+    }),
+    [variant, attachment, onRemove, readOnly],
   );
 
-  const showProgress = progress != null && Number.isFinite(progress);
+  const showProgress =
+    !readOnly && progress != null && Number.isFinite(progress);
 
   const defaultLayout =
     variant === "pasted" ? (
       <>
         <AttachmentPreview pastedExcerptMaxChars={pastedExcerptMaxChars} />
 
-        <div className="flex h-6 w-full items-center justify-between gap-2 rounded-[6px] bg-white pr-1 pl-2 dark:bg-gray-950/50">
-          <span className="text-xs leading-4 font-[350] text-gray-500 uppercase dark:text-gray-400">
-            Pasted
-          </span>
-          <AttachmentRemove
-            position="inline"
-            className="bg-transparent text-gray-500 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-gray-700"
-          />
-        </div>
+        {!readOnly ? (
+          <div className="flex h-6 w-full items-center justify-between gap-2 rounded-[6px] bg-white pr-1 pl-2 dark:bg-gray-950/50">
+            <span className="text-xs leading-4 font-[350] text-gray-500 uppercase dark:text-gray-400">
+              Pasted
+            </span>
+            <AttachmentRemove
+              position="inline"
+              className="bg-transparent text-gray-500 hover:bg-gray-100 dark:bg-transparent dark:hover:bg-gray-700"
+            />
+          </div>
+        ) : null}
       </>
     ) : variant === "compact" ? (
       <>
@@ -1014,13 +1030,17 @@ function AttachmentRemove({
   "aria-label": ariaLabelProp,
   ...props
 }: AttachmentRemoveProps) {
-  const { variant, attachment, onRemove } =
+  const { variant, attachment, onRemove, readOnly } =
     useAttachmentItemContext("AttachmentRemove");
   const position =
     positionProp ?? (variant === "inline" ? "center-end" : "corner");
 
   const ariaLabel =
     ariaLabelProp ?? `Remove ${attachment.name ?? "attachment"}`;
+
+  if (readOnly) {
+    return null;
+  }
 
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {

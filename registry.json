@@ -102,6 +102,29 @@
           "target": "~/components/nexus-ui/model-selector.tsx"
         }
       ]
+    },
+    {
+      "name": "message",
+      "type": "registry:ui",
+      "title": "Message",
+      "description": "Composable chat message layout with markdown body, actions, and avatar.",
+      "dependencies": [
+        "streamdown",
+        "@streamdown/cjk",
+        "@streamdown/code",
+        "@streamdown/math",
+        "@streamdown/mermaid",
+        "radix-ui",
+        "@radix-ui/react-slot"
+      ],
+      "registryDependencies": ["nexus-ui-theme", "button", "avatar"],
+      "files": [
+        {
+          "path": "registry/new-york/message/message.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/message.tsx"
+        }
+      ]
     }
   ]
 }

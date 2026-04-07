@@ -3,6 +3,7 @@
 import { CodeBlock } from "@/components/codeblock";
 import { Tabs, Tab } from "@/components/tabs";
 import ReviewContainer from "@/components/preview-container";
+import { cn } from "@/lib/utils";
 
 export function DemoWithCodeClient({
   highlightedCode,
@@ -18,7 +19,7 @@ export function DemoWithCodeClient({
   return (
     <Tabs items={["Preview", "Code"]} className={className}>
       <Tab value="Preview">
-        <ReviewContainer className={previewClassName}>{children}</ReviewContainer>
+        <ReviewContainer className={cn("", previewClassName)}>{children}</ReviewContainer>
       </Tab>
       <Tab value="Code">
         <CodeBlock>{highlightedCode}</CodeBlock>

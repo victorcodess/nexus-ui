@@ -1,12 +1,229 @@
 ---
 title: Message
-description: Display chat messages with support for various content types
+description: Composable chat message layout with markdown body, optional avatar, actions, and attachments
 ---
 
 import MessageDefault from "@/components/nexus-ui/examples/message/default";
+import MessageWithActions from "@/components/nexus-ui/examples/message/with-actions";
+import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avatar";
+import MessageWithAttachments from "@/components/nexus-ui/examples/message/with-attachments";
+import MessageRichText from "@/components/nexus-ui/examples/message/rich-text";
 
-The Message component renders a single chat message.
+Composable primitives for rendering **user** and **assistant** turns in a chat UI: alignment, bubble chrome, **[Streamdown](https://github.com/vercel/streamdown)**-powered markdown via **`MessageMarkdown`**, optional **`MessageAvatar`** (shadcn **Avatar** wrappers), **`MessageActions`** for icon buttons, and **[Attachments](/docs/components/attachments)** for file chips above the bubble.
 
 <DemoWithCode src="components/nexus-ui/examples/message/default.tsx">
   <MessageDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/message
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/message
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/message
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/message
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/message/message.tsx" title="components/nexus-ui/message.tsx" />
+</Step>
+<Step>
+<h3>Update the import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Message,
+  MessageStack,
+  MessageContent,
+  MessageMarkdown,
+  MessageActions,
+  MessageActionGroup,
+  MessageAction,
+  MessageAvatar,
+  MessageAvatarImage,
+  MessageAvatarFallback,
+} from "@/components/nexus-ui/message";
+```
+
+```tsx keepBackground
+<Message from="user">
+  <MessageStack>
+    <MessageContent>
+      <MessageMarkdown>Hello</MessageMarkdown>
+    </MessageContent>
+  </MessageStack>
+</Message>
+```
+
+## Examples
+
+### With Actions
+
+Use **`MessageActions`** and **`MessageActionGroup`** for a row of controls. **`MessageAction`** is a thin **Slot** for individual action buttons.
+
+<DemoWithCode src="components/nexus-ui/examples/message/with-actions.tsx">
+  <MessageWithActions />
+</DemoWithCode>
+
+### With avatar
+
+**`MessageAvatar`**, **`MessageAvatarImage`**, and **`MessageAvatarFallback`** wrap the shadcn **Avatar** primitives. Place the avatar **after** **`MessageStack`** for **`from="user"`**, and **before** **`MessageStack`** for **`from="assistant"`**.
+
+<DemoWithCode src="components/nexus-ui/examples/message/with-avatar.tsx">
+  <MessageWithAvatar />
+</DemoWithCode>
+
+### With attachments
+
+Render **`AttachmentList`** / **`Attachment`** inside **`MessageStack`** above **`MessageContent`**. Use **`readOnly`** on **`Attachment`** when showing files that were already sent (no remove control or progress). See **[Attachments](/docs/components/attachments)** for **`AttachmentMeta`** and variants.
+
+<DemoWithCode src="components/nexus-ui/examples/message/with-attachments.tsx">
+  <MessageWithAttachments />
+</DemoWithCode>
+
+### Rich text (markdown)
+
+**`MessageMarkdown`** renders markdown with **Streamdown** and shared prose-style classes. Pass a string as **`children`** (or a template literal) for headings, lists, code blocks, and links.
+
+<DemoWithCode previewClassName="h-[600px] justify-start overflow-y-auto" src="components/nexus-ui/examples/message/rich-text.tsx">
+  <MessageRichText />
+</DemoWithCode>
+
+## API Reference
+
+### Message
+
+Root row: **`justify-end`** for **`from="user"`**, **`justify-start`** for **`from="assistant"`**. Wraps children in a **`max-w-[90%]`** flex row. Provides context for nested primitives.
+
+<TypeTable
+  type={{
+    from: {
+      type: '"user" | "assistant"',
+      description:
+        "Controls horizontal alignment and is read by MessageStack, MessageContent, and MessageActions when their own from prop is omitted.",
+    },
+    className: {
+      type: "string",
+      description: "Merged onto the outer flex container.",
+    },
+  }}
+/>
+
+### MessageStack
+
+Vertical **`gap-2`** column; **`items-end`** for user, **`items-start`** for assistant (from context).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged onto the stack container.",
+    },
+  }}
+/>
+
+### MessageContent
+
+Bubble wrapper: gray background and padding for **user**; transparent for **assistant**. **`from`** overrides context when needed.
+
+<TypeTable
+  type={{
+    from: {
+      type: '"user" | "assistant" (optional)',
+      description:
+        "Overrides Message context for this bubble only.",
+    },
+    className: {
+      type: "string",
+      description: "Merged onto the bubble.",
+    },
+  }}
+/>
+
+### MessageMarkdown
+
+Wrapper around **Streamdown** with default typography classes and edge margin resets (**`[&>*:first-child]:mt-0`**, etc.). Accepts **Streamdown** props (e.g. **`children`** as markdown string).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with built-in prose classes.",
+    },
+    children: {
+      type: "string",
+      description: "Markdown source to render.",
+    },
+  }}
+/>
+
+### MessageActions
+
+Row aligned to the end for **user** and to the start for **assistant**. Optional **`from`** override.
+
+<TypeTable
+  type={{
+    from: {
+      type: '"user" | "assistant" (optional)',
+      description: "Overrides alignment when not nested under Message.",
+    },
+    className: {
+      type: "string",
+      description: "Merged onto the actions row.",
+    },
+  }}
+/>
+
+### MessageActionGroup
+
+Horizontal **`gap-1`** group for action buttons.
+
+### MessageAction
+
+Defaults to a **`div`**; with **`asChild`**, merges props onto the child (**Radix Slot**). Use with **`Button`** **`variant="ghost"`** **`size="icon-sm"`** for icon-only controls.
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description: "Render as the child element instead of a div.",
+    },
+    className: {
+      type: "string",
+      description: "Merged onto the root.",
+    },
+  }}
+/>
+
+### MessageAvatar   
+
+`MessageAvatar`, `MessageAvatarImage`, and `MessageAvatarFallback` accept the same props as their shadcn Avatar counterparts. See the [shadcn Avatar documentation](https://ui.shadcn.com/docs/components/avatar) for more details.
