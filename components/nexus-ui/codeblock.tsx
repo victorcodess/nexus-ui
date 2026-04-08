@@ -1,18 +1,23 @@
 "use client";
 
 /**
- * Streamdown `components.code` for fenced blocks: Shiki via {@link @streamdown/code},
- * line numbers, fence meta (`startLine`, `noLineNumbers`), `data-incomplete` while
- * streaming, and `StreamdownContext.shikiTheme`.
+ * Streamdown `components.code` for fenced blocks (Shiki via {@link @streamdown/code}).
+ * Chrome matches the docs site `CodeBlock` layout (`components/codeblock.tsx`): copy,
+ * `keepBackground`, figure + scroll viewport. No collapse/tabs.
  *
- * Set `components.inlineCode` to a plain `<code>` (see
- * [Streamdown inline code](https://streamdown.ai/docs/components#inline-code)).
+ * Optional: wrap Streamdown with {@link NexusCodeBlockChromeProvider} for `allowCopy` /
+ * `keepBackground`. Also set `components.inlineCode` per
+ * [Streamdown](https://streamdown.ai/docs/components#inline-code).
  */
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
 import { code as codeHighlighter } from "@streamdown/code";
 import type { Element as HastElement } from "hast";
 import {
   type ComponentProps,
+  createContext,
   type CSSProperties,
   type DetailedHTMLProps,
   type HTMLAttributes,
@@ -31,6 +36,98 @@ import type {
 } from "streamdown";
 import { StreamdownContext, useIsCodeFenceIncomplete } from "streamdown";
 import { cn } from "@/lib/utils";
+
+type NexusCodeBlockChromeOptions = {
+  allowCopy: boolean;
+  keepBackground: boolean;
+};
+
+const defaultChrome: NexusCodeBlockChromeOptions = {
+  allowCopy: true,
+  keepBackground: false,
+};
+
+const NexusCodeBlockChromeContext =
+  createContext<NexusCodeBlockChromeOptions>(defaultChrome);
+
+/** Optional: set `keepBackground` / `allowCopy` for {@link NexusCodeBlock} under Streamdown. */
+export function NexusCodeBlockChromeProvider({
+  children,
+  allowCopy = defaultChrome.allowCopy,
+  keepBackground = defaultChrome.keepBackground,
+}: {
+  children: React.ReactNode;
+  allowCopy?: boolean;
+  keepBackground?: boolean;
+}) {
+  const value = useMemo(
+    () => ({ allowCopy, keepBackground }),
+    [allowCopy, keepBackground],
+  );
+  return (
+    <NexusCodeBlockChromeContext.Provider value={value}>
+      {children}
+    </NexusCodeBlockChromeContext.Provider>
+  );
+}
+
+function CodeBlockCopyButton({
+  text,
+  keepBackground,
+  showGlow = false,
+  className,
+}: {
+  text: string;
+  keepBackground: boolean;
+  /** Docs: gradient halo only for floating (untitled) placement. */
+  showGlow?: boolean;
+  className?: string;
+}) {
+  const [checked, onClick] = useCopyButton(() => {
+    void navigator.clipboard.writeText(text);
+  });
+
+  return (
+    <div className="relative">
+      {showGlow ? (
+        <div
+          className={cn(
+            "pointer-events-none absolute top-1/2 left-1/2 z-0 size-13.5 -translate-x-1/2 -translate-y-1/2 rounded-l-full rounded-tr-full bg-linear-to-l",
+            keepBackground
+              ? "from-gray-100 from-70% to-gray-100/0 dark:from-gray-950 dark:to-gray-950/0"
+              : "from-white from-70% to-white/0 dark:from-gray-900 dark:to-gray-900/0",
+          )}
+        />
+      ) : null}
+      <button
+        type="button"
+        data-checked={checked || undefined}
+        className={cn(
+          "relative flex size-7 cursor-pointer items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+          className,
+        )}
+        aria-label={checked ? "Copied" : "Copy code"}
+        onClick={onClick}
+      >
+        <span className="flex size-5 items-center justify-center">
+          {checked ? (
+            <HugeiconsIcon
+              icon={Tick02Icon}
+              strokeWidth={1.75}
+              className="size-4.5"
+            />
+          ) : (
+            <HugeiconsIcon
+              icon={Copy01Icon}
+              strokeWidth={1.75}
+              className="size-4"
+            />
+          )}
+        </span>
+      </button>
+    </div>
+  );
+}
 
 const LANGUAGE_REGEX = /language-([^\s]+)/;
 const START_LINE_PATTERN = /startLine=(\d+)/;
@@ -115,26 +212,12 @@ function parseRootStyle(rootStyle: string): Record<string, string> {
   return style;
 }
 
-const LINE_NUMBER_CLASSES = cn(
-  "block",
-  "before:content-[counter(line)]",
-  "before:inline-block",
-  "before:[counter-increment:line]",
-  "before:w-6",
-  "before:mr-4",
-  "before:text-[13px]",
-  "before:text-right",
-  "before:text-gray-400/60",
-  "dark:before:text-gray-500/60",
-  "before:font-mono",
-  "before:select-none",
-);
-
-type CodeBlockBodyProps = ComponentProps<"div"> & {
+type CodeBlockBodyProps = Omit<ComponentProps<"pre">, "children"> & {
   result: HighlightResult;
   language: string;
-  startLine?: number;
   lineNumbers?: boolean;
+  /** 1-based first line (fence `startLine=`); pairs with `app/global.css` `code .line`. */
+  lineNumbersStart?: number;
 };
 
 const CodeBlockBody = memo(
@@ -142,8 +225,8 @@ const CodeBlockBody = memo(
     result,
     language,
     className,
-    startLine,
     lineNumbers = true,
+    lineNumbersStart = 1,
     ...rest
   }: CodeBlockBodyProps) {
     const preStyle = useMemo(() => {
@@ -157,95 +240,86 @@ const CodeBlockBody = memo(
     }, [result.bg, result.fg, result.rootStyle]);
 
     return (
-      <div
+      <pre
         className={cn(
-          "overflow-x-auto rounded-md border border-gray-200 bg-white p-4 text-sm dark:border-gray-800 dark:bg-gray-950",
+          "w-max min-w-full *:flex *:flex-col bg-(--sdm-bg,inherit) dark:bg-(--shiki-dark-bg,var(--sdm-bg,inherit))",
           className,
         )}
         data-language={language}
         data-slot="nexus-code-block-body"
+        style={preStyle}
         {...rest}
       >
-        <pre
-          className={cn(
-            "bg-(--sdm-bg,inherit) dark:bg-(--shiki-dark-bg,var(--sdm-bg,inherit))",
-          )}
-          style={preStyle}
+        <code
+          style={
+            lineNumbers
+              ? ({
+                  counterSet: `line ${Number(lineNumbersStart) - 1}`,
+                } satisfies CSSProperties)
+              : undefined
+          }
         >
-          <code
-            className={
-              lineNumbers
-                ? "[counter-increment:line_0] [counter-reset:line]"
-                : undefined
-            }
-            style={
-              lineNumbers && startLine && startLine > 1
-                ? { counterReset: `line ${startLine - 1}` }
-                : undefined
-            }
-          >
-            {result.tokens.map((row, rowIndex) => (
-              <span
-                key={rowIndex}
-                className={lineNumbers ? LINE_NUMBER_CLASSES : undefined}
-              >
-                {row.length === 0 || (row.length === 1 && row[0].content === "")
-                  ? "\n"
-                  : row.map((token, tokenIndex) => {
-                      const tokenStyle: Record<string, string> = {};
-                      let hasBg = Boolean(token.bgColor);
-                      if (token.color) tokenStyle["--sdm-c"] = token.color;
-                      if (token.bgColor)
-                        tokenStyle["--sdm-tbg"] = token.bgColor;
-                      if (token.htmlStyle) {
-                        for (const [key, value] of Object.entries(
-                          token.htmlStyle,
-                        )) {
-                          if (value == null) continue;
-                          if (key === "color") {
-                            tokenStyle["--sdm-c"] = String(value);
-                          } else if (key === "background-color") {
-                            tokenStyle["--sdm-tbg"] = String(value);
-                            hasBg = true;
-                          } else {
-                            tokenStyle[key] = String(value);
-                          }
+          {result.tokens.map((row, rowIndex) => (
+            <span
+              key={rowIndex}
+              className={lineNumbers ? "line block" : "block"}
+            >
+              {row.length === 0 || (row.length === 1 && row[0].content === "")
+                ? "\n"
+                : row.map((token, tokenIndex) => {
+                    const tokenStyle: Record<string, string> = {};
+                    let hasBg = Boolean(token.bgColor);
+                    if (token.color) tokenStyle["--sdm-c"] = token.color;
+                    if (token.bgColor)
+                      tokenStyle["--sdm-tbg"] = token.bgColor;
+                    if (token.htmlStyle) {
+                      for (const [key, value] of Object.entries(
+                        token.htmlStyle,
+                      )) {
+                        if (value == null) continue;
+                        if (key === "color") {
+                          tokenStyle["--sdm-c"] = String(value);
+                        } else if (key === "background-color") {
+                          tokenStyle["--sdm-tbg"] = String(value);
+                          hasBg = true;
+                        } else {
+                          tokenStyle[key] = String(value);
                         }
                       }
-                      const htmlAttrs = (
-                        token as {
-                          htmlAttrs?: Record<string, string | undefined>;
-                        }
-                      ).htmlAttrs;
-                      return (
-                        <span
-                          key={tokenIndex}
-                          className={cn(
-                            "text-(--sdm-c,inherit)",
-                            "dark:text-(--shiki-dark,var(--sdm-c,inherit))",
-                            hasBg && "bg-(--sdm-tbg)",
-                            hasBg && "dark:bg-(--shiki-dark-bg,var(--sdm-tbg))",
-                          )}
-                          style={tokenStyle as CSSProperties}
-                          {...htmlAttrs}
-                        >
-                          {token.content}
-                        </span>
-                      );
-                    })}
-              </span>
-            ))}
-          </code>
-        </pre>
-      </div>
+                    }
+                    const htmlAttrs = (
+                      token as {
+                        htmlAttrs?: Record<string, string | undefined>;
+                      }
+                    ).htmlAttrs;
+                    return (
+                      <span
+                        key={tokenIndex}
+                        className={cn(
+                          "text-(--sdm-c,inherit)",
+                          "dark:text-(--shiki-dark,var(--sdm-c,inherit))",
+                          hasBg && "bg-(--sdm-tbg)",
+                          hasBg && "dark:bg-(--shiki-dark-bg,var(--sdm-tbg))",
+                        )}
+                        style={tokenStyle as CSSProperties}
+                        {...htmlAttrs}
+                      >
+                        {token.content}
+                      </span>
+                    );
+                  })}
+            </span>
+          ))}
+        </code>
+      </pre>
     );
   },
   (prev, next) =>
     prev.result === next.result &&
     prev.language === next.language &&
     prev.className === next.className &&
-    prev.startLine === next.startLine &&
-    prev.lineNumbers === next.lineNumbers,
+    prev.lineNumbers === next.lineNumbers &&
+    prev.lineNumbersStart === next.lineNumbersStart,
 );
 
 function HighlightedCodeBlockBody({
@@ -253,16 +327,16 @@ function HighlightedCodeBlockBody({
   language,
   raw,
   className,
-  startLine,
   lineNumbers,
+  lineNumbersStart,
   codePlugin,
 }: {
   code: string;
   language: string;
   raw: HighlightResult;
   className?: string;
-  startLine?: number;
   lineNumbers?: boolean;
+  lineNumbersStart?: number;
   codePlugin: CodeHighlighterPlugin;
 }) {
   const { shikiTheme } = useContext(StreamdownContext);
@@ -285,8 +359,8 @@ function HighlightedCodeBlockBody({
       className={className}
       language={language}
       lineNumbers={lineNumbers}
+      lineNumbersStart={lineNumbersStart}
       result={result}
-      startLine={startLine}
     />
   );
 }
@@ -310,32 +384,61 @@ function FenceCodeBlockView({
   lineNumbers = true,
   codePlugin = codeHighlighter,
 }: FenceCodeBlockViewProps) {
+  const { allowCopy, keepBackground } = useContext(NexusCodeBlockChromeContext);
   const trimmed = useMemo(() => trimTrailingNewlines(code), [code]);
   const raw = useMemo(() => buildRawHighlightResult(trimmed), [trimmed]);
 
+  const title = (language || "code").toLowerCase();
+
   return (
-    <div
+    <figure
       className={cn(
-        "my-4 flex w-full flex-col gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-900/50",
+        "my-4 rounded-xl bg-gray-100 dark:bg-background",
+        !keepBackground && "border border-gray-200 dark:border-white/10",
+        "not-prose relative w-full overflow-hidden text-[13px] font-[450]",
         className,
       )}
       data-incomplete={isIncomplete || undefined}
       data-language={language}
       data-slot="nexus-code-block"
+      dir="ltr"
+      tabIndex={-1}
       style={{ contentVisibility: "auto", containIntrinsicSize: "auto 200px" }}
     >
-      <div className="flex h-8 items-center text-xs text-gray-500 dark:text-gray-400">
-        <span className="ml-1 font-mono lowercase">{language}</span>
+      <div className="flex h-9.5 items-center gap-2 px-4 text-gray-500 dark:text-gray-400">
+        <figcaption className="flex-1 truncate text-[13px] lowercase">
+          {title}
+        </figcaption>
+        {allowCopy ? (
+          <div className="-me-2 flex shrink-0 items-center">
+            <CodeBlockCopyButton
+              text={trimmed}
+              keepBackground={keepBackground}
+              showGlow={false}
+            />
+          </div>
+        ) : null}
       </div>
-      <HighlightedCodeBlockBody
-        code={trimmed}
-        codePlugin={codePlugin}
-        language={language}
-        lineNumbers={lineNumbers}
-        raw={raw}
-        startLine={startLine}
-      />
-    </div>
+      <div className="relative overflow-hidden rounded-xl bg-white dark:bg-gray-900">
+        <div
+          className={cn(
+            "fd-scroll-container no-scrollbar overflow-auto overscroll-x-none rounded-t-xl px-4 py-3.5 text-sm leading-6",
+            keepBackground
+              ? "bg-gray-100! dark:bg-gray-950!"
+              : "bg-white dark:bg-gray-900",
+          )}
+        >
+          <HighlightedCodeBlockBody
+            code={trimmed}
+            codePlugin={codePlugin}
+            language={language}
+            lineNumbers={lineNumbers}
+            lineNumbersStart={startLine ?? 1}
+            raw={raw}
+          />
+        </div>
+      </div>
+    </figure>
   );
 }
 
