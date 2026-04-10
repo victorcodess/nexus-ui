@@ -4,10 +4,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { ArrowDown02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  StickToBottom,
-  useStickToBottomContext,
-} from "use-stick-to-bottom";
+import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
 import { cn } from "@/lib/utils";
 
@@ -22,7 +19,7 @@ function Thread({
   return (
     <StickToBottom
       data-slot="thread"
-      className={cn("relative w-full flex overflow-y-auto", className)}
+      className={cn("relative w-full h-full", className)}
       resize={resize}
       initial={initial}
       {...props}
@@ -37,7 +34,7 @@ function ThreadContent({ className, ...props }: ThreadContentProps) {
     <StickToBottom.Content
       data-slot="thread-content"
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-6 p-6",
+        "flex w-full flex-col gap-6 p-6",
         className,
       )}
       {...props}
@@ -70,7 +67,7 @@ function ThreadScrollToBottom({
       type={asChild ? undefined : "button"}
       className={cn(
         !asChild &&
-          "absolute bottom-6 shadow-sm left-[50%] flex size-8 translate-x-[-50%] cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-500 transition-all hover:bg-gray-200 active:scale-95 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700",
+          "absolute bottom-6 left-[50%] flex size-8 translate-x-[-50%] cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-500 shadow-sm transition-all hover:bg-gray-200 active:scale-95 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700",
         className,
       )}
       onClick={(event) => {

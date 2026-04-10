@@ -14,6 +14,11 @@ import {
   MessageStack,
 } from "@/components/nexus-ui/message";
 import {
+  Thread,
+  ThreadContent,
+  ThreadScrollToBottom,
+} from "@/components/nexus-ui/thread";
+import {
   ModelSelector,
   ModelSelectorContent,
   ModelSelectorGroup,
@@ -55,10 +60,8 @@ const ASSISTANT_SHORT_REHYPE_PLUGINS = [
   defaultRehypePlugins.sanitize,
 ] as const;
 
-const imgUser =
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop";
-const imgAssistant =
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=128&h=128&fit=crop";
+const imgUser = "/assets/user-avatar.avif";
+const imgAssistant = "/assets/nexus-avatar.png";
 
 /** Predetermined assistant copy — cycles per exchange (0 → 1 → 2 → …). */
 const ASSISTANT_RESPONSE_HELLO = `Hello! I'm here whenever you want to **brainstorm**, draft something, or step through a problem—just say what you're working on.`;
@@ -87,15 +90,6 @@ Plug in your own numbers, but this frame keeps surprises smaller:
 | Food | $100–220 | Mix of groceries, cafés, one nicer dinner |
 | Getting around | $35–90 | Gas, trains, parking, or a few rideshares |
 | Fun | $40–150 | Tickets, shops, whatever fills your cup |
-
-Quick scratch total in your browser console:
-
-\`\`\`javascript
-const weekend = { stay: 280, food: 150, travel: 55, fun: 80 };
-const total = Object.values(weekend).reduce((a, b) => a + b, 0);
-
-console.log(\`Roughly $\${total} before flights or extras\`);
-\`\`\`
 
 Treat it as a starting point—your city, season, and travel style will move the rows up or down.`;
 
@@ -272,13 +266,13 @@ export default function MessageDemo() {
   }, []);
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-white dark:bg-gray-950">
-      <div className="flex-1 overflow-y-auto px-4 pt-40 pb-44">
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+    <div className="bor der-5 border-purple-500 flex items-start h-screen pt-20 px-10 relative">
+      <Thread className="h-[75vh] bor der-5 border-blue-500">
+        <ThreadContent className="bor der-5 border-red-500 max-w-2xl mx-auto pb-40">
           {messages.map((m) => (
             <motion.div
               key={m.id}
-              className="w-full"
+              className="w-full bor der-5 border-green-500"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
@@ -442,10 +436,11 @@ export default function MessageDemo() {
               </Message>
             </motion.div>
           ))}
-        </div>
-      </div>
+        </ThreadContent>
+        <ThreadScrollToBottom className="-bottom-0 z-50" />
+      </Thread>
 
-      <div className="fixed right-0 bottom-0 left-0 z-10 border-t-0 border-gray-200 bg-white/85 p-6 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95">
+      <div className="hid den fixed right-0 bottom-0 left-0 z-10 bor der-t-2 border-amber-500  bg-white/70 pt-6 pb-12 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95">
         <div className="mx-auto w-full max-w-xl">
           <PromptInput onSubmit={handleSubmit} className="shadow-sm">
             <PromptInputTextarea
@@ -504,7 +499,7 @@ export default function MessageDemo() {
                   <Button
                     type="button"
                     className="size-8 cursor-pointer rounded-full bg-gray-800 text-white transition-transform hover:bg-gray-900 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                    disabled={!input.trim()}
+                    disabled={!input.trim() && !awaitingAssistantResponse}
                     onClick={() => input.trim() && handleSubmit(input)}
                     aria-label={
                       awaitingAssistantResponse
