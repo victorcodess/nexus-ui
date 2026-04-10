@@ -19,7 +19,7 @@ function Thread({
   return (
     <StickToBottom
       data-slot="thread"
-      className={cn("relative flex w-full overflow-y-auto", className)}
+      className={cn("relative w-full h-full", className)}
       resize={resize}
       initial={initial}
       {...props}
@@ -34,7 +34,7 @@ function ThreadContent({ className, ...props }: ThreadContentProps) {
     <StickToBottom.Content
       data-slot="thread-content"
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-6 p-6",
+        "flex w-full flex-col gap-6 p-6",
         className,
       )}
       {...props}
