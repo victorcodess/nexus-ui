@@ -20,6 +20,7 @@ import ModelSelectorWithCheckbox from "@/components/nexus-ui/examples/model-sele
 import MessageDefault from "@/components/nexus-ui/examples/message/default";
 import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avatar";
 import MessageWithActions from "@/components/nexus-ui/examples/message/with-actions";
+import { ShadcnBaseThemeMenu } from "@/components/nexus-ui/examples/shadcn-base-theme-menu";
 
 const GAP_PX = 40;
 /** Each column is at most this wide; grid caps at three tracks + gutters. */
@@ -122,9 +123,10 @@ export default function ThemeDemo() {
   }, []);
 
   return (
-    <div className="dark h-screen max-h-screen overflow-hidden bg-background text-foreground">
+    <div className="h-screen max-h-screen overflow-hidden bg-background text-foreground">
+      <ShadcnBaseThemeMenu />
       <div className="box-border flex h-full min-h-0 items-center justify-center p-6 sm:p-8">
-        <div className="box-border max-h-[calc(100vh-3rem)] max-w-[calc(100vw-8rem)] overflow-auto">
+        <div className="box-border max-h-[calc(100vh-3rem)] max-w-[calc(100vw-8rem)] overflow-auto -mt-30">
                    <div
             className="mx-auto grid w-full items-start"
             style={{
