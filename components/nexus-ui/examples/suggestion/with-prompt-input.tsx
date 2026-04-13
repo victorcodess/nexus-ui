@@ -52,7 +52,7 @@ export default function SuggestionWithPromptInput() {
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-border"
+                className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
               >
                 <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
               </Button>
@@ -64,7 +64,7 @@ export default function SuggestionWithPromptInput() {
                 type="button"
                 size="icon-sm"
                 className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
-                disabled={isLoading || !input.trim()}
+                disabled={!isLoading && !input.trim()}
                 onClick={() => input.trim() && doSubmit(input)}
               >
                 {isLoading ? (

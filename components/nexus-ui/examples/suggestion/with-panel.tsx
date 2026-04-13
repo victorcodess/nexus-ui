@@ -154,7 +154,7 @@ export default function SuggestionWithPanel() {
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-border"
+                className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
               >
                 <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
               </Button>
@@ -166,7 +166,7 @@ export default function SuggestionWithPanel() {
                 type="button"
                 size="icon-sm"
                 className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
-                disabled={isLoading || !input.trim()}
+                disabled={!isLoading && !input.trim()}
                 onClick={() => input.trim() && doSubmit(input)}
               >
                 {isLoading ? (
@@ -206,8 +206,8 @@ export default function SuggestionWithPanel() {
             <>
               <SuggestionPanelHeader className="h-6">
                 <SuggestionPanelTitle>
-                  <active.icon className="size-3.5 text-gray-400" />
-                  <span className="text-[13px] font-normal text-gray-400">
+                  <active.icon className="size-3.5 text-ring" />
+                  <span className="text-[13px] font-normal text-ring">
                     {active.label}
                   </span>
                 </SuggestionPanelTitle>

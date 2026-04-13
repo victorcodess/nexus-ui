@@ -33,16 +33,16 @@ export default function ModelSelectorCustomTrigger() {
         <HugeiconsIcon
           icon={AiMagicIcon}
           strokeWidth={2.0}
-          className="size-3.5 text-gray-500 dark:text-gray-400"
+          className="size-3.5 text-muted-foreground"
         />
-        <span className="text-gray-500 dark:text-gray-400">Using</span>
-        <span className="font-medium text-gray-900 dark:text-gray-100">
+        <span className="text-muted-foreground">Using</span>
+        <span className="font-medium text-foreground">
           {selected?.title ?? model}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2.0}
-          className="size-4 shrink-0 text-gray-400 dark:text-gray-500"
+          className="size-4 shrink-0 text-muted-foreground"
         />
       </ModelSelectorTrigger>
       <ModelSelectorContent className="w-[264px]" align="start">

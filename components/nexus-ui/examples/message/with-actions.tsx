@@ -34,7 +34,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={Edit04Icon}
@@ -48,7 +48,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={Copy01Icon}
@@ -76,7 +76,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={Copy01Icon}
@@ -90,7 +90,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={ThumbsUpIcon}
@@ -104,7 +104,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={ThumbsDownIcon}
@@ -118,7 +118,7 @@ const MessageWithActions = () => {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={RepeatIcon}

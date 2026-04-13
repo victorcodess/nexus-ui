@@ -22,12 +22,15 @@ const V0Input = () => {
       <PromptInputActions className="px-0 py-0">
         <PromptInputActionGroup className="gap-1">
           <PromptInputAction asChild>
-            <Button className="-none size-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <Button
+              type="button"
+              className="-none size-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
+            >
               <V0Plus className="size-4" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="h-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <Button className="h-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border">
               <V0Model className="mr-0.5 size-4" />
               <span>v0 Max</span>
               <V0Caret className="size-4" />
@@ -37,7 +40,7 @@ const V0Input = () => {
 
         <PromptInputActionGroup className="">
           <PromptInputAction asChild>
-            <Button className="size-7 cursor-pointer gap-1 rounded-sm border border-gray-200 bg-gray-100/50 text-[13px] leading-6 font-normal text-gray-200 dark:border-border-primary dark:bg-gray-700 dark:text-border-primary">
+            <Button className="size-7 cursor-pointer gap-1 rounded-sm border border-border bg-muted/50 text-[13px] leading-6 font-normal text-muted-foreground">
               <V0ArrowUp className="size-4" />
             </Button>
           </PromptInputAction>

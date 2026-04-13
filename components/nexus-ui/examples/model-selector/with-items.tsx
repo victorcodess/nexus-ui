@@ -61,17 +61,16 @@ export default function ModelSelectorWithItems() {
         >
           <div className="flex w-full items-center justify-between gap-2">
             <div className="flex flex-col gap-0.25">
-              <p className="text-sm font-normal text-gray-900 dark:text-gray-100">
+              <p className="text-sm font-normal text-foreground">
                 Extended thinking
               </p>
-              <p className="text-xs font-[350] text-gray-400 dark:text-gray-400">
+              <p className="text-xs font-[350] text-muted-foreground">
                 Think longer for complex tasks
               </p>
             </div>
             <Switch
               checked={extendedThinking}
               onCheckedChange={setExtendedThinking}
-              className="data-[state=checked]:bg-gray-600 dark:data-[state=checked]:bg-gray-300 data-[state=checked]:**:data-[slot=switch-thumb]:dark:bg-gray-800"
             />
           </div>
         </ModelSelectorItem>

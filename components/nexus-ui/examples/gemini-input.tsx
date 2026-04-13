@@ -22,27 +22,33 @@ const GeminiInput = () => {
       <PromptInputActions className="px-0 pt-2 pb-0">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiAdd className="size-5 text-[#5D5D5D]" />
+            <Button
+              type="button"
+              className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
+            >
+              <GeminiAdd className="size-5 text-muted-foreground" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiPageInfo className="size-5 text-[#5D5D5D]" />
+            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border">
+              <GeminiPageInfo className="size-5 text-muted-foreground" />
               <span className="max-sm:hidden">Tools</span>
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border">
               <span>Fast</span>
-              <GeminiCaret className="-mb-0.5 size-5 text-[#5D5D5D]" />
+              <GeminiCaret className="-mb-0.5 size-5 text-muted-foreground" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <GeminiMic className="size-5 text-[#5D5D5D]" />
+            <Button
+              type="button"
+              className="size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
+            >
+              <GeminiMic className="size-5 text-muted-foreground" />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>

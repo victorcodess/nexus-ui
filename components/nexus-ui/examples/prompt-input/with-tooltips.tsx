@@ -56,32 +56,62 @@ export default function PromptInputWithTooltips() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <PromptInputAction asChild>
-                  <Button type="button" className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+                  >
                     <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Attach file</TooltipContent>
+              <TooltipContent
+                className="rounded-full bg-primary text-primary-foreground"
+                arrowClassName="fill-primary bg-primary"
+              >
+                Attach file
+              </TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <PromptInputAction asChild>
-                  <Button type="button" className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+                  >
                     <HugeiconsIcon icon={Image01Icon} strokeWidth={2.0} className="size-4" />
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Upload image</TooltipContent>
+              <TooltipContent
+                className="rounded-full bg-primary text-primary-foreground"
+                arrowClassName="fill-primary bg-primary"
+              >
+                Upload image
+              </TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <PromptInputAction asChild>
-                  <Button type="button" className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 transition-transform hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+                  >
                     <HugeiconsIcon icon={Mic02Icon} strokeWidth={2.0} className="size-4" />
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Voice input</TooltipContent>
+              <TooltipContent
+                className="rounded-full bg-primary text-primary-foreground"
+                arrowClassName="fill-primary bg-primary"
+              >
+                Voice input
+              </TooltipContent>
             </Tooltip>
           </PromptInputActionGroup>
           <PromptInputActionGroup>
@@ -90,8 +120,9 @@ export default function PromptInputWithTooltips() {
                 <PromptInputAction asChild>
                   <Button
                     type="button"
-                    className="size-8 cursor-pointer rounded-full bg-gray-700 text-white transition-transform hover:bg-gray-800 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                    disabled={isLoading || !input.trim()}
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                    disabled={!isLoading && !input.trim()}
                     onClick={() => input.trim() && doSubmit(input)}
                   >
                     {isLoading ? (
@@ -102,7 +133,12 @@ export default function PromptInputWithTooltips() {
                   </Button>
                 </PromptInputAction>
               </TooltipTrigger>
-              <TooltipContent className="rounded-full text-white bg-gray-900 dark:text-white dark:bg-gray-700" arrowClassName="fill-gray-900 dark:fill-gray-700 bg-gray-900 dark:bg-gray-700">Send message</TooltipContent>
+              <TooltipContent
+                className="rounded-full bg-primary text-primary-foreground"
+                arrowClassName="fill-primary bg-primary"
+              >
+                Send message
+              </TooltipContent>
             </Tooltip>
           </PromptInputActionGroup>
         </PromptInputActions>

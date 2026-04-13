@@ -75,7 +75,7 @@ const V0Input = () => {
           <PromptInputAction asChild>
             <Button
               type="button"
-              className="-none size-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              className="-none size-7 cursor-pointer gap-1 rounded-sm bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
             >
               <V0Plus className="size-4" />
             </Button>
@@ -88,14 +88,14 @@ const V0Input = () => {
             >
               <ModelSelectorTrigger
                 variant="ghost"
-                className="h-7 gap-1 rounded-sm border-none bg-transparent px-1.5 text-xs leading-4 font-normal text-[#5D5D5D] transition-all hover:bg-gray-100 active:scale-99 dark:text-white dark:hover:bg-gray-700"
+                className="h-7 gap-1 rounded-sm border-none bg-transparent px-1.5 text-xs leading-4 font-normal text-muted-foreground transition-all hover:bg-muted active:scale-99 dark:text-white dark:hover:bg-border"
               >
-                <SelectedIcon className="size-4 shrink-0 text-gray-600 dark:text-gray-300 [&_.stroke-v0-gray-500]:stroke-gray-400 dark:[&_.stroke-v0-gray-500]:stroke-gray-600" />
+                <SelectedIcon className="size-4 shrink-0 text-muted-foreground [&_.stroke-v0-gray-500]:stroke-muted-foreground/80 dark:[&_.stroke-v0-gray-500]:stroke-muted-foreground" />
                 <span className="truncate">{selected.title}</span>
                 <V0Caret className="-ml-0.5 size-4 shrink-0" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
-                className="w-[168px] min-w-0 rounded-xl border border-gray-200 px-1.5 py-1.5 shadow-modal dark:border-gray-700 dark:bg-gray-800"
+                className="w-[168px] min-w-0 rounded-xl border border-border bg-popover px-1.5 py-1.5 shadow-modal"
                 align="start"
                 alignOffset={-10}
               >
@@ -110,9 +110,9 @@ const V0Input = () => {
                       value={m.value}
                       icon={m.icon}
                       title={m.title}
-                      className="min-h-0 px-2 py-1.5 **:data-[slot=model-selector-item-icon]:text-gray-600 dark:focus:bg-gray-900 dark:**:data-[slot=model-selector-item-icon]:text-gray-300 [&_.stroke-v0-gray-500]:stroke-gray-400 dark:[&_.stroke-v0-gray-500]:stroke-gray-600"
+                      className="min-h-0 px-2 py-1.5 **:data-[slot=model-selector-item-icon]:text-muted-foreground focus:bg-accent dark:**:data-[slot=model-selector-item-icon]:text-muted-foreground [&_.stroke-v0-gray-500]:stroke-muted-foreground/80 dark:[&_.stroke-v0-gray-500]:stroke-muted-foreground"
                       indicator={
-                        <V0Check className="size-4 text-gray-500 dark:text-white" />
+                        <V0Check className="size-4 text-muted-foreground dark:text-foreground" />
                       }
                     />
                   ))}
@@ -127,11 +127,11 @@ const V0Input = () => {
             <Button
               type="button"
               className={cn(
-                "size-7 cursor-pointer gap-1 rounded-sm border border-gray-200 bg-gray-100/50 text-[13px] leading-6 font-normal text-gray-900 transition-all hover:bg-gray-200/80 active:scale-97 disabled:opacity-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600",
+                "size-7 cursor-pointer gap-1 rounded-sm border border-border bg-muted/50 text-[13px] leading-6 font-normal text-foreground transition-all hover:bg-muted active:scale-97 disabled:opacity-50 dark:text-foreground",
                 isLoading &&
-                  "w-fit bg-gray-800 text-white disabled:opacity-100 dark:bg-gray-50! dark:text-gray-900",
+                  "w-fit border-transparent bg-foreground text-background disabled:opacity-100 dark:bg-background dark:text-foreground",
                 input.trim() &&
-                  "border-none bg-gray-800 text-white dark:bg-gray-50! dark:text-gray-900!",
+                  "border-none bg-foreground text-background dark:bg-background dark:text-foreground",
               )}
               disabled={isLoading || !input.trim()}
               onClick={() => input.trim() && doSubmit(input)}

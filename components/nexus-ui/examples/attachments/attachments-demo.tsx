@@ -547,7 +547,7 @@ function AttachmentsDemo() {
         aria-label="Attachment layout"
         aria-hidden={!attachmentLayoutTabsVisible}
         className={cn(
-          "not-prose absolute top-1/4 right-0 left-0 z-50 flex h-9 items-center justify-center gap-2 bg-white px-4 dark:bg-gray-950",
+          "not-prose absolute top-1/4 right-0 left-0 z-50 flex h-9 items-center justify-center gap-2 bg-background px-4",
           !attachmentLayoutTabsVisible && "pointer-events-none",
         )}
         initial={false}
@@ -573,11 +573,10 @@ function AttachmentsDemo() {
               tabIndex={attachmentLayoutTabsVisible ? undefined : -1}
               onClick={() => setAttachmentVariant(v)}
               className={cn(
-                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-full px-3 text-[13px] font-[450] whitespace-nowrap text-gray-400 transition-colors outline-none select-none dark:text-gray-500",
-                "focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 dark:focus-visible:ring-gray-500 dark:focus-visible:ring-offset-gray-950",
-                "hover:text-gray-900 dark:hover:text-gray-50",
-                selected &&
-                  "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50",
+                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-full px-3 text-[13px] font-[450] whitespace-nowrap text-muted-foreground transition-colors outline-none select-none",
+                "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "hover:text-foreground",
+                selected && "bg-muted text-foreground",
               )}
             >
               {label}
@@ -652,8 +651,8 @@ function AttachmentsDemo() {
                         <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
-                          className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                          size="icon-sm"
+                          className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
                         >
                           <HugeiconsIcon
                             icon={PlusSignIcon}
@@ -671,8 +670,9 @@ function AttachmentsDemo() {
                     <PromptInputAction asChild>
                       <Button
                         type="button"
-                        className="size-8 cursor-pointer rounded-full bg-gray-700 text-white transition-transform hover:bg-gray-800 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                        disabled={isLoading || !canSend}
+                        size="icon-sm"
+                        className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                        disabled={!isLoading && !canSend}
                         onClick={() => handleSubmit(message)}
                       >
                         {isLoading ? (
@@ -735,8 +735,8 @@ function AttachmentsDemo() {
                 <>
                   <SuggestionPanelHeader className="h-6">
                     <SuggestionPanelTitle>
-                      <active.icon className="size-3.5 text-gray-400" />
-                      <span className="text-[13px] font-normal text-gray-400">
+                      <active.icon className="size-3.5 text-muted-foreground" />
+                      <span className="text-[13px] font-normal text-muted-foreground">
                         {active.label}
                       </span>
                     </SuggestionPanelTitle>
@@ -762,13 +762,13 @@ function AttachmentsDemo() {
                             variant="ghost"
                             highlight={active.highlight}
                             value={text}
-                            className="group h-auto w-full justify-between rounded-[6px] px-3 text-left whitespace-normal text-gray-900 hover:bg-gray-200/72"
+                            className="group h-auto w-full justify-between rounded-[6px] px-3 text-left whitespace-normal text-foreground hover:bg-border"
                           >
                             {text}
                             <HugeiconsIcon
                               icon={ArrowRight01Icon}
                               strokeWidth={2.0}
-                              className="size-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-500"
+                              className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
                             />
                           </Suggestion>
                         ))}

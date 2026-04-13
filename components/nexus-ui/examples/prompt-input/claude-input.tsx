@@ -95,7 +95,10 @@ const ClaudeInput = () => {
       <PromptInputActions className="px-1 py-0">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-gray-600 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-900">
+            <Button
+              type="button"
+              className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
+            >
               <ClaudeAdd className="size-5" />
             </Button>
           </PromptInputAction>
@@ -110,7 +113,7 @@ const ClaudeInput = () => {
             >
               <ModelSelectorTrigger
                 variant="ghost"
-                className="h-8 cursor-pointer gap-1 rounded-sm border-none bg-transparent pr-1.5 pl-2.5 text-[13px] leading-6 font-normal text-gray-900 transition-all hover:bg-gray-200 active:scale-97 data-[state=open]:bg-gray-200 dark:text-white dark:hover:bg-gray-900 dark:data-[state=open]:bg-gray-900"
+                className="h-8 cursor-pointer gap-1 rounded-sm border-none bg-transparent pr-1.5 pl-2.5 text-[13px] leading-6 font-normal text-foreground transition-all hover:bg-muted active:scale-97 data-[state=open]:bg-muted dark:text-white dark:hover:bg-border dark:data-[state=open]:bg-border"
               >
                 <span>
                   {allModels.find((m) => m.value === model)?.title ??
@@ -119,7 +122,7 @@ const ClaudeInput = () => {
                 <ClaudeCaret className="size-4" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
-                className="w-[256px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-modal dark:bg-gray-800"
+                className="w-[256px] rounded-xl border border-border bg-popover p-1.5 shadow-modal"
                 align="end"
                 sideOffset={4}
               >
@@ -141,40 +144,39 @@ const ClaudeInput = () => {
                             className="size-4.5 text-blue-500 dark:text-blue-400"
                           />
                         }
-                        className="gap-10 rounded-md px-2 py-1.5 focus:bg-gray-100 **:data-[slot=model-selector-radio-item-indicator]:right-4 dark:focus:bg-gray-900"
+                        className="gap-10 rounded-md px-2 py-1.5 focus:bg-accent **:data-[slot=model-selector-radio-item-indicator]:right-4"
                       />
                     ))}
                   </ModelSelectorRadioGroup>
                 </ModelSelectorGroup>
-                <ModelSelectorSeparator className="my-1.5 dark:bg-gray-700" />
+                <ModelSelectorSeparator className="my-1.5 bg-border" />
                 <ModelSelectorItem
                   onClick={() => setExtendedThinking(!extendedThinking)}
-                  className="px-2 py-1.5 dark:focus:bg-gray-900"
+                  className="px-2 py-1.5 focus:bg-accent"
                 >
                   <div className="flex w-full items-center justify-between gap-2">
                     <div className="flex flex-col gap-0.25">
-                      <p className="text-sm font-normal text-gray-900 dark:text-gray-100">
+                      <p className="text-sm font-normal text-foreground">
                         Extended thinking
                       </p>
-                      <p className="text-xs font-[350] text-gray-400 dark:text-gray-400">
+                      <p className="text-xs font-[350] text-muted-foreground">
                         Think longer for complex tasks
                       </p>
                     </div>
                     <Switch
                       checked={extendedThinking}
                       onCheckedChange={setExtendedThinking}
-                      className="data-[state=checked]:bg-gray-600 dark:data-[state=checked]:bg-gray-300 data-[state=checked]:**:data-[slot=switch-thumb]:dark:bg-gray-800"
                     />
                   </div>
                 </ModelSelectorItem>
-                <ModelSelectorSeparator className="dark:bg-gray-700" />
+                <ModelSelectorSeparator className="bg-border" />
                 <ModelSelectorGroup>
                   <ModelSelectorSub>
-                    <ModelSelectorSubTrigger className="data-[state=open]:bg-gray-0 px-2 py-1.5 dark:focus:bg-gray-900 dark:data-[state=open]:bg-gray-900">
+                    <ModelSelectorSubTrigger className="px-2 py-1.5 focus:bg-accent data-[state=open]:bg-accent dark:data-[state=open]:bg-accent">
                       More models
                     </ModelSelectorSubTrigger>
                     <ModelSelectorPortal>
-                      <ModelSelectorSubContent className="w-[192px] gap-0 rounded-xl border border-gray-200 bg-white p-1.5 shadow-modal dark:border-gray-700 dark:bg-gray-800">
+                      <ModelSelectorSubContent className="w-[192px] gap-0 rounded-xl border border-border bg-popover p-1.5 shadow-modal">
                         <ModelSelectorRadioGroup
                           value={model}
                           onValueChange={setModel}
@@ -184,7 +186,7 @@ const ClaudeInput = () => {
                               key={m.value}
                               value={m.value}
                               title={m.title}
-                              className="min-h-8 px-2 dark:focus:bg-gray-900"
+                              className="min-h-8 px-2 focus:bg-accent"
                             />
                           ))}
                         </ModelSelectorRadioGroup>
@@ -199,16 +201,16 @@ const ClaudeInput = () => {
             <Button
               type="button"
               className={cn(
-                "size-8 cursor-pointer gap-1 rounded-md bg-transparent text-[13px] leading-6 font-normal text-gray-900 transition-all hover:bg-gray-200 active:scale-97 disabled:opacity-70 dark:text-white dark:hover:bg-gray-900",
+                "size-8 cursor-pointer gap-1 rounded-md bg-transparent text-[13px] leading-6 font-normal text-foreground transition-all hover:bg-muted active:scale-97 disabled:opacity-70 dark:text-white dark:hover:bg-border",
                 input.trim() && "bg-[#df6e3e] dark:bg-[#BC6844]",
                 isLoading &&
-                  "border border-gray-300 bg-transparent disabled:opacity-100 dark:border-gray-600 dark:bg-transparent dark:hover:bg-transparent",
+                  "border border-border bg-transparent disabled:opacity-100 dark:bg-transparent dark:hover:bg-transparent",
               )}
               disabled={isLoading}
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <ClaudeDisc className="text-gray-700 dark:text-gray-50" />
+                <ClaudeDisc className="text-muted-foreground dark:text-foreground" />
               ) : input.trim() ? (
                 <ClaudeArrowUp className="text-white" />
               ) : (

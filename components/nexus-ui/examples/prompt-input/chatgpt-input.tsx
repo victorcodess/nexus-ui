@@ -46,14 +46,14 @@ const ChatgptInput = () => {
       <PromptInputActions className="px-3 py-2.5">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
-              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4 text-[#5D5D5D]" />
+            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted sm:w-fit dark:bg-muted dark:text-foreground">
+              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4 text-muted-foreground" />
               <span className="hidden sm:inline">Attach</span>
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border-primary bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
-              <HugeiconsIcon icon={Search01Icon} strokeWidth={2.0} className="size-4 text-[#5D5D5D]" />
+            <Button className="w-9 cursor-pointer gap-1 rounded-full border border-border bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted sm:w-fit dark:bg-muted dark:text-foreground">
+              <HugeiconsIcon icon={Search01Icon} strokeWidth={2.0} className="size-4 text-muted-foreground" />
               <span className="hidden sm:inline">Search</span>
             </Button>
           </PromptInputAction>
@@ -65,7 +65,7 @@ const ChatgptInput = () => {
             >
               <ModelSelectorTrigger
                 variant="ghost"
-                className="h-9 gap-1 rounded-full border border-border-primary px-2.5 text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 sm:h-9 sm:px-3 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                className="h-9 gap-1 rounded-full border border-border px-2.5 text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted sm:h-9 sm:px-3 dark:text-foreground dark:hover:bg-border"
               >
                 <span className="max-w-28 truncate sm:max-w-none">
                   {selectedTitle}
@@ -73,7 +73,7 @@ const ChatgptInput = () => {
                 <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2.0} className="size-4 shrink-0 opacity-60" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
-                className="min-w-[200px] rounded-xl border border-gray-200 bg-white p-1.5 shadow-modal dark:border-gray-700 dark:bg-gray-800"
+                className="min-w-[200px] rounded-xl border border-border bg-popover p-1.5 shadow-modal"
                 align="start"
               >
                 <ModelSelectorGroup>
@@ -90,10 +90,10 @@ const ChatgptInput = () => {
                           <HugeiconsIcon
                             icon={Tick02Icon}
                             strokeWidth={2.0}
-                            className="size-4 text-gray-900 dark:text-white"
+                            className="size-4 text-foreground"
                           />
                         }
-                        className="rounded-md px-2 py-1.5 focus:bg-gray-100 dark:focus:bg-gray-900"
+                        className="rounded-md px-2 py-1.5 focus:bg-accent"
                       />
                     ))}
                   </ModelSelectorRadioGroup>
@@ -104,7 +104,7 @@ const ChatgptInput = () => {
         </PromptInputActionGroup>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="w-9 cursor-pointer gap-1 rounded-full bg-gray-200 text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 sm:w-fit dark:bg-gray-700 dark:text-white">
+            <Button className="w-9 cursor-pointer gap-1 rounded-full bg-muted text-[13px] leading-6 font-normal text-foreground hover:bg-muted sm:w-fit dark:text-foreground">
               <HugeiconsIcon icon={Mic02Icon} strokeWidth={2.0} className="size-4" />
               <span className="hidden sm:inline">Voice</span>
             </Button>

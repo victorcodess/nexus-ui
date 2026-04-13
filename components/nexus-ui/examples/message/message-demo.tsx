@@ -266,13 +266,13 @@ export default function MessageDemo() {
   }, []);
 
   return (
-    <div className="bor der-5 border-purple-500 flex items-start h-screen pt-20 px-10 relative">
-      <Thread className="h-[75vh] bor der-5 border-blue-500">
-        <ThreadContent className="bor der-5 border-red-500 max-w-2xl mx-auto pb-40">
+    <div className="relative flex h-screen items-start px-10 pt-20">
+      <Thread className="h-[75vh]">
+        <ThreadContent className="mx-auto max-w-2xl pb-40">
           {messages.map((m) => (
             <motion.div
               key={m.id}
-              className="w-full bor der-5 border-green-500"
+              className="w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{
@@ -327,7 +327,7 @@ export default function MessageDemo() {
                                 type="button"
                                 variant="ghost"
                                 size="icon-sm"
-                                className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                                className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                                 aria-label="Copy message"
                                 onClick={() => copyMessage(m.targetText)}
                               >
@@ -343,7 +343,7 @@ export default function MessageDemo() {
                                 type="button"
                                 variant="ghost"
                                 size="icon-sm"
-                                className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                                className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                                 aria-label="Good response"
                               >
                                 <HugeiconsIcon
@@ -358,7 +358,7 @@ export default function MessageDemo() {
                                 type="button"
                                 variant="ghost"
                                 size="icon-sm"
-                                className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                                className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                                 aria-label="Bad response"
                               >
                                 <HugeiconsIcon
@@ -373,7 +373,7 @@ export default function MessageDemo() {
                                 type="button"
                                 variant="ghost"
                                 size="icon-sm"
-                                className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                                className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                                 aria-label="Regenerate"
                               >
                                 <HugeiconsIcon
@@ -400,7 +400,7 @@ export default function MessageDemo() {
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                             aria-label="Edit message"
                           >
                             <HugeiconsIcon
@@ -415,7 +415,7 @@ export default function MessageDemo() {
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-gray-500 transition-all hover:bg-gray-100 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                             aria-label="Copy message"
                             onClick={() => copyMessage(m.text)}
                           >
@@ -440,7 +440,7 @@ export default function MessageDemo() {
         <ThreadScrollToBottom className="-bottom-0 z-50" />
       </Thread>
 
-      <div className="hid den fixed right-0 bottom-0 left-0 z-10 bor der-t-2 border-amber-500  bg-white/70 pt-6 pb-12 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95">
+      <div className="fixed right-0 bottom-0 left-0 z-10 border-t border-border bg-background/70 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95">
         <div className="mx-auto w-full max-w-xl">
           <PromptInput onSubmit={handleSubmit} className="shadow-sm">
             <PromptInputTextarea
@@ -454,8 +454,8 @@ export default function MessageDemo() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
                     aria-label="More actions"
                   >
                     <HugeiconsIcon
@@ -498,8 +498,9 @@ export default function MessageDemo() {
                 <PromptInputAction asChild>
                   <Button
                     type="button"
-                    className="size-8 cursor-pointer rounded-full bg-gray-800 text-white transition-transform hover:bg-gray-900 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                    disabled={!input.trim() && !awaitingAssistantResponse}
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                    disabled={!awaitingAssistantResponse && !input.trim()}
                     onClick={() => input.trim() && handleSubmit(input)}
                     aria-label={
                       awaitingAssistantResponse

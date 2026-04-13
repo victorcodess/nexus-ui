@@ -282,8 +282,8 @@ function AttachmentsWithPromptInput() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    className="size-8 cursor-pointer rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
                   >
                     <HugeiconsIcon
                       icon={PlusSignIcon}
@@ -298,8 +298,9 @@ function AttachmentsWithPromptInput() {
               <PromptInputAction asChild>
                 <Button
                   type="button"
-                  className="size-8 cursor-pointer rounded-full bg-gray-700 text-white transition-transform hover:bg-gray-800 active:scale-97 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                  disabled={isLoading || !canSend}
+                  size="icon-sm"
+                  className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                  disabled={!isLoading && !canSend}
                   onClick={() => handleSubmit(message)}
                 >
                   {isLoading ? (

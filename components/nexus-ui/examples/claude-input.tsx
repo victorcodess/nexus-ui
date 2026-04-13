@@ -21,7 +21,10 @@ const ClaudeInput = () => {
       <PromptInputActions className="px-1 py-0">
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button
+              type="button"
+              className="size-8 cursor-pointer gap-1 rounded-md border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground hover:bg-muted dark:text-white dark:hover:bg-border"
+            >
               <ClaudeAdd className="size-5" />
             </Button>
           </PromptInputAction>
@@ -29,13 +32,13 @@ const ClaudeInput = () => {
 
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="h-8 cursor-pointer gap-1 rounded-md bg-transparent pr-2! text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="h-8 cursor-pointer gap-1 rounded-md bg-transparent pr-2! text-[13px] leading-6 font-normal text-foreground hover:bg-muted dark:text-white dark:hover:bg-border">
               <span>Sonnet 4.6</span>
               <ClaudeCaret className="size-4" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-md bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button className="size-8 cursor-pointer gap-1 rounded-md bg-transparent text-[13px] leading-6 font-normal text-foreground hover:bg-muted dark:text-white dark:hover:bg-border">
               <ClaudeAudioLines className="size-5" />
             </Button>
           </PromptInputAction>

@@ -78,17 +78,17 @@ const GeminiInput = () => {
           <PromptInputAction asChild>
             <Button
               type="button"
-              className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] transition-all hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+              className="size-10 cursor-pointer rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
             >
-              <GeminiAdd className="size-5 text-[#5D5D5D]" />
+              <GeminiAdd className="size-5 text-muted-foreground" />
             </Button>
           </PromptInputAction>
           <PromptInputAction asChild>
             <Button
               type="button"
-              className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] transition-all hover:bg-gray-200 active:scale-97 dark:text-white dark:hover:bg-gray-700"
+              className="h-10 cursor-pointer gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
             >
-              <GeminiPageInfo className="size-5 text-[#5D5D5D]" />
+              <GeminiPageInfo className="size-5 text-muted-foreground" />
               <span className="max-sm:hidden">Tools</span>
             </Button>
           </PromptInputAction>
@@ -102,15 +102,15 @@ const GeminiInput = () => {
             >
               <ModelSelectorTrigger
                 variant="ghost"
-                className="h-10 gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] transition-all hover:bg-gray-200 active:scale-97 data-[state=open]:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
+                className="h-10 gap-1.75 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground transition-all hover:bg-muted active:scale-97 data-[state=open]:bg-muted dark:text-white dark:hover:bg-border"
               >
                 <span>
                   {geminiModels.find((m) => m.value === model)?.title ?? "Fast"}
                 </span>
-                <GeminiCaret className="-mb-0.5 size-5 text-[#5D5D5D]" />
+                <GeminiCaret className="-mb-0.5 size-5 text-muted-foreground" />
               </ModelSelectorTrigger>
               <ModelSelectorContent
-                className="w-[320px] rounded-xl border border-gray-200 bg-white px-0 py-2 shadow-modal dark:border-gray-700 dark:bg-gray-800"
+                className="w-[320px] rounded-xl border border-border bg-popover px-0 py-2 shadow-modal"
                 align="end"
                 sideOffset={8}
               >
@@ -131,7 +131,7 @@ const GeminiInput = () => {
                         indicator={
                           <GeminiCheck className="size-6 text-blue-500 dark:text-blue-400" />
                         }
-                        className="gap-10 rounded-none px-4 focus:bg-gray-100 **:data-[slot=model-selector-radio-item-indicator]:right-4 dark:focus:bg-gray-900"
+                        className="gap-10 rounded-none px-4 focus:bg-accent **:data-[slot=model-selector-radio-item-indicator]:right-4"
                       />
                     ))}
                   </ModelSelectorRadioGroup>
@@ -143,10 +143,10 @@ const GeminiInput = () => {
                 >
                   <div className="flex w-full items-center justify-between gap-2 px-4">
                     <div className="flex flex-col gap-0.25">
-                      <p className="text-sm font-normal text-gray-900 dark:text-gray-100">
+                      <p className="text-sm font-normal text-foreground">
                         Upgrade to Google AI Plus
                       </p>
-                      <p className="text-xs font-[350] text-gray-400 dark:text-gray-400">
+                      <p className="text-xs font-[350] text-muted-foreground">
                         Get access to select Pro features
                       </p>
                     </div>
@@ -165,8 +165,8 @@ const GeminiInput = () => {
             <Button
               type="button"
               className={cn(
-                "size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-[#5D5D5D] transition-all hover:bg-gray-200 active:scale-97 disabled:opacity-70 dark:text-white dark:hover:bg-gray-700",
-                isLoading && "bg-blue-100 dark:bg-blue-50",
+                "size-10 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-muted-foreground transition-all hover:bg-muted active:scale-97 disabled:opacity-70 dark:text-white dark:hover:bg-border",
+                isLoading && "bg-primary/10",
               )}
               disabled={isLoading}
               onClick={() => input.trim() && doSubmit(input)}
@@ -174,9 +174,9 @@ const GeminiInput = () => {
               {isLoading ? (
                 <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current text-blue-400" />
               ) : input.trim() ? (
-                <GeminiSend className="size-5 text-[#5D5D5D]" />
+                <GeminiSend className="size-5 text-muted-foreground" />
               ) : (
-                <GeminiMic className="size-5 text-[#5D5D5D]" />
+                <GeminiMic className="size-5 text-muted-foreground" />
               )}
             </Button>
           </PromptInputAction>
