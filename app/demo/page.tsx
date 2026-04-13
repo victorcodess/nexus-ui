@@ -1,5 +1,5 @@
-import MessageDemo from "@/components/nexus-ui/examples/message/message-demo";
+import ThemeDemo from "@/components/nexus-ui/examples/theme-demo";
 
 export default function DemoPage() {
-  return <MessageDemo />;
+  return <ThemeDemo />;
 }

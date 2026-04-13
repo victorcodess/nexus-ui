@@ -8,10 +8,8 @@ import {
   MessageStack,
 } from "@/components/nexus-ui/message";
 
-const imgUser =
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128&fit=crop";
-const imgAssistant =
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=128&h=128&fit=crop";
+const imgUser = "/assets/user-avatar.avif";
+const imgAssistant = "/assets/nexus-avatar.png";
 
 const MessageWithAvatar = () => {
   return (
@@ -22,11 +20,11 @@ const MessageWithAvatar = () => {
             <MessageMarkdown>Hello — can you help me draft an email?</MessageMarkdown>
           </MessageContent>
         </MessageStack>
-        <MessageAvatar src={imgUser} alt="" fallback="U" />
+        <MessageAvatar src={imgUser} alt="" fallback="U" className="border border-accent" />
       </Message>
 
       <Message from="assistant">
-        <MessageAvatar src={imgAssistant} alt="" fallback="A" />
+        <MessageAvatar src={imgAssistant} alt="" fallback="A" className="border border-accent" />
         <MessageStack>
           <MessageContent>
             <MessageMarkdown>

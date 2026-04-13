@@ -15,7 +15,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
 const triggerVariants = cva(
-  "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 font-normal text-primary outline-none transition-all duration-200 ease-out [&>span:last-child]:transition-transform [&>span:last-child]:duration-200 data-[state=open]:[&>span:last-child]:rotate-180",
+  "inline-flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 font-normal text-primary text-sm outline-none transition-all duration-200 ease-out [&>span:last-child]:transition-transform [&>span:last-child]:duration-200 data-[state=open]:[&>span:last-child]:rotate-180",
   {
     variants: {
       variant: {
