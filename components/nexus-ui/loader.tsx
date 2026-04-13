@@ -216,7 +216,7 @@ export function TypingLoader({
         <div
           key={i}
           className={cn(
-            "bg-gray-800 animate-[typing_1s_infinite] rounded-full",
+            "bg-foreground animate-[typing_1s_infinite] rounded-full",
             dotSizes[size]
           )}
           style={{
