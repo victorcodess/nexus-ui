@@ -201,7 +201,12 @@ export function ChatInput() {
       <PromptInputActions>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+            >
               <Paperclip />
             </Button>
           </PromptInputAction>
@@ -209,7 +214,11 @@ export function ChatInput() {
 
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-gray-700 text-[13px] leading-6 font-normal text-white hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+            <Button
+              type="button"
+              size="icon-sm"
+              className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+            >
               <ArrowUp />
             </Button>
           </PromptInputAction>

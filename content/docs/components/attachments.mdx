@@ -274,8 +274,8 @@ export default function ChatWithAttachments() {
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    size="icon-sm"
+                    className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
                     disabled={isLoading}
                   >
                     <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
@@ -287,8 +287,9 @@ export default function ChatWithAttachments() {
               <PromptInputAction asChild>
                 <Button
                   type="submit"
-                  className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                  disabled={isLoading}
+                  size="icon-sm"
+                  className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                  disabled={isLoading || !input.trim()}
                 >
                   {isLoading ? (
                     <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />

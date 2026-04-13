@@ -195,8 +195,9 @@ export default function ChatWithPromptInput() {
             <PromptInputAction asChild>
               <Button
                 type="submit"
-                className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                disabled={isLoading}
+                size="icon-sm"
+                className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                disabled={isLoading || !input.trim()}
               >
                 {isLoading ? (
                   <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />

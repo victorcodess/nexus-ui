@@ -199,7 +199,12 @@ export default function ChatWithSuggestions() {
           <PromptInputActions>
             <PromptInputActionGroup>
               <PromptInputAction asChild>
-                <Button className="size-8 rounded-full border-none bg-transparent text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+                >
                   <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
                 </Button>
               </PromptInputAction>
@@ -208,8 +213,9 @@ export default function ChatWithSuggestions() {
               <PromptInputAction asChild>
                 <Button
                   type="submit"
-                  className="size-8 rounded-full bg-gray-700 text-white hover:bg-gray-800 disabled:opacity-70 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
-                  disabled={isLoading}
+                  size="icon-sm"
+                  className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
+                  disabled={isLoading || !input.trim()}
                 >
                   {isLoading ? (
                     <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
