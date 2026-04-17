@@ -37,6 +37,7 @@
     "ai": "^6.0.164",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.6.0",
     "fumadocs-core": "16.6.2",
     "fumadocs-mdx": "14.2.7",
     "fumadocs-ui": "16.6.2",
