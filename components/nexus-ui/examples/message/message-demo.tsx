@@ -107,12 +107,6 @@ const models = [
     description: "Chain-of-thought",
   },
   {
-    value: "sonar-reasoning-pro",
-    icon: PerplexityIcon,
-    title: "Perplexity Sonar Reasoning Pro",
-    description: "Advanced reasoning",
-  },
-  {
     value: "sonar-deep-research",
     icon: PerplexityIcon,
     title: "Perplexity Sonar Deep Research",
