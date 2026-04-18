@@ -4,9 +4,448 @@ description: Inline source references with hover preview
 ---
 
 import CitationDefault from "@/components/nexus-ui/examples/citation/default";
+import CitationMultipleSources from "@/components/nexus-ui/examples/citation/multiple-sources";
+import CitationTriggerVariants from "@/components/nexus-ui/examples/citation/trigger-variants";
+import CitationInlineWithText from "@/components/nexus-ui/examples/citation/inline-with-text";
 
-Composable inline source references with hover preview.
+Inline **source** pills on a **Hover Card**: favicon, label, and a preview with title, description, and link row. Pass **`citations`** as **`{ url, title?, description? }`**; URLs drive **favicons** and a short **site name** from the hostname.
+
+**`Citation`** provides list context and (with **`CitationCarousel`**) the active slide. Item-scoped primitives (**`CitationTitle`**, **`CitationDescription`**, …) read **`CitationCarouselItem`** when present, otherwise the carousel’s **active** citation.
 
 <DemoWithCode src="components/nexus-ui/examples/citation/default.tsx">
   <CitationDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/citation
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/citation
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/citation
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/citation
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/citation/citation.tsx" title="components/nexus-ui/citation.tsx" />
+</Step>
+<Step>
+<h3>Install registry dependencies: <code>@nexus-ui/nexus-ui-theme</code>, <code>carousel</code>, and <code>hover-card</code> (or use the CLI so they install automatically).</h3>
+</Step>
+<Step>
+<h3>Update the import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Citation,
+  CitationCarousel,
+  CitationCarouselContent,
+  CitationCarouselHeader,
+  CitationCarouselIndex,
+  CitationCarouselItem,
+  CitationCarouselNext,
+  CitationCarouselPagination,
+  CitationCarouselPrev,
+  CitationContent,
+  CitationDescription,
+  CitationFavicon,
+  CitationFaviconGroup,
+  CitationItem,
+  CitationSiteName,
+  CitationSource,
+  CitationTitle,
+  CitationTrigger,
+} from "@/components/nexus-ui/citation";
+```
+
+Single source: **`CitationTrigger`** + **`CitationContent`** + **`CitationItem`** + field primitives. Multiple sources: **`CitationCarousel`** with **`CitationCarouselItem`** **`index`**, header row, and pagination controls.
+
+```tsx keepBackground
+<Citation citations={[{ url: "https://example.com", title: "Example", description: "…" }]}>
+  <CitationTrigger />
+  <CitationContent>
+    <CitationItem>
+      <CitationTitle />
+      <CitationDescription />
+      <CitationSource />
+    </CitationItem>
+  </CitationContent>
+</Citation>
+```
+
+## Examples
+
+### Multiple sources
+
+With more than one **`citations`** entry, the default chip shows **`+N`** after the first source. The card body uses **`CitationCarousel`** so **`CitationCarouselPrev`**, **`CitationCarouselNext`**, and **`CitationCarouselIndex`** stay in sync with Embla.
+
+<DemoWithCode src="components/nexus-ui/examples/citation/multiple-sources.tsx">
+  <CitationMultipleSources />
+</DemoWithCode>
+
+### Trigger label and favicon
+
+Default chip variations: **favicon only** (**`showSiteName={false}`**), **numeric id** (**`showFavicon={false}`** **`label="[14]"`**), **hostname** (**`label`** from **`parseCitationUrl(url).hostname`**), and **resolved site name** (**`label`** from **`resolveCitationSource(...).siteName`**).
+
+<DemoWithCode src="components/nexus-ui/examples/citation/trigger-variants.tsx">
+  <CitationTriggerVariants />
+</DemoWithCode>
+
+### Inline with text
+
+Three short **paragraphs** of body copy with chips **inside** the sentences. Wrap each **`Citation`** in **`inline-block align-middle`** (and a light **`translate-y`**) so the pill aligns with the line. Because the hover-card **root** is block-level, model each paragraph as a **`div`** (or another block wrapper)—not a **`<p>`**—so the markup stays valid when **`Citation`** sits mid-sentence.
+
+<DemoWithCode src="components/nexus-ui/examples/citation/inline-with-text.tsx">
+  <CitationInlineWithText />
+</DemoWithCode>
+
+## API Reference
+
+### Citation
+
+Root **Hover Card** plus citation list context. Accepts **`HoverCard`** props (`open`, `onOpenChange`, `openDelay`, …) except **`children`**.
+
+<TypeTable
+  type={{
+    citations: {
+      type: "CitationSourceInput[]",
+      description:
+        "Sources to show. Each item requires url; title and description are optional React nodes for the card body.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "CitationTrigger and CitationContent; optionally CitationCarousel and item primitives inside the content.",
+    },
+  }}
+/>
+
+### CitationTrigger
+
+Default chip links to the **first** citation’s URL. With **`children`**, renders **`HoverCardTrigger`** with **`asChild`** only ( **`label`**, **`showFavicon`**, **`showSiteName`** apply to the built-in anchor only).
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Optional custom trigger element. When set, label/showFavicon/showSiteName are ignored.",
+    },
+    label: {
+      type: "React.ReactNode",
+      description: "Replaces the auto-derived site-name text on the default chip.",
+    },
+    showFavicon: {
+      type: "boolean",
+      default: "true",
+      description: "Show the first source’s favicon on the default chip.",
+    },
+    showSiteName: {
+      type: "boolean",
+      default: "true",
+      description:
+        "Show site-name (or label) text. When false with favicon on, yields a favicon-only chip.",
+    },
+  }}
+/>
+
+### CitationContent
+
+Preview panel. Forwards to **`HoverCardContent`**.
+
+<TypeTable
+  type={{
+    align: {
+      type: "string",
+      default: '"center"',
+      description: "Radix popper align prop.",
+    },
+    sideOffset: {
+      type: "number",
+      default: "4",
+      description: "Distance from the trigger in px.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default card shell styles.",
+    },
+  }}
+/>
+
+### CitationCarousel
+
+**`Carousel`** root; registers Embla **`setApi`** on **`Citation`** context (your **`setApi`** still runs).
+
+<TypeTable
+  type={{
+    orientation: {
+      type: '"horizontal" | "vertical"',
+      default: '"horizontal"',
+      description: "Carousel axis; forwarded to Embla via the shared Carousel primitive.",
+    },
+    opts: {
+      type: "object",
+      description: "Optional Embla carousel options (see embla-carousel-react).",
+    },
+    plugins: {
+      type: "EmblaPlugin | EmblaPlugin[]",
+      description: "Optional Embla plugins array.",
+    },
+    setApi: {
+      type: "(api: CarouselApi | undefined) => void",
+      description: "Optional; invoked when the Embla instance is ready or cleared.",
+    },
+    className: {
+      type: "string",
+      description: "Classes on the carousel region wrapper.",
+    },
+  }}
+/>
+
+### CitationCarouselHeader
+
+Layout row above the slide viewport (e.g. summary **`CitationSource`** + **`CitationCarouselPagination`**). **`div`** props.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Default includes horizontal padding and top padding.",
+    },
+  }}
+/>
+
+### CitationCarouselContent
+
+Wraps **`CarouselContent`** and syncs viewport **height** to the **active** slide (multi-slide horizontal tracks are as tall as the tallest slide). **`className`** applies to the **inner flex track** (slides row).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Classes on the flex track inside the overflow viewport.",
+    },
+  }}
+/>
+
+### CitationCarouselItem
+
+One slide; **`index`** selects **`citations[index]`** and sets **`CitationItemContext`**.
+
+<TypeTable
+  type={{
+    index: {
+      type: "number",
+      description: "Zero-based index into Citation citations.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with slide layout (includes self-start).",
+    },
+  }}
+/>
+
+### CitationCarouselPagination
+
+Flex row for nav controls. **`div`** props.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Default flex row with gap for prev / index / next.",
+    },
+  }}
+/>
+
+### CitationCarouselPrev / CitationCarouselNext
+
+Icon buttons; **`children`** replace the default Hugeicons arrows. Standard **`button`** HTML attributes.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default circular button styles.",
+    },
+    disabled: {
+      type: "boolean",
+      description: "Mirrors Embla canScrollPrev / canScrollNext from context.",
+    },
+  }}
+/>
+
+### CitationCarouselIndex
+
+**`current / count`** from context (**1-based** current). **`span`** HTML attributes.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Default tabular-nums muted text.",
+    },
+  }}
+/>
+
+### CitationItem
+
+Card row link: **anchor** to the resolved citation URL unless **`href`** overrides.
+
+<TypeTable
+  type={{
+    href: {
+      type: "string",
+      description: "Optional; defaults to the active or item-scoped citation url.",
+    },
+    className: {
+      type: "string",
+      description: "Default column layout with padding inside the hover card.",
+    },
+  }}
+/>
+
+### CitationTitle
+
+Heading (**`h4`**); **`children`** default to resolved **`title`** (hidden if null).
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Override displayed title; omit to use citation.title.",
+    },
+    className: {
+      type: "string",
+      description: "Line-clamp and typography defaults.",
+    },
+  }}
+/>
+
+### CitationDescription
+
+Paragraph; **`children`** default to resolved **`description`** (hidden if null).
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Override body text; omit to use citation.description.",
+    },
+    className: {
+      type: "string",
+      description: "Line-clamp and muted foreground defaults.",
+    },
+  }}
+/>
+
+### CitationSource
+
+Footer row; default **`CitationFavicon`** (footer variant) + **`CitationSiteName`**. **`div`** props.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Replace the default favicon + site name row entirely.",
+    },
+    className: {
+      type: "string",
+      description: "Default flex row with gap; often tightened in carousel headers.",
+    },
+  }}
+/>
+
+### CitationFavicon
+
+Round image from **`src`** or resolved **`faviconSrc`**.
+
+<TypeTable
+  type={{
+    variant: {
+      type: '"trigger" | "footer"',
+      default: '"footer"',
+      description: "Footer adds a border ring; trigger is flush for chips.",
+    },
+    src: {
+      type: "string",
+      description: "Optional favicon URL; defaults from citation context.",
+    },
+    className: {
+      type: "string",
+      description: "Wrapper div classes (size defaults to icon scale).",
+    },
+  }}
+/>
+
+### CitationFaviconGroup
+
+Stacks a **`CitationFavicon`** per **`citations`** entry (trigger variant) unless **`children`** are provided. **`div`** props.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Custom cluster of favicons or other inline content.",
+    },
+    className: {
+      type: "string",
+      description: "Default overlapping stack with ring separation.",
+    },
+  }}
+/>
+
+### CitationSiteName
+
+**`&lt;span&gt;`**; **`children`** default to resolved **`siteName`**.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Override label; omit to use derived site name from hostname.",
+    },
+    className: {
+      type: "string",
+      description: "Truncate and text-primary defaults.",
+    },
+  }}
+/>
+
+### Types and helpers
+
+Exported for typing and pipelines:
+
+- **`CitationProps`**, **`CitationTriggerProps`**, **`CitationContentProps`** — root and slot prop types
+- **`CitationSourceInput`** — `{ url: string; title?: React.ReactNode; description?: React.ReactNode }`
+- **`ResolvedCitation`** — normalized **`url`**, **`title`**, **`description`**, **`siteName`**, **`faviconSrc`**
+- **`parseCitationUrl(urlStr)`** — tolerant URL parse for display and favicon host
+- **`resolveCitationSource` / `resolveCitationSources`** — map inputs to **`ResolvedCitation`**
+- **`rootDomainSiteName(url)`** — short label from hostname (heuristic, not a full PSL)

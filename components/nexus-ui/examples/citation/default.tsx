@@ -2,22 +2,12 @@
 
 import {
   Citation,
-  CitationCarousel,
-  CitationCarouselContent,
-  CitationCarouselHeader,
-  CitationCarouselIndex,
-  CitationCarouselItem,
-  CitationCarouselNext,
-  CitationCarouselPagination,
-  CitationCarouselPrev,
   CitationContent,
   CitationDescription,
   CitationItem,
-  CitationSiteName,
   CitationSource,
   CitationTitle,
   CitationTrigger,
-  CitationFaviconGroup,
 } from "@/components/nexus-ui/citation";
 
 const SOURCES = [
@@ -34,60 +24,45 @@ const SOURCES = [
       "List of countries (or dependencies) in Africa ranked by population, from the most populated. Growth rate, median age, fertility rate, area, density, population density, urbanization, urban population, share of world population.",
   },
   {
-    url: "https://dabafinance.com/en/insights/top-10-largest-african-economies-by-gdp-in-2026",
-    title: "Top 10 Largest African Economies by GDP in 2026",
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/flex",
+    title: "flex",
     description:
-      "When discussing African economies its easy to confuse which countries are growing fastest with which economies are actually largest These are two very different measurements and both mat...",
+      "The flex CSS shorthand property sets how a flex item will grow or shrink to fit the space available in its flex container.",
   },
-];
+  {
+    url: "https://github.com/vercel/ai",
+    title: "Vercel AI SDK",
+    description:
+      "The AI Toolkit for TypeScript. From the creators of Next.js, the AI SDK is a free open-source library for building AI-powered applications.",
+  },
+] as const;
+
+function SingleCitation({
+  source,
+}: {
+  source: (typeof SOURCES)[number];
+}) {
+  return (
+    <Citation citations={[source]}>
+      <CitationTrigger />
+
+      <CitationContent>
+        <CitationItem>
+          <CitationTitle />
+          <CitationDescription />
+          <CitationSource />
+        </CitationItem>
+      </CitationContent>
+    </Citation>
+  );
+}
 
 function CitationDefault() {
   return (
-    <div className="flex items-center gap-5">
-      <Citation citations={SOURCES}>
-        <CitationTrigger />
-
-        <CitationContent>
-          <CitationCarousel>
-            <CitationCarouselHeader>
-              <CitationSource className="mt-0 h-6.5 rounded-full bg-secondary pr-1.5 pl-1">
-                <CitationFaviconGroup />
-                <CitationSiteName>{SOURCES.length} sources</CitationSiteName>
-              </CitationSource>
-
-              <CitationCarouselPagination>
-                <CitationCarouselPrev />
-                <CitationCarouselIndex />
-                <CitationCarouselNext />
-              </CitationCarouselPagination>
-            </CitationCarouselHeader>
-
-            <CitationCarouselContent>
-              {SOURCES.map((_, index) => (
-                <CitationCarouselItem key={SOURCES[index].url} index={index}>
-                  <CitationItem>
-                    <CitationTitle />
-                    <CitationDescription />
-                    <CitationSource />
-                  </CitationItem>
-                </CitationCarouselItem>
-              ))}
-            </CitationCarouselContent>
-          </CitationCarousel>
-        </CitationContent>
-      </Citation>
-
-      <Citation citations={SOURCES.slice(2, 3)}>
-        <CitationTrigger />
-
-        <CitationContent>
-          <CitationItem>
-            <CitationTitle />
-            <CitationDescription />
-            <CitationSource />
-          </CitationItem>
-        </CitationContent>
-      </Citation>
+    <div className="flex flex-wrap items-center gap-3">
+      {SOURCES.map((source) => (
+        <SingleCitation key={source.url} source={source} />
+      ))}
     </div>
   );
 }

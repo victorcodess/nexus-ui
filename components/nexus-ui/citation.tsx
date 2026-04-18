@@ -303,7 +303,7 @@ function CitationTrigger({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary no-underline! opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100",
+          "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary no-underline! opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
           hasText && showFavicon && "gap-1 py-1 pr-2 pl-1",
           hasText && !showFavicon && "px-2 py-1",
           !hasText && showFavicon && "p-1",
