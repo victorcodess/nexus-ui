@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import {
   HoverCard,
   HoverCardContent,
@@ -86,11 +94,23 @@ export function resolveCitationSources(
 }
 
 type CitationRootContextValue = {
-  citation: ResolvedCitation;
+  citations: ResolvedCitation[];
+  activeIndex: number;
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
+  carouselApi: CarouselApi | null;
+  setCarouselApi: (api: CarouselApi | undefined) => void;
+  scrollPrev: () => void;
+  scrollNext: () => void;
+  canScrollPrev: boolean;
+  canScrollNext: boolean;
+  carouselCurrent: number;
+  carouselCount: number;
 };
 
 const CitationRootContext =
   React.createContext<CitationRootContextValue | null>(null);
+
+const CitationItemContext = React.createContext<ResolvedCitation | null>(null);
 
 function useCitationRoot(component: string): CitationRootContextValue {
   const ctx = React.useContext(CitationRootContext);
@@ -101,28 +121,120 @@ function useCitationRoot(component: string): CitationRootContextValue {
 }
 
 function useResolvedCitation(component: string): ResolvedCitation {
+  const item = React.useContext(CitationItemContext);
   const root = useCitationRoot(component);
-  return root.citation;
+  const idx = Math.min(
+    Math.max(0, root.activeIndex),
+    Math.max(0, root.citations.length - 1),
+  );
+  const fromRoot = root.citations[idx];
+  const resolved = item ?? fromRoot;
+  if (!resolved) {
+    throw new Error(`${component}: no citation for this scope`);
+  }
+  return resolved;
 }
 
 export type CitationProps = Omit<
   React.ComponentProps<typeof HoverCard>,
   "children"
 > & {
-  citation: CitationSourceInput;
+  citations: CitationSourceInput[];
   children?: React.ReactNode;
 };
 
-function Citation({ citation, children, ...hoverCardProps }: CitationProps) {
+function Citation({
+  citations: citationInputs,
+  children,
+  ...hoverCardProps
+}: CitationProps) {
   const resolved = React.useMemo(
-    () => resolveCitationSource(citation),
-    [citation],
+    () => resolveCitationSources(citationInputs),
+    [citationInputs],
   );
 
-  const value = React.useMemo<CitationRootContextValue>(
-    () => ({ citation: resolved }),
-    [resolved],
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [carouselApi, setCarouselApi] = React.useState<CarouselApi | null>(
+    null,
   );
+  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+  const [canScrollNext, setCanScrollNext] = React.useState(false);
+  const [carouselCurrent, setCarouselCurrent] = React.useState(1);
+  const [carouselCount, setCarouselCount] = React.useState(0);
+
+  const len = resolved.length;
+
+  React.useEffect(() => {
+    setActiveIndex((i) => (len === 0 ? 0 : Math.min(Math.max(0, i), len - 1)));
+  }, [len]);
+
+  React.useEffect(() => {
+    if (!carouselApi) {
+      setCanScrollPrev(false);
+      setCanScrollNext(false);
+      setCarouselCount(0);
+      setCarouselCurrent(1);
+      return;
+    }
+    const sync = () => {
+      setActiveIndex(carouselApi.selectedScrollSnap());
+      setCanScrollPrev(carouselApi.canScrollPrev());
+      setCanScrollNext(carouselApi.canScrollNext());
+      setCarouselCount(carouselApi.scrollSnapList().length);
+      setCarouselCurrent(carouselApi.selectedScrollSnap() + 1);
+    };
+    sync();
+    carouselApi.on("select", sync);
+    carouselApi.on("reInit", sync);
+    return () => {
+      carouselApi.off("select", sync);
+      carouselApi.off("reInit", sync);
+    };
+  }, [carouselApi]);
+
+  const setCarouselApiCb = React.useCallback((api: CarouselApi | undefined) => {
+    setCarouselApi(api ?? null);
+  }, []);
+
+  const scrollPrev = React.useCallback(() => {
+    carouselApi?.scrollPrev();
+  }, [carouselApi]);
+
+  const scrollNext = React.useCallback(() => {
+    carouselApi?.scrollNext();
+  }, [carouselApi]);
+
+  const value = React.useMemo<CitationRootContextValue>(
+    () => ({
+      citations: resolved,
+      activeIndex,
+      setActiveIndex,
+      carouselApi,
+      setCarouselApi: setCarouselApiCb,
+      scrollPrev,
+      scrollNext,
+      canScrollPrev,
+      canScrollNext,
+      carouselCurrent,
+      carouselCount,
+    }),
+    [
+      resolved,
+      activeIndex,
+      carouselApi,
+      setCarouselApiCb,
+      scrollPrev,
+      scrollNext,
+      canScrollPrev,
+      canScrollNext,
+      carouselCurrent,
+      carouselCount,
+    ],
+  );
+
+  if (len === 0) {
+    return null;
+  }
 
   return (
     <CitationRootContext.Provider value={value}>
@@ -158,7 +270,7 @@ function CitationTrigger({
   ...props
 }: CitationTriggerProps) {
   const root = useCitationRoot("CitationTrigger");
-  const c = root.citation;
+  const c = root.citations[0]!;
 
   if (children != null) {
     return (
@@ -202,6 +314,11 @@ function CitationTrigger({
           <CitationFavicon variant="trigger" src={c.faviconSrc} />
         ) : null}
         {hasText ? <CitationSiteName>{text}</CitationSiteName> : null}
+        {root.citations.length > 1 && (
+          <span data-slot="citation-extra-count" className="text-xs leading-4.5 font-[350] text-muted-foreground tabular-nums">
+            +{root.citations.length - 1}
+          </span>
+        )}
       </a>
     </HoverCardTrigger>
   );
@@ -228,6 +345,254 @@ function CitationContent({
       )}
       {...props}
     />
+  );
+}
+
+type CitationCarouselProps = React.ComponentProps<typeof Carousel>;
+
+function CitationCarousel({
+  setApi: setApiProp,
+  ...props
+}: CitationCarouselProps) {
+  const { setCarouselApi } = useCitationRoot("CitationCarousel");
+  return (
+    <Carousel
+      data-slot="citation-carousel"
+      setApi={(api) => {
+        setCarouselApi(api);
+        setApiProp?.(api);
+      }}
+      {...props}
+    />
+  );
+}
+
+type CitationCarouselHeaderProps = React.ComponentProps<"div">;
+
+function CitationCarouselHeader({
+  className,
+  ...props
+}: CitationCarouselHeaderProps) {
+  return (
+    <div
+      data-slot="citation-carousel-header"
+      className={cn(
+        "flex h-auto w-full items-center justify-between px-3 pt-3",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/** Horizontal flex track height = max(slides); shrink viewport to the active slide. */
+function useCarouselViewportHeight(
+  wrapRef: React.RefObject<HTMLDivElement | null>,
+  carouselApi: CarouselApi | null,
+  activeIndex: number,
+) {
+  React.useLayoutEffect(() => {
+    const vp = wrapRef.current?.querySelector<HTMLElement>(
+      "[data-slot=carousel-content]",
+    );
+    if (!vp) return;
+    const clear = () => {
+      vp.style.height = "";
+      vp.style.transition = "";
+    };
+    if (!carouselApi) return clear();
+    vp.style.transition = "height 500ms ease-out";
+    const sync = () => {
+      const h = carouselApi.slideNodes()[activeIndex]?.offsetHeight ?? 0;
+      vp.style.height = h > 0 ? `${h}px` : "";
+    };
+    sync();
+    const slide = carouselApi.slideNodes()[activeIndex];
+    if (!slide) return clear;
+    const ro = new ResizeObserver(sync);
+    ro.observe(slide);
+    return () => (ro.disconnect(), clear());
+  }, [carouselApi, activeIndex]);
+}
+
+type CitationCarouselContentProps = React.ComponentProps<
+  typeof CarouselContent
+>;
+
+function CitationCarouselContent({
+  className,
+  ...props
+}: CitationCarouselContentProps) {
+  const { carouselApi, activeIndex } = useCitationRoot(
+    "CitationCarouselContent",
+  );
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+  useCarouselViewportHeight(wrapRef, carouselApi, activeIndex);
+
+  return (
+    <div ref={wrapRef} className="contents">
+      <CarouselContent
+        data-slot="citation-carousel-content"
+        className={className}
+        {...props}
+      />
+    </div>
+  );
+}
+
+type CitationCarouselItemProps = React.ComponentProps<typeof CarouselItem> & {
+  index: number;
+};
+
+function CitationCarouselItem({
+  index,
+  className,
+  children,
+  ...props
+}: CitationCarouselItemProps) {
+  const { citations } = useCitationRoot("CitationCarouselItem");
+  const item = citations[index];
+  if (!item) return null;
+
+  return (
+    <CarouselItem
+      data-slot="citation-carousel-item"
+      className={cn("self-start", className)}
+      {...props}
+    >
+      <CitationItemContext.Provider value={item}>
+        {children}
+      </CitationItemContext.Provider>
+    </CarouselItem>
+  );
+}
+
+type CitationCarouselPaginationProps = React.ComponentProps<"div">;
+
+function CitationCarouselPagination({
+  className,
+  ...props
+}: CitationCarouselPaginationProps) {
+  return (
+    <div
+      data-slot="citation-carousel-pagination"
+      className={cn("flex items-center gap-1", className)}
+      {...props}
+    />
+  );
+}
+
+type CitationCarouselNavButtonProps =
+  React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+function CitationCarouselPrev({
+  className,
+  children,
+  ...props
+}: CitationCarouselNavButtonProps) {
+  const { scrollPrev, canScrollPrev } = useCitationRoot("CitationCarouselPrev");
+  return (
+    <button
+      type="button"
+      data-slot="citation-carousel-prev"
+      disabled={!canScrollPrev}
+      className={cn(
+        "flex size-6.5 cursor-pointer items-center justify-center rounded-full text-primary outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50",
+        className,
+      )}
+      onClick={scrollPrev}
+      {...props}
+    >
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowLeft01Icon}
+          strokeWidth={2}
+          className="size-4"
+        />
+      )}
+    </button>
+  );
+}
+
+function CitationCarouselNext({
+  className,
+  children,
+  ...props
+}: CitationCarouselNavButtonProps) {
+  const { scrollNext, canScrollNext } = useCitationRoot("CitationCarouselNext");
+  return (
+    <button
+      type="button"
+      data-slot="citation-carousel-next"
+      disabled={!canScrollNext}
+      className={cn(
+        "flex size-6.5 cursor-pointer items-center justify-center rounded-full text-primary outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50",
+        className,
+      )}
+      onClick={scrollNext}
+      {...props}
+    >
+      {children ?? (
+        <HugeiconsIcon
+          icon={ArrowRight01Icon}
+          strokeWidth={2}
+          className="size-4"
+        />
+      )}
+    </button>
+  );
+}
+
+type CitationCarouselIndexProps = React.HTMLAttributes<HTMLSpanElement>;
+
+function CitationCarouselIndex({
+  className,
+  ...props
+}: CitationCarouselIndexProps) {
+  const { carouselCurrent, carouselCount } = useCitationRoot(
+    "CitationCarouselIndex",
+  );
+
+  return (
+    <span
+      data-slot="citation-carousel-index"
+      className={cn(
+        "text-xs leading-4.5 font-[350] text-muted-foreground tabular-nums",
+        className,
+      )}
+      {...props}
+    >
+      {carouselCurrent}/{carouselCount}
+    </span>
+  );
+}
+
+type CitationFaviconGroupProps = React.ComponentProps<"div">;
+
+function CitationFaviconGroup({
+  className,
+  children,
+  ...props
+}: CitationFaviconGroupProps) {
+  const { citations } = useCitationRoot("CitationFaviconGroup");
+  return (
+    <div
+      data-slot="citation-favicon-group"
+      className={cn(
+        "flex -space-x-2 *:data-[slot=citation-favicon]:ring-2 *:data-[slot=citation-favicon]:ring-secondary",
+        className,
+      )}
+      {...props}
+    >
+      {children ??
+        citations.map((citation, i) => (
+          <CitationFavicon
+            key={citation.url + i}
+            variant="trigger"
+            src={citation.faviconSrc}
+          />
+        ))}
+    </div>
   );
 }
 
@@ -346,6 +711,7 @@ function CitationFavicon({
 
   return (
     <div
+      data-slot="citation-favicon"
       className={cn(
         "flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background",
         variant === "footer" && "border border-border dark:border-accent",
@@ -383,9 +749,18 @@ function CitationSiteName({
 
 export {
   Citation,
+  CitationCarousel,
+  CitationCarouselContent,
+  CitationCarouselHeader,
+  CitationCarouselIndex,
+  CitationCarouselItem,
+  CitationCarouselNext,
+  CitationCarouselPagination,
+  CitationCarouselPrev,
   CitationContent,
   CitationDescription,
   CitationFavicon,
+  CitationFaviconGroup,
   CitationItem,
   CitationSiteName,
   CitationSource,
