@@ -39,16 +39,16 @@ const SOURCES = [
     description:
       "When discussing African economies its easy to confuse which countries are growing fastest with which economies are actually largest These are two very different measurements and both mat...",
   },
-] as const;
+];
 
 function CitationDefault() {
   return (
     <div className="flex items-center gap-5">
-      <Citation citations={[...SOURCES]}>
+      <Citation citations={SOURCES} open>
         <CitationTrigger />
 
         <CitationContent>
-          <CitationCarousel className="flex w-full flex-col">
+          <CitationCarousel>
             <CitationCarouselHeader>
               <CitationSource className="mt-0 h-6.5 rounded-full bg-secondary pr-1.5 pl-1">
                 <CitationFaviconGroup />
@@ -77,7 +77,7 @@ function CitationDefault() {
         </CitationContent>
       </Citation>
 
-      <Citation citations={[...SOURCES.slice(2, 3)]}>
+      <Citation citations={SOURCES.slice(2, 3)}>
         <CitationTrigger />
 
         <CitationContent>
