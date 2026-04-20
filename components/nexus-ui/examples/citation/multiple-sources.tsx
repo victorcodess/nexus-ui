@@ -104,7 +104,7 @@ const BUNDLES = [GROUP_A, GROUP_B, GROUP_C, GROUP_D];
 
 function MultiSourceCitation({ items }: { items: Source[] }) {
   return (
-    <Citation citations={items} open>
+    <Citation citations={items}>
       <CitationTrigger />
 
       <CitationContent>

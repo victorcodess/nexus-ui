@@ -106,6 +106,292 @@ The trigger can sit **inline** with surrounding copy—place **`Citation`** wher
   <CitationInlineWithText />
 </DemoWithCode>
 
+## Vercel AI SDK Integration
+
+The [Vercel AI SDK](https://sdk.vercel.ai) does not define a single standard for **inline citations** in chat streams—models are not required to emit a shared citation syntax, and there is no built-in “citation” channel you can rely on for every provider. [Streamdown](https://streamdown.ai/) also has **no official inline-citation or footnote-to-chip resolution**; you have to wire sources yourself.
+
+**Citation** takes **`citations: CitationSourceInput[]`** only. In practice, you can fill that array from **(1)** a **structured object** stream (**`streamObject`** + **`experimental_useObject`**) with a Zod schema, or **(2)** assistant **`UIMessage`** parts of **`type: "source-url"`** from **`useChat`** when your **`POST /api/chat`** response actually includes them (**`toUIMessageStreamResponse({ sendSources: true })`** and a model or provider that emits source parts—many completions only stream **`text`**).
+
+### Structured object stream
+
+<Steps>
+<Step>
+<h3>Install the AI SDK and Zod</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai zod
+```
+
+</Step>
+<Step>
+<h3>Add the citation API route</h3>
+
+Define the Zod schema in this file and export it so the client can pass the same shape to **`useObject`**.
+
+```ts title="app/api/citation/route.ts"
+import { streamObject, zodSchema } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
+
+export const citationSchema = z.object({
+  content: z.string(),
+  citations: z.array(
+    z.object({
+      number: z.string(),
+      title: z.string(),
+      url: z.string(),
+      description: z.string().optional(),
+    }),
+  ),
+});
+
+export const maxDuration = 30;
+
+export async function POST(req: Request) {
+  const { prompt } = (await req.json()) as { prompt: string };
+
+  const result = streamObject({
+    model: openai("gpt-4o"),
+    schema: zodSchema(citationSchema),
+    prompt: `Generate a well-researched paragraph about ${prompt} with proper citations.
+
+Include:
+- A comprehensive paragraph with inline citations marked as [1], [2], etc.
+- 2-3 citations with realistic source information
+- Each citation should have a title, URL, and optional description
+- Make the content informative and the sources credible
+
+Format citations as numbered references within the text.`,
+  });
+
+  return result.toTextStreamResponse();
+}
+```
+
+</Step>
+<Step>
+<h3>Add a client page for structured citations</h3>
+
+```tsx title="app/citations-object/page.tsx"
+"use client";
+
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { Button } from "@/components/ui/button";
+import {
+  Citation,
+  CitationContent,
+  CitationItem,
+  CitationTrigger,
+} from "@/components/nexus-ui/citation";
+import { citationSchema } from "@/app/api/citation/route";
+
+export default function CitationsObjectPage() {
+  const { object, submit, isLoading } = useObject({
+    api: "/api/citation",
+    schema: citationSchema,
+  });
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-6 p-6">
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          onClick={() => submit({ prompt: "how tidal power works" })}
+          disabled={isLoading}
+          variant="outline"
+        >
+          Tidal energy
+        </Button>
+        <Button
+          type="button"
+          onClick={() =>
+            submit({ prompt: "the history of the printing press in Europe" })
+          }
+          disabled={isLoading}
+          variant="outline"
+        >
+          Printing history
+        </Button>
+      </div>
+
+      {isLoading && !object ? (
+        <p className="text-muted-foreground text-sm">
+          Generating content with citations…
+        </p>
+      ) : null}
+
+      {object?.content ? (
+        <div className="prose prose-sm max-w-none">
+          <p className="leading-relaxed">
+            {object.content.split(/(\[\d+\])/).map((part, index) => {
+              const citationMatch = part.match(/\[(\d+)\]/);
+              if (citationMatch) {
+                const citationNumber = citationMatch[1];
+                const row = object.citations?.find(
+                  (c) => c.number === citationNumber,
+                );
+                if (row) {
+                  return (
+                    <Citation
+                      key={index}
+                      citations={[
+                        {
+                          url: row.url,
+                          title: row.title,
+                          description: row.description,
+                        },
+                      ]}
+                    >
+                      <CitationTrigger />
+                      <CitationContent>
+                        <CitationItem />
+                      </CitationContent>
+                    </Citation>
+                  );
+                }
+              }
+              return part;
+            })}
+          </p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+```
+
+</Step>
+</Steps>
+
+### Chat stream with source-url parts
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+
+</Step>
+<Step>
+<h3>Add the chat API route</h3>
+
+```ts title="app/api/chat/route.ts"
+import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: openai("gpt-4o-mini"),
+    system:
+      "You are a helpful assistant. When you cite web sources, include URLs in your answer where applicable.",
+    messages: await convertToModelMessages(messages),
+  });
+
+  return result.toUIMessageStreamResponse({
+    sendSources: true,
+  });
+}
+```
+
+</Step>
+<Step>
+<h3>Add a client page for chat citations</h3>
+
+```tsx title="app/citations-chat/page.tsx"
+"use client";
+
+import { useCallback, useMemo, useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import {
+  DefaultChatTransport,
+  isTextUIPart,
+  type UIMessage,
+} from "ai";
+import { Button } from "@/components/ui/button";
+import {
+  Citation,
+  CitationContent,
+  CitationItem,
+  CitationTrigger,
+  type CitationSourceInput,
+} from "@/components/nexus-ui/citation";
+
+function textFromMessage(message: UIMessage) {
+  return message.parts.filter(isTextUIPart).map((p) => p.text).join("");
+}
+
+function citationsFromSourceUrlParts(
+  message: UIMessage,
+): CitationSourceInput[] {
+  return message.parts
+    .filter(
+      (p): p is Extract<UIMessage["parts"][number], { type: "source-url" }> =>
+        p.type === "source-url",
+    )
+    .map((p) => ({
+      url: p.url,
+      title: p.title,
+    }));
+}
+
+export default function CitationsChatPage() {
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+
+  const lastAssistant = useMemo(
+    () => [...messages].reverse().find((m) => m.role === "assistant"),
+    [messages],
+  );
+
+  const citations = lastAssistant
+    ? citationsFromSourceUrlParts(lastAssistant)
+    : [];
+  const assistantText = lastAssistant ? textFromMessage(lastAssistant) : "";
+  const isBusy = status === "submitted" || status === "streaming";
+
+  const handleSubmit = useCallback(() => {
+    const t = input.trim();
+    if (!t) return;
+    sendMessage({ text: t });
+    setInput("");
+  }, [input, sendMessage]);
+
+  return (
+    <div className="mx-auto flex max-w-xl flex-col gap-4 p-6">
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        className="min-h-[80px] w-full rounded-md border border-border bg-background p-2 text-sm"
+        placeholder="Ask something…"
+      />
+      <Button type="button" onClick={handleSubmit} disabled={isBusy}>
+        Send
+      </Button>
+      {assistantText ? (
+        <p className="text-sm leading-relaxed">{assistantText}</p>
+      ) : null}
+      {citations.length > 0 ? (
+        <Citation citations={citations}>
+          <CitationTrigger />
+          <CitationContent>
+            <CitationItem />
+          </CitationContent>
+        </Citation>
+      ) : null}
+    </div>
+  );
+}
+```
+
+</Step>
+</Steps>
+
 ## API Reference
 
 ### Citation
@@ -424,8 +710,7 @@ Chip with an optional overlapping favicon stack plus a **`{n} source(s)`** label
     },
     label: {
       type: "React.ReactNode",
-      description:
-        "Optional; defaults to “N source(s)” from citation count.",
+      description: "Optional; defaults to “N source(s)” from citation count.",
     },
     className: {
       type: "string",
@@ -469,4 +754,3 @@ export function resolveCitationSources(
   inputs: CitationSourceInput[],
 ): ResolvedCitation[];
 ```
-
