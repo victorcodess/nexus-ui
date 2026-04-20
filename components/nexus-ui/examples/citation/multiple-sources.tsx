@@ -11,13 +11,9 @@ import {
   CitationCarouselPagination,
   CitationCarouselPrev,
   CitationContent,
-  CitationDescription,
   CitationItem,
-  CitationSiteName,
-  CitationSource,
-  CitationTitle,
+  CitationSourcesBadge,
   CitationTrigger,
-  CitationFaviconGroup,
 } from "@/components/nexus-ui/citation";
 
 type Source = {
@@ -108,16 +104,13 @@ const BUNDLES = [GROUP_A, GROUP_B, GROUP_C, GROUP_D];
 
 function MultiSourceCitation({ items }: { items: Source[] }) {
   return (
-    <Citation citations={items}>
+    <Citation citations={items} open>
       <CitationTrigger />
 
       <CitationContent>
         <CitationCarousel className="flex w-full flex-col">
           <CitationCarouselHeader>
-            <CitationSource className="mt-0 h-6.5 rounded-full bg-secondary pr-1.5 pl-1">
-              <CitationFaviconGroup />
-              <CitationSiteName>{items.length} sources</CitationSiteName>
-            </CitationSource>
+            <CitationSourcesBadge />
 
             <CitationCarouselPagination>
               <CitationCarouselPrev />
@@ -129,11 +122,7 @@ function MultiSourceCitation({ items }: { items: Source[] }) {
           <CitationCarouselContent>
             {items.map((_, index) => (
               <CitationCarouselItem key={items[index].url} index={index}>
-                <CitationItem>
-                  <CitationTitle />
-                  <CitationDescription />
-                  <CitationSource />
-                </CitationItem>
+                <CitationItem />
               </CitationCarouselItem>
             ))}
           </CitationCarouselContent>

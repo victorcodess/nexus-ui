@@ -3,10 +3,7 @@
 import {
   Citation,
   CitationContent,
-  CitationDescription,
   CitationItem,
-  CitationSource,
-  CitationTitle,
   CitationTrigger,
 } from "@/components/nexus-ui/citation";
 
@@ -38,11 +35,7 @@ function InlineCitation({ source }: { source: Source }) {
     <Citation citations={[source]}>
       <CitationTrigger />
       <CitationContent>
-        <CitationItem>
-          <CitationTitle />
-          <CitationDescription />
-          <CitationSource />
-        </CitationItem>
+        <CitationItem />
       </CitationContent>
     </Citation>
   );

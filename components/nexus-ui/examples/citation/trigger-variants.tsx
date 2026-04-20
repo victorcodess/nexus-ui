@@ -3,11 +3,8 @@
 import {
   Citation,
   CitationContent,
-  CitationDescription,
   CitationItem,
   parseCitationUrl,
-  CitationSource,
-  CitationTitle,
   CitationTrigger,
   resolveCitationSource,
 } from "@/components/nexus-ui/citation";
@@ -15,8 +12,7 @@ import {
 const SOURCE = {
   url: "https://github.com/victorcodess/nexus-ui",
   title: "victorcodess/nexus-ui",
-  description:
-    "Beautiful, customizable components for modern AI experiences.",
+  description: "Beautiful, customizable components for modern AI experiences.",
 };
 
 const resolved = resolveCitationSource(SOURCE);
@@ -28,44 +24,28 @@ function CitationTriggerVariants() {
       <Citation citations={[SOURCE]}>
         <CitationTrigger showSiteName={false} />
         <CitationContent>
-          <CitationItem>
-            <CitationTitle />
-            <CitationDescription />
-            <CitationSource />
-          </CitationItem>
+          <CitationItem />
         </CitationContent>
       </Citation>
 
       <Citation citations={[SOURCE]}>
         <CitationTrigger showFavicon={false} label="2" />
         <CitationContent>
-          <CitationItem>
-            <CitationTitle />
-            <CitationDescription />
-            <CitationSource />
-          </CitationItem>
+          <CitationItem />
         </CitationContent>
       </Citation>
 
       <Citation citations={[SOURCE]}>
         <CitationTrigger showFavicon={false} label={hostname} />
         <CitationContent>
-          <CitationItem>
-            <CitationTitle />
-            <CitationDescription />
-            <CitationSource />
-          </CitationItem>
+          <CitationItem />
         </CitationContent>
       </Citation>
 
       <Citation citations={[SOURCE]}>
         <CitationTrigger showFavicon={false} label={resolved.siteName} />
         <CitationContent>
-          <CitationItem>
-            <CitationTitle />
-            <CitationDescription />
-            <CitationSource />
-          </CitationItem>
+          <CitationItem />
         </CitationContent>
       </Citation>
     </div>

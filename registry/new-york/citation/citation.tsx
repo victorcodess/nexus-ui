@@ -250,11 +250,10 @@ function Citation({
   );
 }
 
-export type CitationTriggerProps = React.ComponentProps<
-  typeof HoverCardTrigger
+export type CitationTriggerProps = Omit<
+  React.ComponentProps<typeof HoverCardTrigger>,
+  "children"
 > & {
-  /** Full custom trigger; when set, `label`, `showFavicon`, and `showSiteName` are ignored. */
-  children?: React.ReactNode;
   /** Replaces the default site name text; still respects `showFavicon` / `showSiteName`. */
   label?: React.ReactNode;
   showFavicon?: boolean;
@@ -263,7 +262,6 @@ export type CitationTriggerProps = React.ComponentProps<
 
 function CitationTrigger({
   className,
-  children,
   label,
   showFavicon = true,
   showSiteName = true,
@@ -271,14 +269,6 @@ function CitationTrigger({
 }: CitationTriggerProps) {
   const root = useCitationRoot("CitationTrigger");
   const c = root.citations[0]!;
-
-  if (children != null) {
-    return (
-      <HoverCardTrigger data-slot="citation-trigger" asChild {...props}>
-        {children}
-      </HoverCardTrigger>
-    );
-  }
 
   let text: React.ReactNode =
     label !== undefined && label !== null
@@ -296,30 +286,45 @@ function CitationTrigger({
     hasText = true;
   }
 
+  const baseClassName = cn(
+    "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
+    hasText && showFavicon && "gap-1 py-1 pr-2 pl-1",
+    hasText && !showFavicon && "px-2 py-1",
+    !hasText && showFavicon && "p-1",
+  );
+  const multipleSources = root.citations.length > 1;
+
+  const chipBody = (
+    <>
+      {showFavicon ? (
+        <CitationFavicon src={c.faviconSrc} />
+      ) : null}
+      {hasText ? <CitationSiteName>{text}</CitationSiteName> : null}
+      {multipleSources && (
+        <span
+          data-slot="citation-extra-count"
+          className="text-xs leading-4.5 font-[350] text-muted-foreground tabular-nums"
+        >
+          +{root.citations.length - 1}
+        </span>
+      )}
+    </>
+  );
+
   return (
     <HoverCardTrigger data-slot="citation-trigger" asChild {...props}>
-      <a
-        href={c.url}
-        target="_blank"
-        rel="noreferrer"
-        className={cn(
-          "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary no-underline! opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100",
-          hasText && showFavicon && "gap-1 py-1 pr-2 pl-1",
-          hasText && !showFavicon && "px-2 py-1",
-          !hasText && showFavicon && "p-1",
-          className,
-        )}
-      >
-        {showFavicon ? (
-          <CitationFavicon variant="trigger" src={c.faviconSrc} />
-        ) : null}
-        {hasText ? <CitationSiteName>{text}</CitationSiteName> : null}
-        {root.citations.length > 1 && (
-          <span data-slot="citation-extra-count" className="text-xs leading-4.5 font-[350] text-muted-foreground tabular-nums">
-            +{root.citations.length - 1}
-          </span>
-        )}
-      </a>
+      {multipleSources ? (
+        <span className={cn(baseClassName, className)}>{chipBody}</span>
+      ) : (
+        <a
+          href={c.url}
+          target="_blank"
+          rel="noreferrer"
+          className={cn(baseClassName, className)}
+        >
+          {chipBody}
+        </a>
+      )}
     </HoverCardTrigger>
   );
 }
@@ -588,7 +593,6 @@ function CitationFaviconGroup({
         citations.map((citation, i) => (
           <CitationFavicon
             key={citation.url + i}
-            variant="trigger"
             src={citation.faviconSrc}
           />
         ))}
@@ -596,15 +600,96 @@ function CitationFaviconGroup({
   );
 }
 
-type CitationItemProps = React.ComponentPropsWithoutRef<"a">;
+export type CitationSourcesBadgeProps = Omit<
+  React.ComponentPropsWithoutRef<"div">,
+  "children"
+> & {
+  /** Include the overlapping favicon stack. Default: true. */
+  showFavicons?: boolean;
+  /** Override the trailing label; default is "{n} source(s)" from `citations`. */
+  label?: React.ReactNode;
+};
+
+/** Stacked favicons + count label for headers, message actions, etc. Must be inside `Citation`. */
+function CitationSourcesBadge({
+  className,
+  showFavicons = true,
+  label,
+  ...props
+}: CitationSourcesBadgeProps) {
+  const { citations } = useCitationRoot("CitationSourcesBadge");
+  const count = citations.length;
+  const text =
+    label ?? `${count} ${count === 1 ? "source" : "sources"}`;
+
+  return (
+    <div
+      data-slot="citation-sources-badge"
+      className={cn(
+        "mt-0 flex h-6.5 items-center gap-1.5 rounded-full bg-secondary pr-1.5",
+        showFavicons ? "pl-1" : "pl-1.5",
+        className,
+      )}
+      {...props}
+    >
+      {showFavicons ? (
+        <div
+          data-slot="citation-favicon-group"
+          className="flex -space-x-2 *:data-[slot=citation-favicon]:ring-2 *:data-[slot=citation-favicon]:ring-secondary"
+        >
+          {citations.map((citation, i) => (
+            <CitationFavicon key={citation.url + i} src={citation.faviconSrc} />
+          ))}
+        </div>
+      ) : null}
+      <span className="text-xs leading-4.5 font-normal text-primary">
+        {text}
+      </span>
+    </div>
+  );
+}
+
+export type CitationItemProps = React.ComponentPropsWithoutRef<"a"> & {
+  /** Include the default title (`h4`). Default: true. */
+  showTitle?: boolean;
+  /** Include the default description (`p`). Default: true. */
+  showDescription?: boolean;
+  /** Include the default footer row (`CitationSource`). Default: true. */
+  showSource?: boolean;
+};
 
 function CitationItem({
   className,
   children,
   href,
+  showTitle = true,
+  showDescription = true,
+  showSource = true,
   ...props
 }: CitationItemProps) {
   const c = useResolvedCitation("CitationItem");
+  const defaultContent = (
+    <>
+      {showTitle && c.title != null ? (
+        <h4
+          data-slot="citation-title"
+          className="line-clamp-2 text-xs leading-4 font-[450] text-primary"
+        >
+          {c.title}
+        </h4>
+      ) : null}
+      {showDescription && c.description != null ? (
+        <p
+          data-slot="citation-description"
+          className="line-clamp-3 text-xs leading-4.5 font-[350] text-muted-foreground"
+        >
+          {c.description}
+        </p>
+      ) : null}
+      {showSource ? <CitationSource /> : null}
+    </>
+  );
+
   return (
     <a
       data-slot="citation-item"
@@ -617,54 +702,8 @@ function CitationItem({
       rel="noreferrer"
       {...props}
     >
-      {children}
+      {children ?? defaultContent}
     </a>
-  );
-}
-
-type CitationTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
-
-function CitationTitle({ className, children, ...props }: CitationTitleProps) {
-  const c = useResolvedCitation("CitationTitle");
-  const content = children ?? c.title;
-  if (content == null) return null;
-
-  return (
-    <h4
-      data-slot="citation-title"
-      className={cn(
-        "line-clamp-2 text-xs leading-4 font-[450] text-primary",
-        className,
-      )}
-      {...props}
-    >
-      {content}
-    </h4>
-  );
-}
-
-type CitationDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
-
-function CitationDescription({
-  className,
-  children,
-  ...props
-}: CitationDescriptionProps) {
-  const c = useResolvedCitation("CitationDescription");
-  const content = children ?? c.description;
-  if (content == null) return null;
-
-  return (
-    <p
-      data-slot="citation-description"
-      className={cn(
-        "line-clamp-3 text-xs leading-4.5 font-[350] text-muted-foreground",
-        className,
-      )}
-      {...props}
-    >
-      {content}
-    </p>
   );
 }
 
@@ -683,7 +722,7 @@ function CitationSource({
     >
       {children ?? (
         <>
-          <CitationFavicon variant="footer" />
+          <CitationFavicon />
           <CitationSiteName />
         </>
       )}
@@ -695,12 +734,10 @@ type CitationFaviconProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > & {
-  variant?: "trigger" | "footer";
   src?: string;
 };
 
 function CitationFavicon({
-  variant = "footer",
   className,
   src,
   ...props
@@ -710,17 +747,16 @@ function CitationFavicon({
   if (resolvedSrc === "") return null;
 
   return (
-    <div
+    <img
+      src={resolvedSrc}
+      alt=""
       data-slot="citation-favicon"
       className={cn(
-        "flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background",
-        variant === "footer" && "border border-border dark:border-accent",
+        "size-4 shrink-0 rounded-full bg-background",
         className,
       )}
       {...props}
-    >
-      <img src={resolvedSrc} alt="" className="size-full object-cover" />
-    </div>
+    />
   );
 }
 
@@ -737,7 +773,7 @@ function CitationSiteName({
     <span
       data-slot="citation-site-name"
       className={cn(
-        "truncate text-xs leading-4.5 font-normal text-primary",
+        "text-xs leading-4.5 font-normal text-primary",
         className,
       )}
       {...props}
@@ -758,12 +794,11 @@ export {
   CitationCarouselPagination,
   CitationCarouselPrev,
   CitationContent,
-  CitationDescription,
   CitationFavicon,
   CitationFaviconGroup,
   CitationItem,
+  CitationSourcesBadge,
   CitationSiteName,
   CitationSource,
-  CitationTitle,
   CitationTrigger,
 };
