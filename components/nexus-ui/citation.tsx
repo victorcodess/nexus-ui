@@ -595,7 +595,7 @@ function CitationSourcesBadge({
     <div
       data-slot="citation-sources-badge"
       className={cn(
-        "mt-0 flex h-6.5 items-center gap-1.5 rounded-full bg-secondary pr-1.5",
+        "mt-0 flex h-6.5 items-center gap-1.5 rounded-full bg-secondary pr-1.5 w-fit",
         showFavicons ? "pl-1" : "pl-1.5",
         className,
       )}
@@ -606,7 +606,7 @@ function CitationSourcesBadge({
           data-slot="citation-favicon-group"
           className="flex -space-x-2 *:data-[slot=citation-favicon]:ring-2 *:data-[slot=citation-favicon]:ring-secondary"
         >
-          {citations.map((citation, i) => (
+          {citations.slice(0, 3).map((citation, i) => (
             <CitationFavicon key={citation.url + i} src={citation.faviconSrc} />
           ))}
         </div>

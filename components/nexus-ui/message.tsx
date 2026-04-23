@@ -217,7 +217,7 @@ function MessageActionGroup({ className, ...props }: MessageActionGroupProps) {
   return (
     <div
       data-slot="message-action-group"
-      className={cn("flex gap-1", className)}
+      className={cn("flex gap-1 items-center", className)}
       {...props}
     />
   );

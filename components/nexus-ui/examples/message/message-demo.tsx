@@ -2,11 +2,7 @@
 
 import * as React from "react";
 import { useChat } from "@ai-sdk/react";
-import {
-  DefaultChatTransport,
-  isTextUIPart,
-  type UIMessage,
-} from "ai";
+import { DefaultChatTransport, isTextUIPart, type UIMessage } from "ai";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +35,7 @@ import PromptInput, {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
+import { Citation, CitationSourcesBadge } from "@/components/nexus-ui/citation";
 import { TypingLoader } from "@/components/nexus-ui/loader";
 import PerplexityIcon from "@/components/svgs/perplexity";
 import ChatgptIcon from "@/components/svgs/chatgpt";
@@ -48,7 +45,6 @@ import {
   ArrowUp02Icon,
   Copy01Icon,
   Edit04Icon,
-  Link01Icon,
   PlusSignIcon,
   RepeatIcon,
   SquareIcon,
@@ -115,7 +111,10 @@ const models = [
 ] as const;
 
 function textFromMessage(message: UIMessage) {
-  return message.parts.filter(isTextUIPart).map((p) => p.text).join("");
+  return message.parts
+    .filter(isTextUIPart)
+    .map((p) => p.text)
+    .join("");
 }
 
 function isAssistantTextStreaming(message: UIMessage) {
@@ -177,7 +176,7 @@ export default function MessageDemo() {
   );
 
   return (
-    <div className="relative flex h-screen items-start px-0 lg:px-10 pt-5 lg:pt-20">
+    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-10 lg:pt-20">
       <Thread className="h-[75vh]">
         <ThreadContent className="mx-auto max-w-2xl pb-40">
           {visibleMessages.map((m) => {
@@ -229,32 +228,6 @@ export default function MessageDemo() {
                           >
                             {text}
                           </MessageMarkdown>
-                          {sourceUrls.length > 0 ? (
-                            <div className="mt-4 border-t border-border pt-3">
-                              <p className="mb-2 flex items-center gap-1.5 text-muted-foreground text-xs font-medium tracking-wide uppercase dark:text-white/70">
-                                <HugeiconsIcon
-                                  icon={Link01Icon}
-                                  strokeWidth={2}
-                                  className="size-3.5"
-                                />
-                                Sources
-                              </p>
-                              <ul className="flex max-h-48 flex-col gap-1.5 overflow-y-auto text-sm">
-                                {sourceUrls.map((s) => (
-                                  <li key={s.sourceId} className="min-w-0">
-                                    <a
-                                      href={s.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
-                                    >
-                                      {s.title?.trim() || s.url}
-                                    </a>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ) : null}
                         </MessageContent>
                         {!isAssistantTextStreaming(m) && text.length > 0 ? (
                           <MessageActions>
@@ -313,7 +286,9 @@ export default function MessageDemo() {
                                   className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
                                   aria-label="Regenerate"
                                   disabled={busy}
-                                  onClick={() => void regenerate({ messageId: m.id })}
+                                  onClick={() =>
+                                    void regenerate({ messageId: m.id })
+                                  }
                                 >
                                   <HugeiconsIcon
                                     icon={RepeatIcon}
@@ -321,6 +296,18 @@ export default function MessageDemo() {
                                     className="size-4"
                                   />
                                 </Button>
+                              </MessageAction>
+                              <MessageAction className="ml-1">
+                                {sourceUrls.length > 0 ? (
+                                  <Citation
+                                    citations={sourceUrls.map((s) => ({
+                                      url: s.url,
+                                      title: s.title?.trim() || s.url,
+                                    }))}
+                                  >
+                                    <CitationSourcesBadge />
+                                  </Citation>
+                                ) : null}
                               </MessageAction>
                             </MessageActionGroup>
                           </MessageActions>
@@ -400,7 +387,7 @@ export default function MessageDemo() {
         <ThreadScrollToBottom className="bottom-0 z-50" />
       </Thread>
 
-      <div className="fixed right-0 bottom-0 left-0 z-10 border-t border-accent bg-background/70 pt-6 pb-12 flex justify-center items-center backdrop-blur-sm dark:bg-background/95 w-full px-6">
+      <div className="fixed right-0 bottom-0 left-0 z-10 flex w-full items-center justify-center border-t border-accent bg-background/70 px-6 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95">
         <div className="mx-auto w-full max-w-xl space-y-2">
           {error ? (
             <div
@@ -419,7 +406,10 @@ export default function MessageDemo() {
               </Button>
             </div>
           ) : null}
-          <PromptInput onSubmit={(v) => void handleSubmit(v)} className="shadow-sm">
+          <PromptInput
+            onSubmit={(v) => void handleSubmit(v)}
+            className="shadow-sm"
+          >
             <PromptInputTextarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -487,9 +477,7 @@ export default function MessageDemo() {
                       }
                       void handleSubmit(input);
                     }}
-                    aria-label={
-                      busy ? "Stop generation" : "Send message"
-                    }
+                    aria-label={busy ? "Stop generation" : "Send message"}
                   >
                     {busy ? (
                       <HugeiconsIcon
