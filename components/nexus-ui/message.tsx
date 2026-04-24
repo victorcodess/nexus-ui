@@ -119,7 +119,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
         "min-h-10 rounded-[20px] text-sm leading-6 text-primary",
         from === "user"
           ? "w-fit bg-muted px-4 py-2"
-          : "w-full bg-transparent px-2",
+          : "w-full bg-transparent px-2 mb-2",
         className,
       )}
       {...props}

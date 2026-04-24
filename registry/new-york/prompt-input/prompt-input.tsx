@@ -171,5 +171,3 @@ export {
   PromptInputActionGroup,
   PromptInputAction,
 };
-
-export default PromptInput;

@@ -119,7 +119,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
         "min-h-10 rounded-[20px] text-sm leading-6 text-primary",
         from === "user"
           ? "w-fit bg-muted px-4 py-2"
-          : "w-full bg-transparent px-2",
+          : "w-full bg-transparent px-2 mb-2",
         className,
       )}
       {...props}
@@ -129,7 +129,71 @@ function MessageContent({ className, ...props }: MessageContentProps) {
 
 type MessageMarkdownProps = React.ComponentProps<typeof Streamdown>;
 
-function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
+function MessageMarkdown({
+  className,
+  components,
+  ...props
+}: MessageMarkdownProps) {
+  const defaultComponents = {
+    code: CodeBlock,
+    inlineCode: ({
+      children,
+      className,
+      ...props
+    }: React.HTMLAttributes<HTMLElement>) => (
+      <code
+        className={cn(
+          "rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]",
+          className,
+        )}
+        data-slot="message-markdown-inline-code"
+        {...props}
+      >
+        {children}
+      </code>
+    ),
+    table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+      <div
+        data-slot="message-markdown-table-wrap"
+        className={[
+          "my-6 prose-no-margin overflow-hidden rounded-2xl border border-border bg-muted dark:border-accent dark:bg-background",
+          "[&_tbody_tr:first-child_td:first-child]:rounded-ss-xl",
+          "[&_tbody_tr:first-child_td:last-child]:rounded-se-xl",
+          "[&_tbody_tr:last-child_td:first-child]:rounded-es-xl",
+          "[&_tbody_tr:last-child_td:last-child]:rounded-ee-xl",
+        ].join(" ")}
+      >
+        <table
+          data-slot="message-markdown-table"
+          className="w-full border-separate border-spacing-0 border-none bg-muted text-sm dark:bg-background"
+          {...props}
+        />
+      </div>
+    ),
+    th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+      <th
+        data-slot="message-markdown-th"
+        className="border-none px-5 py-2 text-start text-[13px] font-normal! text-muted-foreground! dark:bg-background"
+        {...props}
+      />
+    ),
+    td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+      <td
+        data-slot="message-markdown-td"
+        className="border-0 border-accent bg-card px-5 py-3 text-[13px] text-primary dark:bg-card [tr:not(:first-child)_&]:border-t"
+        {...props}
+      />
+    ),
+  };
+
+  const mergedComponents = React.useMemo(
+    () => ({
+      ...(defaultComponents as object),
+      ...((components ?? {}) as object),
+    }),
+    [components],
+  );
+
   return (
     <Streamdown
       data-slot="message-markdown"
@@ -138,53 +202,7 @@ function MessageMarkdown({ className, ...props }: MessageMarkdownProps) {
         "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className,
       )}
-      components={{
-        code: CodeBlock,
-        inlineCode: ({ children, className, ...props }) => (
-          <code
-            className={cn(
-              "rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]",
-              className,
-            )}
-            data-slot="message-markdown-inline-code"
-            {...props}
-          >
-            {children}
-          </code>
-        ),
-        table: (props) => (
-          <div
-            data-slot="message-markdown-table-wrap"
-            className={[
-              "my-6 prose-no-margin overflow-hidden rounded-2xl border border-border bg-muted dark:border-accent dark:bg-background",
-              "[&_tbody_tr:first-child_td:first-child]:rounded-ss-xl",
-              "[&_tbody_tr:first-child_td:last-child]:rounded-se-xl",
-              "[&_tbody_tr:last-child_td:first-child]:rounded-es-xl",
-              "[&_tbody_tr:last-child_td:last-child]:rounded-ee-xl",
-            ].join(" ")}
-          >
-            <table
-              data-slot="message-markdown-table"
-              className="w-full border-separate border-spacing-0 border-none bg-muted text-sm dark:bg-background"
-              {...props}
-            />
-          </div>
-        ),
-        th: (props) => (
-          <th
-            data-slot="message-markdown-th"
-            className="border-none px-5 py-2 text-start text-[13px] font-normal! text-muted-foreground! dark:bg-background"
-            {...props}
-          />
-        ),
-        td: (props) => (
-          <td
-            data-slot="message-markdown-td"
-            className="border-0 border-accent bg-card px-5 py-3 text-[13px] text-primary dark:bg-card [tr:not(:first-child)_&]:border-t"
-            {...props}
-          />
-        ),
-      }}
+      components={mergedComponents as MessageMarkdownProps["components"]}
       shikiTheme={["github-light", "github-dark"]}
       plugins={streamdownPlugins}
       {...props}
@@ -217,7 +235,7 @@ function MessageActionGroup({ className, ...props }: MessageActionGroupProps) {
   return (
     <div
       data-slot="message-action-group"
-      className={cn("flex gap-1", className)}
+      className={cn("flex gap-1 items-center", className)}
       {...props}
     />
   );

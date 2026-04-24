@@ -287,7 +287,7 @@ function CitationTrigger({
   }
 
   const baseClassName = cn(
-    "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
+    "inline-flex h-5.5 max-w-full cursor-default items-center rounded-full bg-secondary opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
     hasText && showFavicon && "gap-1 py-1 pr-2 pl-1",
     hasText && !showFavicon && "px-2 py-1",
     !hasText && showFavicon && "p-1",
@@ -296,9 +296,7 @@ function CitationTrigger({
 
   const chipBody = (
     <>
-      {showFavicon ? (
-        <CitationFavicon src={c.faviconSrc} />
-      ) : null}
+      {showFavicon ? <CitationFavicon src={c.faviconSrc} /> : null}
       {hasText ? <CitationSiteName>{text}</CitationSiteName> : null}
       {multipleSources && (
         <span
@@ -320,7 +318,7 @@ function CitationTrigger({
           href={c.url}
           target="_blank"
           rel="noreferrer"
-          className={cn(baseClassName, className)}
+          className={cn(baseClassName, className, "not-prose")}
         >
           {chipBody}
         </a>
@@ -572,34 +570,6 @@ function CitationCarouselIndex({
   );
 }
 
-type CitationFaviconGroupProps = React.ComponentProps<"div">;
-
-function CitationFaviconGroup({
-  className,
-  children,
-  ...props
-}: CitationFaviconGroupProps) {
-  const { citations } = useCitationRoot("CitationFaviconGroup");
-  return (
-    <div
-      data-slot="citation-favicon-group"
-      className={cn(
-        "flex -space-x-2 *:data-[slot=citation-favicon]:ring-2 *:data-[slot=citation-favicon]:ring-secondary",
-        className,
-      )}
-      {...props}
-    >
-      {children ??
-        citations.map((citation, i) => (
-          <CitationFavicon
-            key={citation.url + i}
-            src={citation.faviconSrc}
-          />
-        ))}
-    </div>
-  );
-}
-
 export type CitationSourcesBadgeProps = Omit<
   React.ComponentPropsWithoutRef<"div">,
   "children"
@@ -619,15 +589,14 @@ function CitationSourcesBadge({
 }: CitationSourcesBadgeProps) {
   const { citations } = useCitationRoot("CitationSourcesBadge");
   const count = citations.length;
-  const text =
-    label ?? `${count} ${count === 1 ? "source" : "sources"}`;
+  const text = label ?? `${count} ${count === 1 ? "source" : "sources"}`;
 
   return (
     <div
       data-slot="citation-sources-badge"
       className={cn(
-        "mt-0 flex h-6.5 items-center gap-1.5 rounded-full bg-secondary pr-1.5",
-        showFavicons ? "pl-1" : "pl-1.5",
+        "mt-0 flex h-6 items-center gap-1.5 rounded-full bg-secondary pr-2 w-fit",
+        showFavicons ? "pl-1" : "pl-2",
         className,
       )}
       {...props}
@@ -637,7 +606,7 @@ function CitationSourcesBadge({
           data-slot="citation-favicon-group"
           className="flex -space-x-2 *:data-[slot=citation-favicon]:ring-2 *:data-[slot=citation-favicon]:ring-secondary"
         >
-          {citations.map((citation, i) => (
+          {citations.slice(0, 3).map((citation, i) => (
             <CitationFavicon key={citation.url + i} src={citation.faviconSrc} />
           ))}
         </div>
@@ -711,7 +680,6 @@ type CitationSourceProps = React.HTMLAttributes<HTMLDivElement>;
 
 function CitationSource({
   className,
-  children,
   ...props
 }: CitationSourceProps) {
   return (
@@ -720,12 +688,8 @@ function CitationSource({
       className={cn("mt-2 flex items-center gap-1.5", className)}
       {...props}
     >
-      {children ?? (
-        <>
-          <CitationFavicon />
-          <CitationSiteName />
-        </>
-      )}
+      <CitationFavicon />
+      <CitationSiteName />
     </div>
   );
 }
@@ -737,11 +701,7 @@ type CitationFaviconProps = Omit<
   src?: string;
 };
 
-function CitationFavicon({
-  className,
-  src,
-  ...props
-}: CitationFaviconProps) {
+function CitationFavicon({ className, src, ...props }: CitationFaviconProps) {
   const c = useResolvedCitation("CitationFavicon");
   const resolvedSrc = src ?? c.faviconSrc;
   if (resolvedSrc === "") return null;
@@ -751,10 +711,7 @@ function CitationFavicon({
       src={resolvedSrc}
       alt=""
       data-slot="citation-favicon"
-      className={cn(
-        "size-4 shrink-0 rounded-full bg-background",
-        className,
-      )}
+      className={cn("size-4 shrink-0 rounded-full bg-background", className)}
       {...props}
     />
   );
@@ -772,10 +729,7 @@ function CitationSiteName({
   return (
     <span
       data-slot="citation-site-name"
-      className={cn(
-        "text-xs leading-4.5 font-normal text-primary",
-        className,
-      )}
+      className={cn("text-xs leading-4.5 font-normal text-primary", className)}
       {...props}
     >
       {content}
@@ -795,7 +749,6 @@ export {
   CitationCarouselPrev,
   CitationContent,
   CitationFavicon,
-  CitationFaviconGroup,
   CitationItem,
   CitationSourcesBadge,
   CitationSiteName,

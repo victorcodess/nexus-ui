@@ -372,5 +372,3 @@ export {
   SuggestionPanelClose,
   SuggestionPanelContent,
 };
-
-export default Suggestions;
