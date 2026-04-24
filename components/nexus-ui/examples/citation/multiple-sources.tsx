@@ -108,7 +108,7 @@ function MultiSourceCitation({ items }: { items: Source[] }) {
       <CitationTrigger />
 
       <CitationContent>
-        <CitationCarousel className="flex w-full flex-col">
+        <CitationCarousel>
           <CitationCarouselHeader>
             <CitationSourcesBadge />
 

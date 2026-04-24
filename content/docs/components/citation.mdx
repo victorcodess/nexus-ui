@@ -108,186 +108,35 @@ The trigger can sit **inline** with surrounding copy—place **`Citation`** wher
 
 ## Vercel AI SDK Integration
 
-The [Vercel AI SDK](https://sdk.vercel.ai) does not define a single standard for **inline citations** in chat streams—models are not required to emit a shared citation syntax, and there is no built-in “citation” channel you can rely on for every provider. [Streamdown](https://streamdown.ai/) also has **no official inline-citation or footnote-to-chip resolution**; you have to wire sources yourself.
+Use **Citation** with [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) when your model returns **sources** as [`UIMessage`](https://ai-sdk.dev/docs/reference/ai-sdk-core/ui-message) **`parts`** (for example **`type: "source-url"`**). The AI SDK does not standardize citation markup across providers, and [Streamdown](https://streamdown.ai/) does not resolve footnotes for you—so you collect URLs from message parts, match them to inline markers like **`[1]`** in the assistant text, and swap those markers for **`Citation`** inside markdown by overriding the anchor renderer.
 
-**Citation** takes **`citations: CitationSourceInput[]`** only. In practice, you can fill that array from **(1)** a **structured object** stream (**`streamObject`** + **`experimental_useObject`**) with a Zod schema, or **(2)** assistant **`UIMessage`** parts of **`type: "source-url"`** from **`useChat`** when your **`POST /api/chat`** response actually includes them (**`toUIMessageStreamResponse({ sendSources: true })`** and a model or provider that emits source parts—many completions only stream **`text`**).
-
-### Structured object stream
+See [Prompt Input](/docs/components/prompt-input#vercel-ai-sdk-integration) for the same **`POST /api/chat`** shape; below extends it with **`sendSources: true`** and a client-side inline-citation pipeline.
 
 <Steps>
 <Step>
-<h3>Install the AI SDK and Zod</h3>
+<h3>Install the AI SDK and a provider that emits sources</h3>
+
+Add **`ai`**, **`@ai-sdk/react`**, and a provider package whose models surface search or citation URLs in the UI message stream (for example **`@ai-sdk/perplexity`** for Sonar). Many chat models stream text only—without **`source-url`** (or equivalent) parts, you have nothing to map **`[1]`** to.
 
 ```bash
-npm install ai @ai-sdk/react @ai-sdk/openai zod
+npm install ai @ai-sdk/react @ai-sdk/perplexity
 ```
 
 </Step>
 <Step>
-<h3>Add the citation API route</h3>
+<h3>Create a chat API route that streams sources</h3>
 
-Define the Zod schema in this file and export it so the client can pass the same shape to **`useObject`**.
-
-```ts title="app/api/citation/route.ts"
-import { streamObject, zodSchema } from "ai";
-import { openai } from "@ai-sdk/openai";
-import { z } from "zod";
-
-export const citationSchema = z.object({
-  content: z.string(),
-  citations: z.array(
-    z.object({
-      number: z.string(),
-      title: z.string(),
-      url: z.string(),
-      description: z.string().optional(),
-    }),
-  ),
-});
-
-export const maxDuration = 30;
-
-export async function POST(req: Request) {
-  const { prompt } = (await req.json()) as { prompt: string };
-
-  const result = streamObject({
-    model: openai("gpt-4o"),
-    schema: zodSchema(citationSchema),
-    prompt: `Generate a well-researched paragraph about ${prompt} with proper citations.
-
-Include:
-- A comprehensive paragraph with inline citations marked as [1], [2], etc.
-- 2-3 citations with realistic source information
-- Each citation should have a title, URL, and optional description
-- Make the content informative and the sources credible
-
-Format citations as numbered references within the text.`,
-  });
-
-  return result.toTextStreamResponse();
-}
-```
-
-</Step>
-<Step>
-<h3>Add a client page for structured citations</h3>
-
-```tsx title="app/citations-object/page.tsx"
-"use client";
-
-import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { Button } from "@/components/ui/button";
-import {
-  Citation,
-  CitationContent,
-  CitationItem,
-  CitationTrigger,
-} from "@/components/nexus-ui/citation";
-import { citationSchema } from "@/app/api/citation/route";
-
-export default function CitationsObjectPage() {
-  const { object, submit, isLoading } = useObject({
-    api: "/api/citation",
-    schema: citationSchema,
-  });
-
-  return (
-    <div className="mx-auto max-w-4xl space-y-6 p-6">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          onClick={() => submit({ prompt: "how tidal power works" })}
-          disabled={isLoading}
-          variant="outline"
-        >
-          Tidal energy
-        </Button>
-        <Button
-          type="button"
-          onClick={() =>
-            submit({ prompt: "the history of the printing press in Europe" })
-          }
-          disabled={isLoading}
-          variant="outline"
-        >
-          Printing history
-        </Button>
-      </div>
-
-      {isLoading && !object ? (
-        <p className="text-muted-foreground text-sm">
-          Generating content with citations…
-        </p>
-      ) : null}
-
-      {object?.content ? (
-        <div className="prose prose-sm max-w-none">
-          <p className="leading-relaxed">
-            {object.content.split(/(\[\d+\])/).map((part, index) => {
-              const citationMatch = part.match(/\[(\d+)\]/);
-              if (citationMatch) {
-                const citationNumber = citationMatch[1];
-                const row = object.citations?.find(
-                  (c) => c.number === citationNumber,
-                );
-                if (row) {
-                  return (
-                    <Citation
-                      key={index}
-                      citations={[
-                        {
-                          url: row.url,
-                          title: row.title,
-                          description: row.description,
-                        },
-                      ]}
-                    >
-                      <CitationTrigger />
-                      <CitationContent>
-                        <CitationItem />
-                      </CitationContent>
-                    </Citation>
-                  );
-                }
-              }
-              return part;
-            })}
-          </p>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-```
-
-</Step>
-</Steps>
-
-### Chat stream with source-url parts
-
-<Steps>
-<Step>
-<h3>Install the AI SDK</h3>
-
-```bash
-npm install ai @ai-sdk/react @ai-sdk/openai
-```
-
-</Step>
-<Step>
-<h3>Add the chat API route</h3>
+Call **`streamText`**, then return **`toUIMessageStreamResponse({ sendSources: true })`** so the client receives source metadata alongside text. Without **`sendSources`**, assistant messages may omit **`source-url`** parts even when the underlying model found URLs. Pick a model your provider documents as search- or citation-capable.
 
 ```ts title="app/api/chat/route.ts"
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { perplexity } from "@ai-sdk/perplexity";
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
   const result = streamText({
-    model: openai("gpt-4o-mini"),
-    system:
-      "You are a helpful assistant. When you cite web sources, include URLs in your answer where applicable.",
+    model: perplexity("sonar"),
     messages: await convertToModelMessages(messages),
   });
 
@@ -299,98 +148,170 @@ export async function POST(req: Request) {
 
 </Step>
 <Step>
-<h3>Add a client page for chat citations</h3>
+<h3>Add helpers that turn markers into citation UI</h3>
+
+Assistant prose often contains bracket references (**`[1]`**, **`[1][2][4]`**). Treat the ordered list of **`source-url`** parts as the bibliography: **`[1]`** is the first URL, **`[2]`** the second, and so on. **`withInlineCitationLinks`** rewrites each run of adjacent markers into a single markdown link whose **`href`** uses a dedicated **`https://…`** prefix (custom schemes are often stripped by sanitizers). **`createInlineCitationComponents`** passes a custom **`a`** component to Streamdown: real links stay as **`<a>`**; marker links parse the id list, resolve rows from your sources array, and render **`Citation`**, **`CitationTrigger`**, and **`CitationContent`**.
+
+```tsx title="lib/inline-citations.tsx"
+"use client";
+
+import * as React from "react";
+import {
+  Citation,
+  CitationCarousel,
+  CitationCarouselContent,
+  CitationCarouselHeader,
+  CitationCarouselIndex,
+  CitationCarouselItem,
+  CitationCarouselNext,
+  CitationCarouselPagination,
+  CitationCarouselPrev,
+  CitationContent,
+  CitationItem,
+  CitationSourcesBadge,
+  CitationTrigger,
+  type CitationSourceInput,
+} from "@/components/nexus-ui/citation";
+
+const GROUP_RE = /((?:\[\d+\])+)/g;
+const ID_RE = /\[(\d+)\]/g;
+const PREFIX = "https://citations.local/";
+
+export function withInlineCitationLinks(text: string) {
+  return text.replace(GROUP_RE, (match) => {
+    const ids = [...match.matchAll(ID_RE)]
+      .map(([, id]) => Number(id))
+      .filter((id) => Number.isInteger(id) && id > 0);
+    if (ids.length === 0) return match;
+    const label = ids.map((id) => `[${id}]`).join("");
+    return `[${label}](${PREFIX}${ids.join(",")})`;
+  });
+}
+
+function parseIdsFromHref(href: string) {
+  if (!href.startsWith(PREFIX)) return [];
+  return href
+    .slice(PREFIX.length)
+    .split(",")
+    .map((id) => Number(id))
+    .filter((id) => Number.isInteger(id) && id > 0);
+}
+
+function citationsFromIds(ids: number[], sources: CitationSourceInput[]) {
+  return Array.from(new Set(ids))
+    .map((id) => sources[id - 1])
+    .filter(Boolean) as CitationSourceInput[];
+}
+
+export function createInlineCitationComponents(sources: CitationSourceInput[]) {
+  return {
+    a: ({ href, children, ...props }: any) => {
+      if (typeof href !== "string") {
+        return React.createElement("a", { ...props, href }, children);
+      }
+
+      const ids = parseIdsFromHref(href);
+      if (ids.length === 0) {
+        return React.createElement("a", { ...props, href }, children);
+      }
+
+      const citations = citationsFromIds(ids, sources);
+      if (citations.length === 0) return <>{children}</>;
+
+      return (
+        <Citation citations={citations}>
+          <CitationTrigger />
+          <CitationContent>
+            {citations.length > 1 ? (
+              <CitationCarousel>
+                <CitationCarouselHeader>
+                  <CitationSourcesBadge />
+
+                  <CitationCarouselPagination>
+                    <CitationCarouselPrev />
+                    <CitationCarouselIndex />
+                    <CitationCarouselNext />
+                  </CitationCarouselPagination>
+                </CitationCarouselHeader>
+
+                <CitationCarouselContent>
+                  {citations.map((citation, index) => (
+                    <CitationCarouselItem key={citation.url} index={index}>
+                      <CitationItem />
+                    </CitationCarouselItem>
+                  ))}
+                </CitationCarouselContent>
+              </CitationCarousel>
+            ) : (
+              <CitationItem />
+            )}
+          </CitationContent>
+        </Citation>
+      );
+    },
+  };
+}
+```
+
+</Step>
+<Step>
+<h3>Render assistant markdown with `useChat` and MessageMarkdown</h3>
+
+For each assistant message, join **`text`** parts (for example with **`isTextUIPart`**), collect **`source-url`** parts into **`{ url, title }`** objects for **`Citation`**, then pass **`createInlineCitationComponents(sources)`** into **`MessageMarkdown`** via **`components`**. Feed **`withInlineCitationLinks(text)`** as children so markers become links before Streamdown renders. The example below shows one assistant turn; in a full chat, map **`messages`** the same way as in [Message](/docs/components/message#vercel-ai-sdk-integration).
 
 ```tsx title="app/citations-chat/page.tsx"
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import * as React from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, isTextUIPart, type UIMessage } from "ai";
+import { MessageMarkdown } from "@/components/nexus-ui/message";
 import {
-  DefaultChatTransport,
-  isTextUIPart,
-  type UIMessage,
-} from "ai";
-import { Button } from "@/components/ui/button";
-import {
-  Citation,
-  CitationContent,
-  CitationItem,
-  CitationTrigger,
-  type CitationSourceInput,
-} from "@/components/nexus-ui/citation";
+  createInlineCitationComponents,
+  withInlineCitationLinks,
+} from "@/lib/inline-citations";
 
 function textFromMessage(message: UIMessage) {
   return message.parts.filter(isTextUIPart).map((p) => p.text).join("");
 }
 
-function citationsFromSourceUrlParts(
-  message: UIMessage,
-): CitationSourceInput[] {
-  return message.parts
-    .filter(
-      (p): p is Extract<UIMessage["parts"][number], { type: "source-url" }> =>
-        p.type === "source-url",
-    )
-    .map((p) => ({
-      url: p.url,
-      title: p.title,
-    }));
+function sourceUrlPartsFromMessage(message: UIMessage) {
+  return message.parts.filter(
+    (p): p is Extract<UIMessage["parts"][number], { type: "source-url" }> =>
+      p.type === "source-url",
+  );
 }
 
 export default function CitationsChatPage() {
-  const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat({
+  const { messages } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
 
-  const lastAssistant = useMemo(
-    () => [...messages].reverse().find((m) => m.role === "assistant"),
-    [messages],
-  );
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant) return null;
 
-  const citations = lastAssistant
-    ? citationsFromSourceUrlParts(lastAssistant)
-    : [];
-  const assistantText = lastAssistant ? textFromMessage(lastAssistant) : "";
-  const isBusy = status === "submitted" || status === "streaming";
-
-  const handleSubmit = useCallback(() => {
-    const t = input.trim();
-    if (!t) return;
-    sendMessage({ text: t });
-    setInput("");
-  }, [input, sendMessage]);
+  const text = textFromMessage(assistant);
+  const sources = sourceUrlPartsFromMessage(assistant).map((s) => ({
+    url: s.url,
+    title: s.title?.trim() || s.url,
+  }));
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-4 p-6">
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        className="min-h-[80px] w-full rounded-md border border-border bg-background p-2 text-sm"
-        placeholder="Ask something…"
-      />
-      <Button type="button" onClick={handleSubmit} disabled={isBusy}>
-        Send
-      </Button>
-      {assistantText ? (
-        <p className="text-sm leading-relaxed">{assistantText}</p>
-      ) : null}
-      {citations.length > 0 ? (
-        <Citation citations={citations}>
-          <CitationTrigger />
-          <CitationContent>
-            <CitationItem />
-          </CitationContent>
-        </Citation>
-      ) : null}
-    </div>
+    <MessageMarkdown components={createInlineCitationComponents(sources)}>
+      {withInlineCitationLinks(text)}
+    </MessageMarkdown>
   );
 }
 ```
 
 </Step>
 </Steps>
+
+### Provider limits and enriching previews
+
+Only some providers and models return sources through the AI SDK (for example Perplexity Sonar, some Grok variants). Others stream plain text with no **`source-url`** parts. When sources exist, their shape can differ by provider.
+
+Source parts usually give you at least a **URL**. **`Citation`** accepts optional **`title`** and **`description`** for the hover card; the SDK does not fetch page metadata for you. To show real titles or snippets, call a link-preview or metadata service (or your own scraper) and merge the results into the objects you pass to **`citations`** before rendering.
 
 ## API Reference
 
