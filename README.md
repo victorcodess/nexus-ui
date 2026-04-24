@@ -86,7 +86,8 @@ To use the `@nexus-ui` scope with a custom registry, add to your `components.jso
 
 ```tsx
 import { Button } from "@/components/ui/button";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputActions,
   PromptInputAction,
   PromptInputActionGroup,

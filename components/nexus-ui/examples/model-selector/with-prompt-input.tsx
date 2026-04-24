@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputActions,
   PromptInputAction,
   PromptInputActionGroup,

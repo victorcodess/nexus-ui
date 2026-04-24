@@ -97,7 +97,8 @@ After installing components, you can use them in your React application:
 "use client";
 
 import { Button } from "@/components/ui/button";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputActionGroup,

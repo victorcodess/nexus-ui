@@ -1188,5 +1188,3 @@ export {
   AttachmentProperty,
   AttachmentProgress,
 };
-
-export default Attachments;

@@ -29,7 +29,8 @@ import {
   ModelSelectorRadioItem,
   ModelSelectorTrigger,
 } from "@/components/nexus-ui/model-selector";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputAction,
   PromptInputActionGroup,
   PromptInputActions,

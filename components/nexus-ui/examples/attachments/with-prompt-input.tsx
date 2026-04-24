@@ -18,7 +18,8 @@ import {
   useAttachments,
   type AttachmentMeta,
 } from "@/components/nexus-ui/attachments";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputAction,
   PromptInputActionGroup,
   PromptInputActions,

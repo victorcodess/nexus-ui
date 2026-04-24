@@ -70,7 +70,8 @@ Composable chat shell: auto-growing textarea plus a bottom action row for attach
 **Import:**
 
 ```tsx
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputActionGroup,
@@ -324,7 +325,8 @@ Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The cha
 import * as React from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import PromptInput, {
+import {
+  PromptInput,
   PromptInputTextarea,
   PromptInputActions,
   PromptInputActionGroup,
