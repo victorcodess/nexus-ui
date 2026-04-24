@@ -287,7 +287,7 @@ function CitationTrigger({
   }
 
   const baseClassName = cn(
-    "inline-flex h-6 max-w-full cursor-default items-center rounded-full bg-secondary opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
+    "inline-flex h-5.5 max-w-full cursor-default items-center rounded-full bg-secondary opacity-100 transition-colors hover:bg-border data-[state=open]:opacity-100 align-middle",
     hasText && showFavicon && "gap-1 py-1 pr-2 pl-1",
     hasText && !showFavicon && "px-2 py-1",
     !hasText && showFavicon && "p-1",
@@ -318,7 +318,7 @@ function CitationTrigger({
           href={c.url}
           target="_blank"
           rel="noreferrer"
-          className={cn(baseClassName, className)}
+          className={cn(baseClassName, className, "not-prose")}
         >
           {chipBody}
         </a>
@@ -595,8 +595,8 @@ function CitationSourcesBadge({
     <div
       data-slot="citation-sources-badge"
       className={cn(
-        "mt-0 flex h-6.5 items-center gap-1.5 rounded-full bg-secondary pr-1.5 w-fit",
-        showFavicons ? "pl-1" : "pl-1.5",
+        "mt-0 flex h-6 items-center gap-1.5 rounded-full bg-secondary pr-2 w-fit",
+        showFavicons ? "pl-1" : "pl-2",
         className,
       )}
       {...props}
