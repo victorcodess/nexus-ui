@@ -82,34 +82,37 @@ export function createInlineCitationComponents(
       }
 
       return (
-        <Citation citations={citations}>
-          <CitationTrigger />
-          <CitationContent>
-            {citations.length > 1 ? (
-              <CitationCarousel>
-                <CitationCarouselHeader>
-                  <CitationSourcesBadge />
+        <>
+          {" "}
+          <Citation citations={citations}>
+            <CitationTrigger />
+            <CitationContent>
+              {citations.length > 1 ? (
+                <CitationCarousel>
+                  <CitationCarouselHeader>
+                    <CitationSourcesBadge />
 
-                  <CitationCarouselPagination>
-                    <CitationCarouselPrev />
-                    <CitationCarouselIndex />
-                    <CitationCarouselNext />
-                  </CitationCarouselPagination>
-                </CitationCarouselHeader>
+                    <CitationCarouselPagination>
+                      <CitationCarouselPrev />
+                      <CitationCarouselIndex />
+                      <CitationCarouselNext />
+                    </CitationCarouselPagination>
+                  </CitationCarouselHeader>
 
-                <CitationCarouselContent>
-                  {citations.map((citation, index) => (
-                    <CitationCarouselItem key={citation.url} index={index}>
-                      <CitationItem />
-                    </CitationCarouselItem>
-                  ))}
-                </CitationCarouselContent>
-              </CitationCarousel>
-            ) : (
-              <CitationItem />
-            )}
-          </CitationContent>
-        </Citation>
+                  <CitationCarouselContent>
+                    {citations.map((citation, index) => (
+                      <CitationCarouselItem key={citation.url} index={index}>
+                        <CitationItem />
+                      </CitationCarouselItem>
+                    ))}
+                  </CitationCarouselContent>
+                </CitationCarousel>
+              ) : (
+                <CitationItem />
+              )}
+            </CitationContent>
+          </Citation>
+        </>
       );
     },
   };

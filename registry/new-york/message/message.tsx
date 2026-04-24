@@ -73,7 +73,7 @@ function Message({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "flex w-full max-w-[90%] items-start gap-2",
+          "flex w-full max-w-[90%] items-start gap-2 group/message",
           from === "user" ? "ms-auto" : "me-auto",
           className,
         )}
@@ -143,7 +143,7 @@ function MessageMarkdown({
     }: React.HTMLAttributes<HTMLElement>) => (
       <code
         className={cn(
-          "rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]",
+          "rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs border-none font-[450]",
           className,
         )}
         data-slot="message-markdown-inline-code"

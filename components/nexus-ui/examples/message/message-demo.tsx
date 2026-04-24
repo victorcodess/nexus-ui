@@ -36,10 +36,7 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import {
-  Citation,
-  CitationSourcesBadge,
-} from "@/components/nexus-ui/citation";
+import { Citation, CitationSourcesBadge } from "@/components/nexus-ui/citation";
 import { TypingLoader } from "@/components/nexus-ui/loader";
 import {
   getInlineCitationMarkdown,
@@ -69,6 +66,24 @@ const imgAssistant = "/assets/nexus-avatar.png";
  */
 const models = [
   {
+    value: "sonar",
+    icon: PerplexityIcon,
+    title: "Perplexity Sonar",
+    description: "Search + citations",
+  },
+  {
+    value: "sonar-pro",
+    icon: PerplexityIcon,
+    title: "Perplexity Sonar Pro",
+    description: "Deeper search",
+  },
+  {
+    value: "sonar-deep-research",
+    icon: PerplexityIcon,
+    title: "Perplexity Sonar Deep Research",
+    description: "Multi-step research",
+  },
+  {
     value: "openai/gpt-4o",
     icon: ChatgptIcon,
     title: "GPT-4o",
@@ -91,24 +106,6 @@ const models = [
     icon: GeminiIcon,
     title: "Gemini 2.0 Flash",
     description: "Fast and versatile",
-  },
-  {
-    value: "sonar",
-    icon: PerplexityIcon,
-    title: "Perplexity Sonar",
-    description: "Search + citations",
-  },
-  {
-    value: "sonar-pro",
-    icon: PerplexityIcon,
-    title: "Perplexity Sonar Pro",
-    description: "Deeper search",
-  },
-  {
-    value: "sonar-deep-research",
-    icon: PerplexityIcon,
-    title: "Perplexity Sonar Deep Research",
-    description: "Multi-step research",
   },
 ] as const;
 
@@ -248,7 +245,7 @@ export default function MessageDemo() {
                                   type="button"
                                   variant="ghost"
                                   size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                                   aria-label="Copy message"
                                   onClick={() => copyMessage(text)}
                                 >
@@ -264,7 +261,7 @@ export default function MessageDemo() {
                                   type="button"
                                   variant="ghost"
                                   size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                                   aria-label="Good response"
                                 >
                                   <HugeiconsIcon
@@ -279,7 +276,7 @@ export default function MessageDemo() {
                                   type="button"
                                   variant="ghost"
                                   size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                                   aria-label="Bad response"
                                 >
                                   <HugeiconsIcon
@@ -294,7 +291,7 @@ export default function MessageDemo() {
                                   type="button"
                                   variant="ghost"
                                   size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                                   aria-label="Regenerate"
                                   disabled={busy}
                                   onClick={() =>
@@ -330,14 +327,14 @@ export default function MessageDemo() {
                       <MessageContent>
                         <MessageMarkdown>{text}</MessageMarkdown>
                       </MessageContent>
-                      <MessageActions>
+                      <MessageActions className="opacity-0 transition-opacity group-hover/message:opacity-100">
                         <MessageActionGroup>
                           <MessageAction asChild>
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon-sm"
-                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                               aria-label="Edit message"
                             >
                               <HugeiconsIcon
@@ -352,7 +349,7 @@ export default function MessageDemo() {
                               type="button"
                               variant="ghost"
                               size="icon-sm"
-                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97 dark:text-white dark:hover:bg-border"
+                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                               aria-label="Copy message"
                               onClick={() => copyMessage(text)}
                             >
