@@ -44,7 +44,7 @@ function TOCItem({ item }: { item: Primitive.TOCItemType }) {
       className={cn(
         'prose py-1.5 text-[13px] leading-4 font-[450] text-gray-400 dark:text-gray-500 transition-colors wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-gray-600 dark:data-[active=true]:text-gray-300',
         item.depth <= 2 && 'ps-3',
-        item.depth === 3 && 'ps-6',
+        item.depth === 3 && 'ps-6 leading-4.5 py-1.25',
         item.depth >= 4 && 'ps-8 leading-5',
       )}
     >
