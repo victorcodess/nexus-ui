@@ -15,7 +15,6 @@
     "@hugeicons/core-free-icons"
   ],
   "registryDependencies": [
-    "@nexus-ui/nexus-ui-theme",
     "button",
     "avatar"
   ],

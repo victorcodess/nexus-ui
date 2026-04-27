@@ -7,7 +7,6 @@
     "@radix-ui/react-slot"
   ],
   "registryDependencies": [
-    "@nexus-ui/nexus-ui-theme",
     "textarea",
     "scroll-area"
   ],

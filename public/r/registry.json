@@ -7,25 +7,12 @@
       "name": "nexus-ui-theme",
       "type": "registry:theme",
       "title": "Nexus UI theme",
-      "description": "Tailwind v4 theme tokens (gray palette, shadows, scale) used by Nexus UI components.",
+      "description": "Tailwind v4 shadow and scale tokens used by Nexus UI components.",
       "cssVars": {
         "theme": {
-          "color-gray-50": "#fafafa",
-          "color-gray-100": "#f5f5f5",
-          "color-gray-200": "#e5e5e5",
-          "color-gray-300": "#d4d4d4",
-          "color-gray-400": "#a3a3a3",
-          "color-gray-500": "#737373",
-          "color-gray-600": "#525252",
-          "color-gray-700": "#404040",
-          "color-gray-800": "#262626",
-          "color-gray-900": "#171717",
-          "color-gray-950": "#0a0a0a",
           "shadow-sm": "0 2px 4px -2px rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(0, 0, 0, 0.06)",
           "shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)",
-          "scale-96": "0.96",
           "scale-97": "0.97",
-          "scale-98": "0.98",
           "scale-99": "0.99"
         }
       }
@@ -36,7 +23,7 @@
       "title": "Prompt Input",
       "description": "A composable AI chat input component with auto-resizing textarea and action slots.",
       "dependencies": ["@radix-ui/react-slot"],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme", "textarea", "scroll-area"],
+      "registryDependencies": ["textarea", "scroll-area"],
       "files": [
         {
           "path": "registry/new-york/prompt-input/prompt-input.tsx",
@@ -115,7 +102,7 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme", "button", "avatar"],
+      "registryDependencies": ["button", "avatar"],
       "css": {
         "@source \"../node_modules/streamdown/dist/index.js\"": {},
         "@source \"../node_modules/@streamdown/code/dist/*.js\"": {},
