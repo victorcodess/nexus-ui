@@ -8,12 +8,13 @@ import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
 } from "@/lib/site";
+import type { Metadata } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} - Build Better AI Interfaces`,
@@ -48,6 +49,18 @@ export const metadata = {
     canonical: SITE_URL,
   },
   manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      {
+        url: "/favicon-light.ico",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/favicon.ico",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
 };
 
 const jsonLd = {
