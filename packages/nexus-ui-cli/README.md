@@ -15,7 +15,7 @@ You can use the Nexus UI CLI directly with npx, or install components via the sh
 npx nexus-ui-cli@latest
 
 # Or using shadcn CLI
-npx shadcn@latest add https://nexus-ui.dev/api/registry/prompt-input.json
+npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```
 
 ## Prerequisites
@@ -70,9 +70,13 @@ You can also install components using the standard shadcn/ui CLI:
 
 ```bash
 # Install a specific component
-npx shadcn@latest add https://nexus-ui.dev/api/registry/prompt-input.json
-npx shadcn@latest add https://nexus-ui.dev/api/registry/suggestions.json
-npx shadcn@latest add https://nexus-ui.dev/api/registry/model-selector.json
+npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
+npx shadcn@latest add https://nexus-ui.dev/r/suggestions.json
+npx shadcn@latest add https://nexus-ui.dev/r/model-selector.json
+npx shadcn@latest add https://nexus-ui.dev/r/attachments.json
+npx shadcn@latest add https://nexus-ui.dev/r/message.json
+npx shadcn@latest add https://nexus-ui.dev/r/thread.json
+npx shadcn@latest add https://nexus-ui.dev/r/citation.json
 ```
 
 Or add the registry to your `components.json` and use the namespace:
@@ -83,11 +87,15 @@ npx shadcn@latest add @nexus-ui/prompt-input
 
 ## Available Components
 
-| Component       | Description                                                       |
-| --------------- | ----------------------------------------------------------------- |
-| `prompt-input`  | Composable chat input with auto-resizing textarea and action slots |
-| `model-selector`| Dropdown for selecting AI models with radio groups and sub-menus   |
-| `suggestions`   | Prompt suggestion chips for guiding user input                    |
+| Component        | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `prompt-input`   | Composable chat input with auto-resizing textarea and action slots |
+| `model-selector` | Dropdown for selecting AI models with radio groups and sub-menus   |
+| `suggestions`    | Prompt suggestion chips for guiding user input                    |
+| `attachments`    | File-attachment UI for inputs and messages                         |
+| `message`        | Chat message layout with markdown (Streamdown) and optional avatar  |
+| `thread`         | Thread viewport with stick-to-bottom scrolling                     |
+| `citation`       | Inline citations with hover preview and carousel                  |
 
 ## Quick Start Example
 
@@ -153,3 +161,7 @@ Nexus UI uses your existing shadcn/ui configuration. Components will be installe
 - [Prompt Input](https://nexus-ui.dev/docs/components/prompt-input)
 - [Model Selector](https://nexus-ui.dev/docs/components/model-selector)
 - [Suggestions](https://nexus-ui.dev/docs/components/suggestions)
+- [Attachments](https://nexus-ui.dev/docs/components/attachments)
+- [Message](https://nexus-ui.dev/docs/components/message)
+- [Thread](https://nexus-ui.dev/docs/components/thread)
+- [Citation](https://nexus-ui.dev/docs/components/citation)

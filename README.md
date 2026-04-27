@@ -13,7 +13,10 @@
   <a href="https://nexus-ui.dev/docs/components/prompt-input">Prompt Input</a> ·
   <a href="https://nexus-ui.dev/docs/components/model-selector">Model Selector</a> ·
   <a href="https://nexus-ui.dev/docs/components/suggestions">Suggestions</a> ·
-  <a href="https://nexus-ui.dev/docs/components/attachments">Attachments</a>
+  <a href="https://nexus-ui.dev/docs/components/attachments">Attachments</a> ·
+  <a href="https://nexus-ui.dev/docs/components/message">Message</a> ·
+  <a href="https://nexus-ui.dev/docs/components/thread">Thread</a> ·
+  <a href="https://nexus-ui.dev/docs/components/citation">Citation</a>
 </p>
 
 ---
@@ -36,6 +39,9 @@ Copy-paste components into your project. You own the code.
 | `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and items    |
 | `Suggestions`   | Prompt suggestion chips for guiding user input                               |
 | `Attachments`   | File-attachment UI for inputs and messages (compact, inline, detailed, pasted) |
+| `Message`       | Chat message layout with markdown body, optional avatar, actions, and attachments |
+| `Thread`        | Chat thread viewport with stick-to-bottom scrolling and scroll-to-bottom control |
+| `Citation`      | Inline citations with hover preview, favicons, and multi-source carousel    |
 
 ## Quick Start
 
@@ -56,6 +62,9 @@ npx shadcn@latest add @nexus-ui/prompt-input
 npx shadcn@latest add @nexus-ui/model-selector
 npx shadcn@latest add @nexus-ui/suggestions
 npx shadcn@latest add @nexus-ui/attachments
+npx shadcn@latest add @nexus-ui/message
+npx shadcn@latest add @nexus-ui/thread
+npx shadcn@latest add @nexus-ui/citation
 ```
 
 **Option 2: Direct URL**
@@ -69,7 +78,7 @@ npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```bash
 npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments
+npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation
 ```
 
 To use the `@nexus-ui` scope with a custom registry, add to your `components.json`:

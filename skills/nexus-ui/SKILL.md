@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -33,6 +33,9 @@ npx shadcn@latest add @nexus-ui/prompt-input
 npx shadcn@latest add @nexus-ui/model-selector
 npx shadcn@latest add @nexus-ui/suggestions
 npx shadcn@latest add @nexus-ui/attachments
+npx shadcn@latest add @nexus-ui/message
+npx shadcn@latest add @nexus-ui/thread
+npx shadcn@latest add @nexus-ui/citation
 ```
 
 Or install directly via URL (no registry config needed):
@@ -58,6 +61,9 @@ Components are installed to `components/nexus-ui/` by default.
 | Model Selector | `model-selector` | Dropdown for selecting a model with radio groups, sub-menus, and custom items |
 | Suggestions | `suggestions` | Prompt suggestion chips and optional panel layout |
 | Attachments | `attachments` | File-attachment UI for inputs and messages (variants + drag/drop helpers) |
+| Message | `message` | Chat message shell with Streamdown markdown, avatar, and action slots |
+| Thread | `thread` | Stick-to-bottom thread viewport with scroll-to-bottom control |
+| Citation | `citation` | Inline citations with hover preview, favicons, and multi-source carousel |
 
 ## Component APIs
 
@@ -317,6 +323,218 @@ const [items, setItems] = React.useState<AttachmentMeta[]>([]);
 </Attachments>
 ```
 
+### Message
+
+User vs assistant rows with optional avatar, markdown body (via [Streamdown](https://github.com/vercel/streamdown)), and trailing actions.
+
+**Import:**
+
+```tsx
+import {
+  Message,
+  MessageStack,
+  MessageContent,
+  MessageMarkdown,
+  MessageActions,
+  MessageActionGroup,
+  MessageAction,
+  MessageAvatar,
+} from "@/components/nexus-ui/message";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Message` | Root; required `from`: `"user"` \| `"assistant"` (layout + `role="article"`). |
+| `MessageStack` | Vertical stack for multiple blocks inside one message. |
+| `MessageContent` | Bubble / content wrapper (user vs assistant styling). |
+| `MessageMarkdown` | Renders markdown with Streamdown plugins (code, math, mermaid, CJK). |
+| `MessageActions` | Action row container. |
+| `MessageActionGroup` | Groups action buttons. |
+| `MessageAction` | Single action; supports `asChild`. |
+| `MessageAvatar` | Avatar column; `src`, optional `fallback`, `alt`, `size`, `delayMs`. |
+
+**Root props:** On `Message`, required `from`: `"user"` \| `"assistant"`. Standard `HTMLAttributes<HTMLDivElement>` apply to the article wrapper. Default `aria-label` is `"User message"` or `"Assistant message"` unless you pass `aria-label` or `aria-labelledby`.
+
+**Props & hooks:** No exported context hook. Descendants (`MessageStack`, `MessageContent`, `MessageActions`, etc.) read `from` from internal context (fallback `assistant` if used outside `Message`). `MessageMarkdown` accepts [Streamdown](https://github.com/vercel/streamdown) props (`ComponentProps<typeof Streamdown>`): e.g. markdown via `children`, optional `components` merged over built-in `code` / `table` / `inlineCode` defaults, plus `className`. `MessageAction` supports `asChild` (Radix `Slot`). `MessageAvatar`: required `src`; optional `alt`, `fallback`, `delayMs`, `size`, `className`.
+
+**Usage notes:** Registry install adds `codeblock.tsx` next to `message.tsx`. Merge Streamdown-related CSS from the registry item when installing manually. Prefer `MessageAction asChild` around `Button` for actions.
+
+**Example:**
+
+```tsx
+<Message from="assistant">
+  <MessageAvatar src="https://github.com/shadcn.png" fallback="AI" />
+  <MessageStack>
+    <MessageContent>
+      <MessageMarkdown>Here is **markdown** and `inline code`.</MessageMarkdown>
+    </MessageContent>
+    <MessageActions>
+      <MessageActionGroup>
+        <MessageAction asChild>
+          <Button type="button" variant="ghost" size="sm">
+            Copy
+          </Button>
+        </MessageAction>
+      </MessageActionGroup>
+    </MessageActions>
+  </MessageStack>
+</Message>
+
+<Message from="user">
+  <MessageContent>
+    <MessageMarkdown>Short user reply</MessageMarkdown>
+  </MessageContent>
+</Message>
+```
+
+### Thread
+
+Wraps [`use-stick-to-bottom`](https://github.com/stackblitz/use-stick-to-bottom) for a scrollable message list that stays pinned to new content, with a floating control when the user scrolls up.
+
+**Import:**
+
+```tsx
+import {
+  Thread,
+  ThreadContent,
+  ThreadScrollToBottom,
+} from "@/components/nexus-ui/thread";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Thread` | Root; forwards `StickToBottom` props (`resize`, `initial`, spring options, etc.). |
+| `ThreadContent` | Scrollable column for messages (`flex flex-col gap-*`). |
+| `ThreadScrollToBottom` | Button (or `asChild`) shown when not at bottom; calls `scrollToBottom`. |
+
+**Root props:** `Thread` is `StickToBottom` with defaults `resize="smooth"` and `initial="smooth"`. Optional [`StickToBottomOptions`](https://github.com/stackblitz/use-stick-to-bottom): `resize`, `initial`, `mass`, `damping`, `stiffness`, `targetScrollTop`. Also `instance` (pre-created stick-to-bottom instance), `contextRef`, and normal `HTMLAttributes` on the outer div.
+
+**Props & hooks:** Inside `Thread`, use `useStickToBottomContext()` from `use-stick-to-bottom` for `isAtBottom`, `scrollToBottom`, `state`, etc. `ThreadScrollToBottom` uses that context internally and returns `null` when already at the bottom. It accepts `asChild` plus standard button HTML attributes (when not `asChild`, renders a styled `<button>`).
+
+**Usage notes:** Place `ThreadContent` and `ThreadScrollToBottom` as siblings inside `Thread`. Give `Thread` a bounded height (e.g. `h-full` / `min-h-*`) so the scroll region is defined.
+
+**Example:**
+
+```tsx
+<Thread className="min-h-[480px]">
+  <ThreadContent>
+    {messages.map((m) => (
+      <Message key={m.id} from={m.role === "user" ? "user" : "assistant"}>
+        <MessageContent>
+          <MessageMarkdown>{m.text}</MessageMarkdown>
+        </MessageContent>
+      </Message>
+    ))}
+  </ThreadContent>
+  <ThreadScrollToBottom />
+</Thread>
+```
+
+### Citation
+
+Composable inline citation chip(s) with Radix `HoverCard` preview. Multiple URLs use a carousel inside the panel (`CitationCarousel*`).
+
+**Import:**
+
+```tsx
+import {
+  Citation,
+  CitationTrigger,
+  CitationContent,
+  CitationSource,
+  CitationSourcesBadge,
+  CitationItem,
+  CitationFavicon,
+  CitationSiteName,
+  CitationCarousel,
+  CitationCarouselContent,
+  CitationCarouselHeader,
+  CitationCarouselItem,
+  CitationCarouselPrev,
+  CitationCarouselNext,
+  CitationCarouselPagination,
+  CitationCarouselIndex,
+} from "@/components/nexus-ui/citation";
+```
+
+**Helpers:** `resolveCitationSources`, `resolveCitationSource`, `parseCitationUrl`, `rootDomainSiteName`, types `CitationSourceInput`, `ResolvedCitation`.
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Citation` | Root `HoverCard`; owns resolved sources + carousel index state. |
+| `CitationTrigger` | Chip trigger; single-source renders as link, multi-source as `span` + “+N”. |
+| `CitationContent` | Hover panel surface (default `align="center"`, `sideOffset={4}`). |
+| `CitationCarousel` | Shadcn `Carousel`; wires `setApi` into citation context. |
+| `CitationCarouselContent` / `Item` | Slides; each `CitationCarouselItem` requires `index`. |
+| `CitationCarouselPrev` / `Next` / `Index` / `Pagination` / `Header` | Navigation chrome. |
+| `CitationItem` | Default preview body (title, description, `CitationSource`) or custom children; anchor to `href`. |
+| `CitationSource` | Footer row: favicon + site name. |
+| `CitationFavicon` / `CitationSiteName` | Resolve from active carousel item or `CitationItem` scope. |
+| `CitationSourcesBadge` | Stacked favicons + “N sources” (or custom `label`); for toolbars, not the hover chip. |
+
+**Root props:** On `Citation`, required `citations: CitationSourceInput[]` (`url`, optional `title`, `description`). All other props omit `children` from `HoverCard` and pass through; optional `children` compose trigger + content. Renders `null` if `citations` is empty. `openDelay` / `closeDelay` are set to `50` on the root card.
+
+**Props & hooks:** No exported hooks; `CitationItem`, `CitationFavicon`, etc. require an ancestor `Citation` and (for items inside the carousel) a matching `CitationCarouselItem` with `index`. `CitationTrigger`: optional `label`, `showFavicon` (default `true`), `showSiteName` (default `true`). `CitationCarouselItem`: required `index: number`. `CitationItem`: optional `showTitle`, `showDescription`, `showSource` (defaults `true`); `href` defaults to resolved URL. `CitationSourcesBadge`: optional `showFavicons`, `label`.
+
+**Usage notes:** Build `citations` from your RAG / search pipeline; use `resolveCitationSources` if you normalize URLs yourself. For two or more URLs, put `CitationCarousel` + one `CitationCarouselItem` per index inside `CitationContent`. `CitationSourcesBadge` is optional chrome for message headers or actions, still under `Citation`.
+
+**Example (single source):**
+
+```tsx
+<Citation
+  citations={[
+    {
+      url: "https://vercel.com/blog",
+      title: "Vercel Blog",
+      description: "Product and platform updates.",
+    },
+  ]}
+>
+  <CitationTrigger />
+  <CitationContent>
+    <CitationItem />
+  </CitationContent>
+</Citation>
+```
+
+**Example (multiple sources + carousel):**
+
+```tsx
+const sources = [
+  { url: "https://example.com/a", title: "Source A" },
+  { url: "https://example.com/b", title: "Source B" },
+];
+
+<Citation citations={sources}>
+  <CitationTrigger />
+  <CitationContent>
+    <CitationCarousel>
+      <CitationCarouselHeader>
+        <CitationSourcesBadge />
+        <CitationCarouselPagination>
+          <CitationCarouselPrev />
+          <CitationCarouselIndex />
+          <CitationCarouselNext />
+        </CitationCarouselPagination>
+      </CitationCarouselHeader>
+      <CitationCarouselContent>
+        {sources.map((_, index) => (
+          <CitationCarouselItem key={index} index={index}>
+            <CitationItem />
+          </CitationCarouselItem>
+        ))}
+      </CitationCarouselContent>
+    </CitationCarousel>
+  </CitationContent>
+</Citation>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -406,7 +624,11 @@ components/
 │   ├── prompt-input.tsx
 │   ├── model-selector.tsx
 │   ├── suggestions.tsx
-│   └── attachments.tsx
+│   ├── attachments.tsx
+│   ├── message.tsx
+│   ├── codeblock.tsx
+│   ├── thread.tsx
+│   └── citation.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -423,11 +645,14 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Suggestions:** `@radix-ui/react-presence`, `@radix-ui/react-slot`, `class-variance-authority`, shadcn `button`
 - **Model Selector:** `radix-ui` (DropdownMenu), `class-variance-authority`, `@hugeicons/react`, `@hugeicons/core-free-icons`
 - **Attachments:** `@radix-ui/react-slot`, `class-variance-authority`, `@hugeicons/react`, `@hugeicons/core-free-icons`
+- **Message:** `streamdown` + `@streamdown/*` plugins, `radix-ui`, `@radix-ui/react-slot`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `avatar`
+- **Thread:** `@radix-ui/react-slot`, `use-stick-to-bottom`, `@hugeicons/react`, `@hugeicons/core-free-icons`
+- **Citation:** `radix-ui`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `carousel`, `hover-card`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: https://nexus-ui.dev/docs/components/prompt-input · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt
