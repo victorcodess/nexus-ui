@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile, access } from "fs/promises";
 import { join } from "path";
+import { recordInstall } from "@/lib/install-tracking";
 
 const REGISTRY_BASE = process.cwd();
 const R_DIR = join(REGISTRY_BASE, "public", "r");
@@ -37,6 +38,8 @@ export async function GET(
       pathSegments[0].endsWith(".json") &&
       pathSegments[0] !== "registry.json"
     ) {
+      const componentName = pathSegments[0].replace(/\.json$/, "");
+      await recordInstall(componentName, _request);
       const content = await readFile(join(R_DIR, pathSegments[0]), "utf-8");
       return NextResponse.json(JSON.parse(content), {
         headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
