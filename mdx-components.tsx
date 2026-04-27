@@ -15,6 +15,7 @@ import ReviewContainer from "@/components/preview-container";
 import { DemoWithCode } from "@/components/demo-with-code";
 import { ComponentSource } from "@/components/component-source";
 import { Card, Cards } from "@/components/cards";
+import { Heading } from "@/components/heading";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -30,6 +31,12 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     ComponentSource,
     Card,
     Cards,
+    h1: (props) => <Heading as="h1" {...props} />,
+    h2: (props) => <Heading as="h2" {...props} />,
+    h3: (props) => <Heading as="h3" {...props} />,
+    h4: (props) => <Heading as="h4" {...props} />,
+    h5: (props) => <Heading as="h5" {...props} />,
+    h6: (props) => <Heading as="h6" {...props} />,
     CodeBlockTab,
     CodeBlockTabs,
     CodeBlockTabsList,
