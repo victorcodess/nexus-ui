@@ -10,7 +10,7 @@
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint",
-    "registry:build": "shadcn build && node scripts/strip-registry-content.mjs && node scripts/copy-registry-to-public.mjs",
+    "registry:build": "shadcn build && node scripts/copy-registry-to-public.mjs",
     "registry:sync": "node scripts/sync-registry.mjs"
   },
   "dependencies": {
