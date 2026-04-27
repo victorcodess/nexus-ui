@@ -16,7 +16,7 @@ const streamdownPlugins = { cjk, code, math, mermaid } as const;
 
 /** Typography (prose) classes for MessageMarkdown. **/
 const messageMarkdownProseClasses = [
-  "prose max-w-none text-primary font-normal text-sm leading-6",
+  "prose max-w-none text-primary font-normal text-sm leading-6.5",
   // headings
   "prose-headings:font-[450] prose-headings:leading-5.5 prose-h2:tracking-[-0.45px] prose-headings:mb-4 prose-headings:mt-6 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base prose-h3:leading-4.5 prose-h3:tracking-[-0.4px] prose-h4:text-sm prose-h5:text-xs prose-h6:text-xs",
   // heading links
@@ -73,7 +73,7 @@ function Message({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         className={cn(
-          "flex w-full max-w-[90%] items-start gap-2 group/message",
+          "group/message flex w-full max-w-[90%] items-start gap-2",
           from === "user" ? "ms-auto" : "me-auto",
           className,
         )}
@@ -96,9 +96,7 @@ function MessageStack({ className, ...props }: MessageStackProps) {
       data-slot="message-stack"
       className={cn(
         "flex w-full flex-col gap-2",
-        from === "user"
-          ? "items-end"
-          : "items-start",
+        from === "user" ? "items-end" : "items-start",
         className,
       )}
       {...props}
@@ -116,10 +114,10 @@ function MessageContent({ className, ...props }: MessageContentProps) {
     <div
       data-slot="message-content"
       className={cn(
-        "min-h-10 rounded-[20px] text-sm leading-6 text-primary",
+        "rounded-[20px] text-sm leading-6.5 text-primary",
         from === "user"
           ? "w-fit bg-muted px-4 py-2"
-          : "w-full bg-transparent px-2 mb-2",
+          : "mb-2 w-full bg-transparent px-2",
         className,
       )}
       {...props}
@@ -143,7 +141,7 @@ function MessageMarkdown({
     }: React.HTMLAttributes<HTMLElement>) => (
       <code
         className={cn(
-          "rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs border-none font-[450]",
+          "rounded-md border-none bg-muted px-1.5 py-0.5 font-mono text-xs font-[450]",
           className,
         )}
         data-slot="message-markdown-inline-code"
@@ -235,7 +233,7 @@ function MessageActionGroup({ className, ...props }: MessageActionGroupProps) {
   return (
     <div
       data-slot="message-action-group"
-      className={cn("flex gap-1 items-center", className)}
+      className={cn("flex items-center gap-1", className)}
       {...props}
     />
   );
