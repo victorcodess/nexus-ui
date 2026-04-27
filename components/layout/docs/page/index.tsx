@@ -23,7 +23,7 @@ import {
   File02Icon,
   PencilEdit02Icon,
   AiMagicIcon,
-  TextAlignLeftIcon
+  TextAlignLeftIcon,
 } from "@hugeicons/core-free-icons";
 
 interface BreadcrumbOptions extends BreadcrumbProps {
@@ -192,14 +192,21 @@ export function DocsPage({
           >
             {tocOptions.header}
             <div className="flex flex-col">
-              <h3
-                id="toc-title"
-                className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500"
-              >
-                <HugeiconsIcon icon={TextAlignLeftIcon} strokeWidth={2.0} className="size-4" />
-                <span className="text-xs leading-4">On this page</span>
-              </h3>
-              <TOCScrollArea>
+              <div className="">
+                <h3
+                  id="toc-title"
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500"
+                >
+                  <HugeiconsIcon
+                    icon={TextAlignLeftIcon}
+                    strokeWidth={2.0}
+                    className="size-4"
+                  />
+                  <span className="text-xs leading-4">On this page</span>
+                </h3>
+              </div>
+
+              <TOCScrollArea className="max-h-[50vh]">
                 {tocOptions.style === "clerk" ? (
                   <TocClerk.TOCItems />
                 ) : (
@@ -210,7 +217,7 @@ export function DocsPage({
 
             {/* <div className="mx-auto h-px w-[calc(100%-40px)] bg-gray-100 dark:bg-gray-800"></div> */}
 
-            <div className="flex flex-col gap-3 rounded-xl bg-gray-100 dark:bg-gray-800 p-4 transition-colors duration-200">
+            <div className="flex flex-col gap-3 rounded-xl bg-gray-100 p-4 transition-colors duration-200 dark:bg-gray-800">
               {markdownUrl && <CopyPageMarkdown markdownUrl={markdownUrl} />}
               {markdownUrl && (
                 <Link
