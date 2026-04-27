@@ -9,7 +9,7 @@ import { HomeDemoSection } from "@/components/home/home-demo-section";
 export default function HomePage() {
   return (
     <main className="flex h-screen w-full flex-col overflow-auto bg-transparent pt-0 lg:pt-0">
-      <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden bg-gray-950 md:border-none lg:h-[480px] rounded-b-none dark:border-b dark:border-b-gray-800">
+      <div className="relative flex h-[352px] w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-b-none bg-gray-950 md:border-none lg:h-[480px] dark:border-b dark:border-b-gray-800">
         <svg
           width="100%"
           height="100%"
@@ -81,6 +81,20 @@ export default function HomePage() {
             </Button>
           </div>
         </motion.div>
+
+        <a
+          href="https://www.producthunt.com/products/nexus-ui?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-nexus-ui"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-4 right-6 z-10 w-40"
+        >
+          <img
+            alt="Nexus UI - Beautiful, composable components for building AI apps | Product Hunt"
+            width="250"
+            height="54"
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1133349&amp;theme=neutral&amp;t=1777289219511"
+          />
+        </a>
       </div>
 
       <HomeDemoSection />

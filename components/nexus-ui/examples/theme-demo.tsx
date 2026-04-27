@@ -10,9 +10,6 @@ import SuggestionVertical from "@/components/nexus-ui/examples/suggestion/vertic
 import AttachmentsDefault from "@/components/nexus-ui/examples/attachments/default";
 import AttachmentsVariantInline from "@/components/nexus-ui/examples/attachments/variant-inline";
 import AttachmentsVariantDetailed from "@/components/nexus-ui/examples/attachments/variant-detailed";
-import ModelSelectorBasic from "@/components/nexus-ui/examples/model-selector/basic";
-import ModelSelectorDefault from "@/components/nexus-ui/examples/model-selector/default";
-import ModelSelectorWithSearch from "@/components/nexus-ui/examples/model-selector/with-search";
 import ModelSelectorTriggerVariants from "@/components/nexus-ui/examples/model-selector/trigger-variants";
 import ModelSelectorCustomTrigger from "@/components/nexus-ui/examples/model-selector/custom-trigger";
 import ModelSelectorWithSub from "@/components/nexus-ui/examples/model-selector/with-sub";
@@ -21,6 +18,7 @@ import MessageDefault from "@/components/nexus-ui/examples/message/default";
 import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avatar";
 import MessageWithActions from "@/components/nexus-ui/examples/message/with-actions";
 import { ShadcnBaseThemeMenu } from "@/components/nexus-ui/examples/shadcn-base-theme-menu";
+import CitationMultipleSources from "@/components/nexus-ui/examples/citation/multiple-sources";
 
 const GAP_PX = 40;
 /** Each column is at most this wide; grid caps at three tracks + gutters. */
@@ -90,9 +88,7 @@ const BASE_SLOTS: DemoSlot[] = [
     node: (
       <div className="flex flex-col" style={{ gap: GAP_PX }}>
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <ModelSelectorBasic />
-          <ModelSelectorDefault />
-          <ModelSelectorWithSearch />
+          <CitationMultipleSources />
         </div>
       </div>
     ),
