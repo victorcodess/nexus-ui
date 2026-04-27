@@ -129,6 +129,254 @@ function sourceUrlPartsFromMessage(message: UIMessage) {
   );
 }
 
+/** Stays the same for the pre-SDK row and the real UIMessage so the shell does not remount. */
+const PENDING_ASSISTANT_ID = "__nexus-pending-assistant__";
+
+function isPendingAssistantMessage(m: UIMessage) {
+  return m.id === PENDING_ASSISTANT_ID;
+}
+
+/**
+ * Assumes each assistant is preceded by a user. Keys that pair to one stable row
+ * through synthetic → real handoff.
+ */
+function messageRowListKey(m: UIMessage, index: number, rowList: UIMessage[]) {
+  if (m.role === "user" || m.role === "system") {
+    return m.id;
+  }
+  const prev = rowList[index - 1];
+  if (prev?.role === "user") {
+    return `${prev.id}::assistant-handoff`;
+  }
+  return m.id;
+}
+
+type MessagesProps = {
+  displayRows: UIMessage[];
+  status: ReturnType<typeof useChat>["status"];
+  copyMessage: (text: string) => void;
+  busy: boolean;
+  regenerate: ReturnType<typeof useChat>["regenerate"];
+};
+
+function Messages({
+  displayRows,
+  status,
+  copyMessage,
+  busy,
+  regenerate,
+}: MessagesProps) {
+  const pendingAssistantNoEntryColumn = (
+    <div className="relative flex min-h-7 min-w-0 flex-1 items-stretch px-2 pt-1">
+      <TypingLoader size="md" className="absolute" />
+    </div>
+  );
+
+  return (
+    <>
+      {displayRows.map((m, i) => {
+        const from = m.role === "user" ? "user" : "assistant";
+        const text = textFromMessage(m);
+        const isLast = i === displayRows.length - 1;
+        const sourceUrls = sourceUrlPartsFromMessage(m);
+        const inlineCitationSources = sourceUrls.map((source) => ({
+          url: source.url,
+          title: source.title?.trim() || source.url,
+        })) satisfies InlineCitationSource[];
+        const { markdownText, components } = getInlineCitationMarkdown(
+          text,
+          inlineCitationSources,
+        );
+
+        let mainColumn: React.ReactNode;
+        if (from === "user") {
+          mainColumn = (
+            <MessageStack>
+              <MessageContent>
+                <MessageMarkdown>{text}</MessageMarkdown>
+              </MessageContent>
+              <MessageActions className="opacity-0 transition-opacity group-hover/message:opacity-100">
+                <MessageActionGroup>
+                  <MessageAction asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                      aria-label="Edit message"
+                    >
+                      <HugeiconsIcon
+                        icon={Edit04Icon}
+                        strokeWidth={2.0}
+                        className="size-4"
+                      />
+                    </Button>
+                  </MessageAction>
+                  <MessageAction asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                      aria-label="Copy message"
+                      onClick={() => copyMessage(text)}
+                    >
+                      <HugeiconsIcon
+                        icon={Copy01Icon}
+                        strokeWidth={2.0}
+                        className="size-4"
+                      />
+                    </Button>
+                  </MessageAction>
+                </MessageActionGroup>
+              </MessageActions>
+            </MessageStack>
+          );
+        } else {
+          const assistantIsLoading =
+            text === "" &&
+            isLast &&
+            (status === "streaming" || status === "submitted");
+          if (isPendingAssistantMessage(m) || assistantIsLoading) {
+            mainColumn = pendingAssistantNoEntryColumn;
+          } else {
+            mainColumn = (
+              <motion.div
+                className="flex min-w-0 flex-1 flex-col"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  duration: 0.3,
+                  delay: 0,
+                  ease: [0.25, 0.1, 0.25, 1],
+                }}
+              >
+                <MessageStack>
+                  <MessageContent>
+                    <MessageMarkdown
+                      isAnimating={isAssistantTextStreaming(m)}
+                      components={components}
+                    >
+                      {markdownText}
+                    </MessageMarkdown>
+                  </MessageContent>
+                  {!isAssistantTextStreaming(m) && text.length > 0 ? (
+                    <MessageActions>
+                      <MessageActionGroup>
+                        <MessageAction asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                            aria-label="Copy message"
+                            onClick={() => copyMessage(text)}
+                          >
+                            <HugeiconsIcon
+                              icon={Copy01Icon}
+                              strokeWidth={2.0}
+                              className="size-4"
+                            />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                            aria-label="Good response"
+                          >
+                            <HugeiconsIcon
+                              icon={ThumbsUpIcon}
+                              strokeWidth={2.0}
+                              className="size-4"
+                            />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                            aria-label="Bad response"
+                          >
+                            <HugeiconsIcon
+                              icon={ThumbsDownIcon}
+                              strokeWidth={2.0}
+                              className="size-4"
+                            />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                            aria-label="Regenerate"
+                            disabled={busy}
+                            onClick={() => void regenerate({ messageId: m.id })}
+                          >
+                            <HugeiconsIcon
+                              icon={RepeatIcon}
+                              strokeWidth={2.0}
+                              className="size-4"
+                            />
+                          </Button>
+                        </MessageAction>
+                        <MessageAction className="ml-1">
+                          {sourceUrls.length > 0 ? (
+                            <Citation
+                              citations={sourceUrls.map((s) => ({
+                                url: s.url,
+                                title: s.title?.trim() || s.url,
+                              }))}
+                            >
+                              <CitationSourcesBadge />
+                            </Citation>
+                          ) : null}
+                        </MessageAction>
+                      </MessageActionGroup>
+                    </MessageActions>
+                  ) : null}
+                </MessageStack>
+              </motion.div>
+            );
+          }
+        }
+
+        return (
+          <motion.div
+            key={messageRowListKey(m, i, displayRows)}
+            className="w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 0.3,
+              ease: [0.25, 0.1, 0.25, 1],
+              delay: from === "assistant" ? 0.14 : 0,
+            }}
+          >
+            {from === "user" ? (
+              <Message from="user">
+                {mainColumn}
+                <MessageAvatar src={imgUser} alt="" fallback="U" />
+              </Message>
+            ) : (
+              <Message from="assistant">
+                <MessageAvatar src={imgAssistant} alt="" fallback="A" />
+                {mainColumn}
+              </Message>
+            )}
+          </motion.div>
+        );
+      })}
+    </>
+  );
+}
+
 export default function MessageDemo() {
   const copyMessage = React.useCallback((text: string) => {
     void navigator.clipboard?.writeText(text);
@@ -164,6 +412,20 @@ export default function MessageDemo() {
   const showPendingAssistantRow =
     status === "submitted" && lastMessage?.role === "user";
 
+  const displayRows: UIMessage[] = React.useMemo(() => {
+    if (showPendingAssistantRow) {
+      return [
+        ...visibleMessages,
+        {
+          id: PENDING_ASSISTANT_ID,
+          role: "assistant" as const,
+          parts: [],
+        },
+      ];
+    }
+    return visibleMessages;
+  }, [visibleMessages, showPendingAssistantRow]);
+
   const handleSubmit = React.useCallback(
     async (value: string) => {
       const trimmed = value.trim();
@@ -175,222 +437,16 @@ export default function MessageDemo() {
   );
 
   return (
-    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-10 lg:pt-20">
+    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-20">
       <Thread className="h-[75vh]">
         <ThreadContent className="mx-auto max-w-2xl pb-40">
-          {visibleMessages.map((m) => {
-            const from = m.role === "user" ? "user" : "assistant";
-            const text = textFromMessage(m);
-            const isLast = m.id === lastMessage?.id;
-            const showInlineAssistantLoader =
-              m.role === "assistant" &&
-              text === "" &&
-              isLast &&
-              status === "streaming";
-            const sourceUrls = sourceUrlPartsFromMessage(m);
-            const inlineCitationSources = sourceUrls.map((source) => ({
-              url: source.url,
-              title: source.title?.trim() || source.url,
-            })) satisfies InlineCitationSource[];
-            const { markdownText, components } = getInlineCitationMarkdown(
-              text,
-              inlineCitationSources,
-            );
-
-            return (
-              <motion.div
-                key={m.id}
-                className="w-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  duration: 0.3,
-                  ease: [0.25, 0.1, 0.25, 1],
-                  delay: from === "assistant" ? 0.14 : 0,
-                }}
-              >
-                <Message from={from}>
-                  {from === "assistant" ? (
-                    <MessageAvatar src={imgAssistant} alt="" fallback="A" />
-                  ) : null}
-                  {from === "assistant" && showInlineAssistantLoader ? (
-                    <div className="flex min-h-7 min-w-0 flex-1 items-center px-2 pt-1">
-                      <TypingLoader size="md" />
-                    </div>
-                  ) : from === "assistant" ? (
-                    <motion.div
-                      className="flex min-w-0 flex-1 flex-col"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{
-                        duration: 0.3,
-                        delay: 0,
-                        ease: [0.25, 0.1, 0.25, 1],
-                      }}
-                    >
-                      <MessageStack>
-                        <MessageContent>
-                          <MessageMarkdown
-                            isAnimating={isAssistantTextStreaming(m)}
-                            components={components}
-                          >
-                            {markdownText}
-                          </MessageMarkdown>
-                        </MessageContent>
-                        {!isAssistantTextStreaming(m) && text.length > 0 ? (
-                          <MessageActions>
-                            <MessageActionGroup>
-                              <MessageAction asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                                  aria-label="Copy message"
-                                  onClick={() => copyMessage(text)}
-                                >
-                                  <HugeiconsIcon
-                                    icon={Copy01Icon}
-                                    strokeWidth={2.0}
-                                    className="size-4"
-                                  />
-                                </Button>
-                              </MessageAction>
-                              <MessageAction asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                                  aria-label="Good response"
-                                >
-                                  <HugeiconsIcon
-                                    icon={ThumbsUpIcon}
-                                    strokeWidth={2.0}
-                                    className="size-4"
-                                  />
-                                </Button>
-                              </MessageAction>
-                              <MessageAction asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                                  aria-label="Bad response"
-                                >
-                                  <HugeiconsIcon
-                                    icon={ThumbsDownIcon}
-                                    strokeWidth={2.0}
-                                    className="size-4"
-                                  />
-                                </Button>
-                              </MessageAction>
-                              <MessageAction asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                                  aria-label="Regenerate"
-                                  disabled={busy}
-                                  onClick={() =>
-                                    void regenerate({ messageId: m.id })
-                                  }
-                                >
-                                  <HugeiconsIcon
-                                    icon={RepeatIcon}
-                                    strokeWidth={2.0}
-                                    className="size-4"
-                                  />
-                                </Button>
-                              </MessageAction>
-                              <MessageAction className="ml-1">
-                                {sourceUrls.length > 0 ? (
-                                  <Citation
-                                    citations={sourceUrls.map((s) => ({
-                                      url: s.url,
-                                      title: s.title?.trim() || s.url,
-                                    }))}
-                                  >
-                                    <CitationSourcesBadge />
-                                  </Citation>
-                                ) : null}
-                              </MessageAction>
-                            </MessageActionGroup>
-                          </MessageActions>
-                        ) : null}
-                      </MessageStack>
-                    </motion.div>
-                  ) : (
-                    <MessageStack>
-                      <MessageContent>
-                        <MessageMarkdown>{text}</MessageMarkdown>
-                      </MessageContent>
-                      <MessageActions className="opacity-0 transition-opacity group-hover/message:opacity-100">
-                        <MessageActionGroup>
-                          <MessageAction asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                              aria-label="Edit message"
-                            >
-                              <HugeiconsIcon
-                                icon={Edit04Icon}
-                                strokeWidth={2.0}
-                                className="size-4"
-                              />
-                            </Button>
-                          </MessageAction>
-                          <MessageAction asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon-sm"
-                              className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                              aria-label="Copy message"
-                              onClick={() => copyMessage(text)}
-                            >
-                              <HugeiconsIcon
-                                icon={Copy01Icon}
-                                strokeWidth={2.0}
-                                className="size-4"
-                              />
-                            </Button>
-                          </MessageAction>
-                        </MessageActionGroup>
-                      </MessageActions>
-                    </MessageStack>
-                  )}
-                  {from === "user" ? (
-                    <MessageAvatar src={imgUser} alt="" fallback="U" />
-                  ) : null}
-                </Message>
-              </motion.div>
-            );
-          })}
-          {showPendingAssistantRow ? (
-            <motion.div
-              key="assistant-pending"
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{
-                duration: 0.3,
-                ease: [0.25, 0.1, 0.25, 1],
-                delay: 0.14,
-              }}
-            >
-              <Message from="assistant">
-                <MessageAvatar src={imgAssistant} alt="" fallback="A" />
-                <div className="flex min-h-7 min-w-0 flex-1 items-center px-2 pt-1">
-                  <TypingLoader size="md" />
-                </div>
-              </Message>
-            </motion.div>
-          ) : null}
+          <Messages
+            displayRows={displayRows}
+            status={status}
+            copyMessage={copyMessage}
+            busy={busy}
+            regenerate={regenerate}
+          />
         </ThreadContent>
         <ThreadScrollToBottom className="bottom-0 z-50" />
       </Thread>
