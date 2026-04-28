@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { parse as parseDomain } from "tldts";
 
 import {
   Carousel,
@@ -17,14 +18,12 @@ import {
 } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 
-/** One source: `url` plus `title` / `description` from your pipeline. */
 export type CitationSourceInput = {
   url: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
 };
 
-/** Normalized citation for primitives (context / item scope). */
 export type ResolvedCitation = {
   url: string;
   title: React.ReactNode | null;
@@ -33,32 +32,58 @@ export type ResolvedCitation = {
   faviconSrc: string;
 };
 
+const HTTP_PROTOCOL_RE = /^https?:$/i;
+const tryParseUrl = (value: string): URL | null => {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+};
+const parseCitationUrlOrNull = (urlStr: string): URL | null => {
+  const trimmed = urlStr.trim();
+  if (!trimmed) return null;
+  try {
+    return parseCitationUrl(trimmed);
+  } catch {
+    return null;
+  }
+};
+
 export function parseCitationUrl(urlStr: string): URL {
   const trimmed = urlStr.trim();
-  try {
-    return new URL(trimmed);
-  } catch {
-    return new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+  const parsed = tryParseUrl(trimmed) ?? tryParseUrl(`https://${trimmed}`);
+  if (!parsed || !HTTP_PROTOCOL_RE.test(parsed.protocol)) {
+    throw new Error("Citation URL must use http or https");
   }
+  return parsed;
+}
+
+function formatSiteToken(token: string): string {
+  const lower = token.toLowerCase();
+  const isAlpha = /^[a-z]+$/i.test(lower);
+  if (!isAlpha) return token;
+  if (lower.length <= 3) {
+    return lower.toUpperCase();
+  }
+  return lower.slice(0, 1).toUpperCase() + lower.slice(1);
 }
 
 function titleCaseLabel(label: string): string {
   if (!label) return label;
-  const lower = label.toLowerCase();
-  return lower.slice(0, 1).toUpperCase() + lower.slice(1);
+  return label
+    .split("-")
+    .filter(Boolean)
+    .map(formatSiteToken)
+    .join(" ");
 }
 
-/**
- * Label before the last DNS segment for display, e.g. `en.wikipedia.org` → `Wikipedia`.
- * Not a full registrable-domain parse: `bbc.co.uk` → `Co` (wrong). Use a PSL library if you need that.
- */
 export function rootDomainSiteName(url: URL): string {
   const host = url.hostname.replace(/^www\./i, "").toLowerCase();
-  const segments = host.split(".").filter(Boolean);
-  if (segments.length === 0) return "";
-
-  const label =
-    segments.length >= 2 ? segments[segments.length - 2]! : segments[0]!;
+  const { domainWithoutSuffix, isIp } = parseDomain(host, {
+    allowPrivateDomains: true,
+  });
+  const label = isIp ? host : (domainWithoutSuffix ?? host.split(".")[0] ?? "");
 
   return titleCaseLabel(label);
 }
@@ -72,12 +97,14 @@ function hasCitationField(v: unknown): boolean {
 export function resolveCitationSource(
   input: CitationSourceInput,
 ): ResolvedCitation {
-  const parsed = parseCitationUrl(input.url);
-  const siteName = rootDomainSiteName(parsed);
-  const faviconSrc = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsed.hostname)}&sz=64`;
+  const parsed = parseCitationUrlOrNull(input.url);
+  const siteName = parsed ? rootDomainSiteName(parsed) : "Source";
+  const faviconSrc = parsed
+    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsed.hostname)}&sz=64`
+    : "";
 
   return {
-    url: parsed.href,
+    url: parsed?.href ?? "",
     title: hasCitationField(input.title) ? input.title! : null,
     description: hasCitationField(input.description)
       ? input.description!
@@ -254,7 +281,6 @@ export type CitationTriggerProps = Omit<
   React.ComponentProps<typeof HoverCardTrigger>,
   "children"
 > & {
-  /** Replaces the default site name text; still respects `showFavicon` / `showSiteName`. */
   label?: React.ReactNode;
   showFavicon?: boolean;
   showSiteName?: boolean;
@@ -269,6 +295,7 @@ function CitationTrigger({
 }: CitationTriggerProps) {
   const root = useCitationRoot("CitationTrigger");
   const c = root.citations[0]!;
+  const hasValidUrl = !!c.url;
 
   let text: React.ReactNode =
     label !== undefined && label !== null
@@ -311,7 +338,7 @@ function CitationTrigger({
 
   return (
     <HoverCardTrigger data-slot="citation-trigger" asChild {...props}>
-      {multipleSources ? (
+      {multipleSources || !hasValidUrl ? (
         <span className={cn(baseClassName, className)}>{chipBody}</span>
       ) : (
         <a
@@ -388,7 +415,6 @@ function CitationCarouselHeader({
   );
 }
 
-/** Horizontal flex track height = max(slides); shrink viewport to the active slide. */
 function useCarouselViewportHeight(
   wrapRef: React.RefObject<HTMLDivElement | null>,
   carouselApi: CarouselApi | null,
@@ -574,13 +600,10 @@ export type CitationSourcesBadgeProps = Omit<
   React.ComponentPropsWithoutRef<"div">,
   "children"
 > & {
-  /** Include the overlapping favicon stack. Default: true. */
   showFavicons?: boolean;
-  /** Override the trailing label; default is "{n} source(s)" from `citations`. */
   label?: React.ReactNode;
 };
 
-/** Stacked favicons + count label for headers, message actions, etc. Must be inside `Citation`. */
 function CitationSourcesBadge({
   className,
   showFavicons = true,
@@ -619,11 +642,8 @@ function CitationSourcesBadge({
 }
 
 export type CitationItemProps = React.ComponentPropsWithoutRef<"a"> & {
-  /** Include the default title (`h4`). Default: true. */
   showTitle?: boolean;
-  /** Include the default description (`p`). Default: true. */
   showDescription?: boolean;
-  /** Include the default footer row (`CitationSource`). Default: true. */
   showSource?: boolean;
 };
 
@@ -637,6 +657,9 @@ function CitationItem({
   ...props
 }: CitationItemProps) {
   const c = useResolvedCitation("CitationItem");
+  const resolvedHref = href ?? c.url;
+  const safeHref = resolvedHref ? parseCitationUrlOrNull(resolvedHref)?.href : "";
+  const hasValidUrl = !!safeHref;
   const defaultContent = (
     <>
       {showTitle && c.title != null ? (
@@ -666,9 +689,9 @@ function CitationItem({
         "flex w-full flex-col gap-1 p-3 text-start no-underline outline-none",
         className,
       )}
-      href={href ?? c.url}
-      target="_blank"
-      rel="noreferrer"
+      href={hasValidUrl ? safeHref : undefined}
+      target={hasValidUrl ? "_blank" : undefined}
+      rel={hasValidUrl ? "noreferrer" : undefined}
       {...props}
     >
       {children ?? defaultContent}

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { parse as parseDomain } from "tldts";
 
 import {
   Carousel,
@@ -17,14 +18,12 @@ import {
 } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 
-/** One source: `url` plus `title` / `description` from your pipeline. */
 export type CitationSourceInput = {
   url: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
 };
 
-/** Normalized citation for primitives (context / item scope). */
 export type ResolvedCitation = {
   url: string;
   title: React.ReactNode | null;
@@ -60,23 +59,31 @@ export function parseCitationUrl(urlStr: string): URL {
   return parsed;
 }
 
-function titleCaseLabel(label: string): string {
-  if (!label) return label;
-  const lower = label.toLowerCase();
+function formatSiteToken(token: string): string {
+  const lower = token.toLowerCase();
+  const isAlpha = /^[a-z]+$/i.test(lower);
+  if (!isAlpha) return token;
+  if (lower.length <= 3) {
+    return lower.toUpperCase();
+  }
   return lower.slice(0, 1).toUpperCase() + lower.slice(1);
 }
 
-/**
- * Label before the last DNS segment for display, e.g. `en.wikipedia.org` → `Wikipedia`.
- * Not a full registrable-domain parse: `bbc.co.uk` → `Co` (wrong). Use a PSL library if you need that.
- */
+function titleCaseLabel(label: string): string {
+  if (!label) return label;
+  return label
+    .split("-")
+    .filter(Boolean)
+    .map(formatSiteToken)
+    .join(" ");
+}
+
 export function rootDomainSiteName(url: URL): string {
   const host = url.hostname.replace(/^www\./i, "").toLowerCase();
-  const segments = host.split(".").filter(Boolean);
-  if (segments.length === 0) return "";
-
-  const label =
-    segments.length >= 2 ? segments[segments.length - 2]! : segments[0]!;
+  const { domainWithoutSuffix, isIp } = parseDomain(host, {
+    allowPrivateDomains: true,
+  });
+  const label = isIp ? host : (domainWithoutSuffix ?? host.split(".")[0] ?? "");
 
   return titleCaseLabel(label);
 }
@@ -274,7 +281,6 @@ export type CitationTriggerProps = Omit<
   React.ComponentProps<typeof HoverCardTrigger>,
   "children"
 > & {
-  /** Replaces the default site name text; still respects `showFavicon` / `showSiteName`. */
   label?: React.ReactNode;
   showFavicon?: boolean;
   showSiteName?: boolean;
@@ -409,7 +415,6 @@ function CitationCarouselHeader({
   );
 }
 
-/** Horizontal flex track height = max(slides); shrink viewport to the active slide. */
 function useCarouselViewportHeight(
   wrapRef: React.RefObject<HTMLDivElement | null>,
   carouselApi: CarouselApi | null,
@@ -595,13 +600,10 @@ export type CitationSourcesBadgeProps = Omit<
   React.ComponentPropsWithoutRef<"div">,
   "children"
 > & {
-  /** Include the overlapping favicon stack. Default: true. */
   showFavicons?: boolean;
-  /** Override the trailing label; default is "{n} source(s)" from `citations`. */
   label?: React.ReactNode;
 };
 
-/** Stacked favicons + count label for headers, message actions, etc. Must be inside `Citation`. */
 function CitationSourcesBadge({
   className,
   showFavicons = true,
@@ -640,11 +642,8 @@ function CitationSourcesBadge({
 }
 
 export type CitationItemProps = React.ComponentPropsWithoutRef<"a"> & {
-  /** Include the default title (`h4`). Default: true. */
   showTitle?: boolean;
-  /** Include the default description (`p`). Default: true. */
   showDescription?: boolean;
-  /** Include the default footer row (`CitationSource`). Default: true. */
   showSource?: boolean;
 };
 

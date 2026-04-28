@@ -177,7 +177,8 @@
       "dependencies": [
         "radix-ui",
         "@hugeicons/react",
-        "@hugeicons/core-free-icons"
+        "@hugeicons/core-free-icons",
+        "tldts"
       ],
       "registryDependencies": [
         "@nexus-ui/nexus-ui-theme",
