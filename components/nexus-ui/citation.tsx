@@ -33,13 +33,31 @@ export type ResolvedCitation = {
   faviconSrc: string;
 };
 
+const HTTP_PROTOCOL_RE = /^https?:$/i;
+const tryParseUrl = (value: string): URL | null => {
+  try {
+    return new URL(value);
+  } catch {
+    return null;
+  }
+};
+const parseCitationUrlOrNull = (urlStr: string): URL | null => {
+  const trimmed = urlStr.trim();
+  if (!trimmed) return null;
+  try {
+    return parseCitationUrl(trimmed);
+  } catch {
+    return null;
+  }
+};
+
 export function parseCitationUrl(urlStr: string): URL {
   const trimmed = urlStr.trim();
-  try {
-    return new URL(trimmed);
-  } catch {
-    return new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+  const parsed = tryParseUrl(trimmed) ?? tryParseUrl(`https://${trimmed}`);
+  if (!parsed || !HTTP_PROTOCOL_RE.test(parsed.protocol)) {
+    throw new Error("Citation URL must use http or https");
   }
+  return parsed;
 }
 
 function titleCaseLabel(label: string): string {
@@ -72,12 +90,14 @@ function hasCitationField(v: unknown): boolean {
 export function resolveCitationSource(
   input: CitationSourceInput,
 ): ResolvedCitation {
-  const parsed = parseCitationUrl(input.url);
-  const siteName = rootDomainSiteName(parsed);
-  const faviconSrc = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsed.hostname)}&sz=64`;
+  const parsed = parseCitationUrlOrNull(input.url);
+  const siteName = parsed ? rootDomainSiteName(parsed) : "Source";
+  const faviconSrc = parsed
+    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsed.hostname)}&sz=64`
+    : "";
 
   return {
-    url: parsed.href,
+    url: parsed?.href ?? "",
     title: hasCitationField(input.title) ? input.title! : null,
     description: hasCitationField(input.description)
       ? input.description!
@@ -269,6 +289,7 @@ function CitationTrigger({
 }: CitationTriggerProps) {
   const root = useCitationRoot("CitationTrigger");
   const c = root.citations[0]!;
+  const hasValidUrl = !!c.url;
 
   let text: React.ReactNode =
     label !== undefined && label !== null
@@ -311,7 +332,7 @@ function CitationTrigger({
 
   return (
     <HoverCardTrigger data-slot="citation-trigger" asChild {...props}>
-      {multipleSources ? (
+      {multipleSources || !hasValidUrl ? (
         <span className={cn(baseClassName, className)}>{chipBody}</span>
       ) : (
         <a
@@ -637,6 +658,9 @@ function CitationItem({
   ...props
 }: CitationItemProps) {
   const c = useResolvedCitation("CitationItem");
+  const resolvedHref = href ?? c.url;
+  const safeHref = resolvedHref ? parseCitationUrlOrNull(resolvedHref)?.href : "";
+  const hasValidUrl = !!safeHref;
   const defaultContent = (
     <>
       {showTitle && c.title != null ? (
@@ -666,9 +690,9 @@ function CitationItem({
         "flex w-full flex-col gap-1 p-3 text-start no-underline outline-none",
         className,
       )}
-      href={href ?? c.url}
-      target="_blank"
-      rel="noreferrer"
+      href={hasValidUrl ? safeHref : undefined}
+      target={hasValidUrl ? "_blank" : undefined}
+      rel={hasValidUrl ? "noreferrer" : undefined}
       {...props}
     >
       {children ?? defaultContent}
