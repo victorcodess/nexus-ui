@@ -120,7 +120,7 @@ export async function generateMetadata(
       canonical: pageUrl,
     },
     other: {
-      llms: `${SITE_URL}/llms.mdx/docs/${page.slugs.join("/")}`,
+      llms: `${SITE_URL}/llms.txt`,
     },
   };
 }

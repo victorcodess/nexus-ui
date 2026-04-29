@@ -178,6 +178,12 @@ export function DocsPage({
           className,
         )}
       >
+        <p className="sr-only text-xs text-gray-500 dark:text-gray-400">
+          LLM index:{" "}
+          <Link href="/llms.txt" className="underline underline-offset-2">
+            /llms.txt
+          </Link>
+        </p>
         {breadcrumbEnabled &&
           (breadcrumb ?? <PageBreadcrumb {...breadcrumbProps} />)}
         {children}
