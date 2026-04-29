@@ -28,3 +28,5 @@ next-env.d.ts
 .agents
 .claude
 skills-lock.json
+
+INSTALL_TRACKING.md
