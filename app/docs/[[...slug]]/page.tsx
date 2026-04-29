@@ -119,5 +119,8 @@ export async function generateMetadata(
     alternates: {
       canonical: pageUrl,
     },
+    other: {
+      llms: `${SITE_URL}/llms.mdx/docs/${page.slugs.join("/")}`,
+    },
   };
 }

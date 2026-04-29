@@ -17,15 +17,33 @@ const config = {
           source: '/r/:path*',
           destination: '/api/registry/:path*',
         },
+        {
+          source: '/docs',
+          has: [
+            { type: 'header', key: 'accept', value: '(.*)text/markdown(.*)' },
+          ],
+          destination: '/llms.mdx/docs',
+        },
+        {
+          source: '/docs/:path*',
+          has: [
+            { type: 'header', key: 'accept', value: '(.*)text/markdown(.*)' },
+          ],
+          destination: '/llms.mdx/docs/:path*',
+        },
       ],
       afterFiles: [
+        {
+          source: '/docs.md',
+          destination: '/llms.mdx/docs',
+        },
         {
           source: '/docs/:path*.mdx',
           destination: '/llms.mdx/docs/:path*',
         },
         {
           source: '/docs/:path*.md',
-          destination: '/raw/docs/:path*',
+          destination: '/llms.mdx/docs/:path*',
         },
       ],
     };
