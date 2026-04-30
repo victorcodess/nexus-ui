@@ -46,9 +46,6 @@ bunx shadcn@latest add @nexus-ui/reasoning
 <ComponentSource src="registry/new-york/reasoning/reasoning.tsx" title="components/nexus-ui/reasoning.tsx" />
 </Step>
 <Step>
-<h3>Install dependencies: <code>streamdown</code>, <code>@hugeicons/react</code>, <code>@hugeicons/core-free-icons</code>, and shadcn <code>collapsible</code> (or use the CLI so they install automatically).</h3>
-</Step>
-<Step>
 <h3>Update import paths to match your project setup.</h3>
 </Step>
 </Steps>
@@ -74,7 +71,9 @@ import {
 
 ## Vercel AI SDK Integration
 
-Use `Reasoning` with [Vercel AI SDK](https://sdk.vercel.ai) by collecting `reasoning` message parts from assistant turns and mapping them to:
+Some models emit structured reasoning parts in the AI SDK response stream. In practice, models like **DeepSeek R1** and **Claude** can return reasoning content that you can render with `Reasoning`.
+
+Use `Reasoning` with [Vercel AI SDK](https://sdk.vercel.ai) by mapping assistant `reasoning` parts to:
 
 - `isStreaming`: true while reasoning parts are still streaming
 - `ReasoningContent` children: merged reasoning text
@@ -84,25 +83,36 @@ Use `Reasoning` with [Vercel AI SDK](https://sdk.vercel.ai) by collecting `reaso
 <h3>Install the AI SDK</h3>
 
 ```bash
-npm install ai @ai-sdk/react @ai-sdk/openai
+npm install ai @ai-sdk/react
 ```
 
 </Step>
 <Step>
 <h3>Create your chat API route</h3>
 
-`sendReasoning` is enabled by default in `toUIMessageStreamResponse`, but this example keeps it explicit.
+This mirrors the docs demo route: use Claude via the AI Gateway id and enable Anthropic thinking so reasoning parts are returned.
 
 ```ts title="app/api/chat/route.ts"
-import { convertToModelMessages, streamText, UIMessage } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { streamText, smoothStream, UIMessage, convertToModelMessages } from "ai";
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const {
+    messages,
+    model,
+  }: { messages: UIMessage[]; model?: string } = await req.json();
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: "anthropic/claude-sonnet-4.5",
     messages: await convertToModelMessages(messages),
+    experimental_transform: smoothStream({
+      chunking: "word",
+      delayInMs: 18,
+    }),
+    providerOptions: {
+      anthropic: {
+        thinking: { type: "enabled", budgetTokens: 1024 },
+      },
+    },
   });
 
   return result.toUIMessageStreamResponse({
@@ -113,7 +123,7 @@ export async function POST(req: Request) {
 
 </Step>
 <Step>
-<h3>Render assistant reasoning parts with <code>Reasoning</code></h3>
+<h3>Render assistant reasoning parts with <code className="tracking-[0px]!">Reasoning</code></h3>
 
 ```tsx
 "use client";
@@ -160,7 +170,6 @@ export default function ReasoningWithUseChat() {
   );
 }
 ```
-
 </Step>
 </Steps>
 
@@ -168,7 +177,7 @@ export default function ReasoningWithUseChat() {
 
 ### Reasoning
 
-Root component. Manages streaming timing, open state behavior, and label context for children.
+Root component. Manages streaming timing, open state behavior, and label context for children. Wraps [Collapsible](https://www.radix-ui.com/primitives/docs/components/collapsible#root).
 
 <TypeTable
   type={{
@@ -202,7 +211,7 @@ Root component. Manages streaming timing, open state behavior, and label context
 
 ### ReasoningTrigger
 
-Trigger row with built-in brain icon, label text, and rotating chevron. If `children` is provided, it replaces the default label text.
+Trigger row with built-in brain icon, label text, and rotating chevron. If `children` is provided, it replaces the default label text. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger).
 
 <TypeTable
   type={{
@@ -221,7 +230,7 @@ Trigger row with built-in brain icon, label text, and rotating chevron. If `chil
 
 ### ReasoningContent
 
-Collapsible content wrapper with enter/exit animation and markdown rendering via `Streamdown`.
+Collapsible content wrapper with enter/exit animation and markdown rendering via [Streamdown](https://streamdown.ai/). Wraps [Collapsible Content](https://www.radix-ui.com/primitives/docs/components/collapsible#content).
 
 <TypeTable
   type={{
