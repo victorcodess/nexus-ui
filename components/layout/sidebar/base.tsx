@@ -27,7 +27,7 @@ import {
   type CollapsibleContentProps,
   CollapsibleTrigger,
   type CollapsibleTriggerProps,
-} from "../../ui/collapsible";
+} from "../../fd/collapsible";
 import { useMediaQuery } from "fumadocs-core/utils/use-media-query";
 import { Presence } from "@radix-ui/react-presence";
 import scrollIntoView from "scroll-into-view-if-needed";

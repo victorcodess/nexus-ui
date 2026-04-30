@@ -26,7 +26,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../../../ui/collapsible";
+} from "../../../fd/collapsible";
 import { useTOCItems } from "../../../toc";
 import { useActiveAnchor } from "fumadocs-core/toc";
 import { LayoutContext } from "../client";
@@ -122,7 +122,7 @@ export function PageTOCPopoverTrigger({
   return (
     <CollapsibleTrigger
       className={cn(
-        "flex h-10 w-full items-center gap-2.0 px-4 py-2.0 text-start text-sm text-fd-muted-foreground focus-visible:outline-none md:px-6 [&_svg]:size-4",
+        "gap-2.0 py-2.0 flex h-10 w-full items-center px-4 text-start text-sm text-fd-muted-foreground focus-visible:outline-none md:px-6 [&_svg]:size-4",
         className,
       )}
       data-toc-popover-trigger=""
@@ -133,7 +133,7 @@ export function PageTOCPopoverTrigger({
         max={1}
         className={cn("shrink-0", open && "text-fd-primary")}
       />
-      <span className="grid flex-1 *:col-start-1 *:row-start-1 *:my-auto pl-2">
+      <span className="grid flex-1 pl-2 *:col-start-1 *:row-start-1 *:my-auto">
         <span
           className={cn(
             "truncate transition-[opacity,translate,color]",
@@ -324,7 +324,11 @@ function FooterItem({ item, index }: { item: Item; index: 0 | 1 }) {
           index === 1 && "flex-row-reverse",
         )}
       >
-        <HugeiconsIcon icon={Icon} strokeWidth={2.0} className="-mx-1 size-4 shrink-0 rtl:rotate-180" />
+        <HugeiconsIcon
+          icon={Icon}
+          strokeWidth={2.0}
+          className="-mx-1 size-4 shrink-0 rtl:rotate-180"
+        />
         <p>{item.name}</p>
       </div>
     </Link>
@@ -410,7 +414,13 @@ export function PageBreadcrumb({
 
         return (
           <Fragment key={i}>
-            {i !== 0 && <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2.0} className="size-3.5 shrink-0" />}
+            {i !== 0 && (
+              <HugeiconsIcon
+                icon={ArrowRight01Icon}
+                strokeWidth={2.0}
+                className="size-3.5 shrink-0"
+              />
+            )}
             {item.url ? (
               <Link
                 href={item.url}

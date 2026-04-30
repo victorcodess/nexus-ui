@@ -15,7 +15,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "./ui/collapsible";
+} from "./fd/collapsible";
 
 export interface ParameterNode {
   name: string;
@@ -129,7 +129,7 @@ function Item({
         open && "bg-gray-50 dark:bg-gray-950",
       )}
     >
-      <CollapsibleTrigger className="group not-prose relative flex w-full flex-row items-center px-6 py-3.5 text-start hover:bg-gray-200/50 dark:hover:bg-gray-800/50 data-[state=open]:bg-gray-50 dark:data-[state=open]:bg-gray-800">
+      <CollapsibleTrigger className="group not-prose relative flex w-full flex-row items-center px-6 py-3.5 text-start hover:bg-gray-200/50 data-[state=open]:bg-gray-50 dark:hover:bg-gray-800/50 dark:data-[state=open]:bg-gray-800">
         <code
           className={cn(
             "w-1/4 min-w-fit pe-2 font-mono font-medium text-gray-900 dark:text-gray-400",
@@ -144,9 +144,15 @@ function Item({
             {type}
           </Link>
         ) : (
-          <span className="@max-xl:hidden text-gray-900 dark:text-gray-400">{type}</span>
+          <span className="text-gray-900 @max-xl:hidden dark:text-gray-400">
+            {type}
+          </span>
         )}
-        <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2.0} className="absolute end-2 size-4 text-gray-400 transition-transform group-data-[state=open]:rotate-180 dark:text-gray-500" />
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          strokeWidth={2.0}
+          className="absolute end-2 size-4 text-gray-400 transition-transform group-data-[state=open]:rotate-180 dark:text-gray-500"
+        />
       </CollapsibleTrigger>
       <CollapsibleContent className="bg-gray-50 dark:bg-gray-800">
         <div className="fd-scroll-container grid grid-cols-[1fr_3fr] gap-y-4 overflow-auto border-t px-6 py-3 text-sm">
@@ -162,7 +168,9 @@ function Item({
           {defaultValue && (
             <>
               <p className={cn(fieldVariants())}>Default</p>
-              <p className="not-prose my-auto text-gray-900 dark:text-gray-300">{defaultValue}</p>
+              <p className="not-prose my-auto text-gray-900 dark:text-gray-300">
+                {defaultValue}
+              </p>
             </>
           )}
           {parameters.length > 0 && (
