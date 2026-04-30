@@ -47,12 +47,38 @@ bunx shadcn@latest add @nexus-ui/suggestions
 <Tab value="Manual">
 <Steps>
 <Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/nexus-ui-theme button && npm install @radix-ui/react-presence @radix-ui/react-slot class-variance-authority
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/nexus-ui-theme button && pnpm add @radix-ui/react-presence @radix-ui/react-slot class-variance-authority
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/nexus-ui-theme button && yarn add @radix-ui/react-presence @radix-ui/react-slot class-variance-authority
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/nexus-ui-theme button && bun add @radix-ui/react-presence @radix-ui/react-slot class-variance-authority
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
 <h3>Copy and paste the following code into your project.</h3>
 
 <ComponentSource src="registry/new-york/suggestions/suggestions.tsx" title="components/nexus-ui/suggestions.tsx" />
 </Step>
 <Step>
-<h3>Update the import paths to match your project setup.</h3>
+<h3>Update import paths to match your project setup.</h3>
 </Step>
 </Steps>
 </Tab>

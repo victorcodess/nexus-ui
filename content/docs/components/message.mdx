@@ -46,6 +46,32 @@ bunx shadcn@latest add @nexus-ui/message
 <Tab value="Manual">
 <Steps>
 <Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add button avatar && npm install streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add button avatar && pnpm add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add button avatar && yarn add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add button avatar && bun add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
 <h3>Copy and paste the following code into your project.</h3>
 
 <ComponentSource src="registry/new-york/message/message.tsx" title="components/nexus-ui/message.tsx" />
@@ -53,7 +79,7 @@ bunx shadcn@latest add @nexus-ui/message
 <ComponentSource src="registry/new-york/message/codeblock.tsx" title="components/nexus-ui/codeblock.tsx" />
 </Step>
 <Step>
-<h3>Update the import paths to match your project setup.</h3>
+<h3>Update import paths to match your project setup.</h3>
 </Step>
 </Steps>
 </Tab>
