@@ -259,135 +259,129 @@ function Messages({
             !hasReasoning &&
             isLast &&
             (status === "streaming" || status === "submitted");
-          if (isPendingAssistantMessage(m) || assistantIsLoading) {
-            mainColumn = (
-              <MessageStack className="min-w-0 flex-1">
-                <Reasoning isStreaming className="ml-2 mb-1">
-                  <ReasoningTrigger>Thinking...</ReasoningTrigger>
-                </Reasoning>
-              </MessageStack>
-            );
-          } else {
-            const showAssistantResponse =
-              !reasoningIsStreaming && text.length > 0;
-            mainColumn = (
-              <motion.div
-                className="flex min-w-0 flex-1 flex-col"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  duration: 0.3,
-                  delay: 0,
-                  ease: [0.25, 0.1, 0.25, 1],
-                }}
-              >
-                <MessageStack>
-                  {hasReasoning ? (
-                    <Reasoning
-                      isStreaming={reasoningIsStreaming}
-                      className="ml-2 mb-1"
+          const assistantIsPending =
+            isPendingAssistantMessage(m) || assistantIsLoading;
+          const showReasoning = assistantIsPending || hasReasoning;
+          const showAssistantResponse =
+            !assistantIsPending && !reasoningIsStreaming && text.length > 0;
+
+          mainColumn = (
+            <motion.div
+              className="flex min-w-0 flex-1 flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                duration: 0.3,
+                delay: 0,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+            >
+              <MessageStack>
+                {showReasoning ? (
+                  <Reasoning
+                    isStreaming={assistantIsPending || reasoningIsStreaming}
+                    className="ml-2 mb-1"
+                  >
+                    <ReasoningTrigger />
+                    <ReasoningContent>{reasoningText}</ReasoningContent>
+                  </Reasoning>
+                ) : null}
+                {showAssistantResponse ? (
+                  <MessageContent>
+                    <MessageMarkdown
+                      isAnimating={isAssistantTextStreaming(m)}
+                      components={components}
                     >
-                      <ReasoningTrigger />
-                      <ReasoningContent>{reasoningText}</ReasoningContent>
-                    </Reasoning>
-                  ) : null}
-                  {showAssistantResponse ? (
-                    <MessageContent>
-                      <MessageMarkdown
-                        isAnimating={isAssistantTextStreaming(m)}
-                        components={components}
-                      >
-                        {markdownText}
-                      </MessageMarkdown>
-                    </MessageContent>
-                  ) : null}
-                  {showAssistantResponse &&
-                  !isAssistantTextStreaming(m) &&
-                  text.length > 0 ? (
-                    <MessageActions>
-                      <MessageActionGroup>
-                        <MessageAction asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                            aria-label="Copy message"
-                            onClick={() => copyMessage(text)}
+                      {markdownText}
+                    </MessageMarkdown>
+                  </MessageContent>
+                ) : null}
+                {showAssistantResponse &&
+                !isAssistantTextStreaming(m) &&
+                text.length > 0 ? (
+                  <MessageActions>
+                    <MessageActionGroup>
+                      <MessageAction asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                          aria-label="Copy message"
+                          onClick={() => copyMessage(text)}
+                        >
+                          <HugeiconsIcon
+                            icon={Copy01Icon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                          aria-label="Good response"
+                        >
+                          <HugeiconsIcon
+                            icon={ThumbsUpIcon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                          aria-label="Bad response"
+                        >
+                          <HugeiconsIcon
+                            icon={ThumbsDownIcon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
+                          aria-label="Regenerate"
+                          disabled={busy}
+                          onClick={() => void regenerate({ messageId: m.id })}
+                        >
+                          <HugeiconsIcon
+                            icon={RepeatIcon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </MessageAction>
+                      <MessageAction className="ml-1">
+                        {sourceUrls.length > 0 ? (
+                          <Citation
+                            citations={sourceUrls.map((s) => ({
+                              url: s.url,
+                              title: s.title?.trim() || s.url,
+                            }))}
                           >
-                            <HugeiconsIcon
-                              icon={Copy01Icon}
-                              strokeWidth={2.0}
-                              className="size-4"
-                            />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                            aria-label="Good response"
-                          >
-                            <HugeiconsIcon
-                              icon={ThumbsUpIcon}
-                              strokeWidth={2.0}
-                              className="size-4"
-                            />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                            aria-label="Bad response"
-                          >
-                            <HugeiconsIcon
-                              icon={ThumbsDownIcon}
-                              strokeWidth={2.0}
-                              className="size-4"
-                            />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
-                            aria-label="Regenerate"
-                            disabled={busy}
-                            onClick={() => void regenerate({ messageId: m.id })}
-                          >
-                            <HugeiconsIcon
-                              icon={RepeatIcon}
-                              strokeWidth={2.0}
-                              className="size-4"
-                            />
-                          </Button>
-                        </MessageAction>
-                        <MessageAction className="ml-1">
-                          {sourceUrls.length > 0 ? (
-                            <Citation
-                              citations={sourceUrls.map((s) => ({
-                                url: s.url,
-                                title: s.title?.trim() || s.url,
-                              }))}
-                            >
-                              <CitationSourcesBadge />
-                            </Citation>
-                          ) : null}
-                        </MessageAction>
-                      </MessageActionGroup>
-                    </MessageActions>
-                  ) : null}
-                </MessageStack>
-              </motion.div>
-            );
-          }
+                            <CitationSourcesBadge />
+                          </Citation>
+                        ) : null}
+                      </MessageAction>
+                    </MessageActionGroup>
+                  </MessageActions>
+                ) : null}
+              </MessageStack>
+            </motion.div>
+          );
         }
 
         return (

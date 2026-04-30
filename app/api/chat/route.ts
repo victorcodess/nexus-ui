@@ -1,4 +1,9 @@
-import { streamText, UIMessage, convertToModelMessages } from "ai";
+import {
+  streamText,
+  smoothStream,
+  UIMessage,
+  convertToModelMessages,
+} from "ai";
 import { perplexity as perplexityModel } from "@ai-sdk/perplexity";
 
 const PERPLEXITY_MODEL_IDS = [
@@ -36,11 +41,16 @@ export async function POST(req: Request) {
   const languageModel = usePerplexity
     ? perplexityModel(model)
     : (model ?? DEFAULT_GATEWAY_MODEL);
-  const useAnthropicReasoning = !usePerplexity && isAnthropicGatewayModelId(model);
+  const useAnthropicReasoning =
+    !usePerplexity && isAnthropicGatewayModelId(model);
 
   const result = streamText({
     model: languageModel,
     messages: await convertToModelMessages(messages),
+    experimental_transform: smoothStream({
+      chunking: "word",
+      delayInMs: 18,
+    }),
     providerOptions: useAnthropicReasoning
       ? {
           anthropic: {
