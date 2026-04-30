@@ -404,3 +404,29 @@ code .line {
     opacity: 1;
   }
 }
+
+@keyframes reasoning-expand {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes reasoning-collapse {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-collapsible-down {
+  animation: reasoning-expand 0.2s ease-out;
+}
+
+@utility animate-collapsible-up {
+  animation: reasoning-collapse 0.2s ease-out;
+}

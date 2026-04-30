@@ -179,7 +179,7 @@ function ReasoningContent({
     <CollapsibleContent
       data-slot="reasoning-content"
       className={cn(
-        "mt-2 ml-2 overflow-hidden border-l pl-3 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1",
+        "mt-2 ml-2 overflow-hidden border-l pl-3 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
         className,
       )}
       {...props}
