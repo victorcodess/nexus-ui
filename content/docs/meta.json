@@ -11,6 +11,7 @@
     "components/message",
     "components/model-selector",
     "components/prompt-input",
+    "components/reasoning",
     "components/suggestions",
     "components/thread"
   ]
