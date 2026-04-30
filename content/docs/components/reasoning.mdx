@@ -1,13 +1,239 @@
 ---
 title: Reasoning
-description: Expandable display for model reasoning steps
-
+description: Collapsible AI reasoning block with streaming-aware labels and markdown content
 ---
 
 import ReasoningDefault from "@/components/nexus-ui/examples/reasoning/default";
 
-Expandable display for model reasoning steps.
+Collapsible reasoning UI for assistant "thinking" traces. The root tracks streaming state to update the trigger label (`Thinking...` -> `Thought for N seconds`) and auto-opens/closes content while reasoning streams.
 
-<DemoWithCode src="components/nexus-ui/examples/reasoning/default.tsx" previewClassName="">
+<DemoWithCode src="components/nexus-ui/examples/reasoning/default.tsx">
   <ReasoningDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/reasoning
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/reasoning
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/reasoning
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/reasoning
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/reasoning/reasoning.tsx" title="components/nexus-ui/reasoning.tsx" />
+</Step>
+<Step>
+<h3>Install dependencies: <code>streamdown</code>, <code>@hugeicons/react</code>, <code>@hugeicons/core-free-icons</code>, and shadcn <code>collapsible</code> (or use the CLI so they install automatically).</h3>
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Reasoning,
+  ReasoningTrigger,
+  ReasoningContent,
+} from "@/components/nexus-ui/reasoning";
+```
+
+```tsx keepBackground noCollapse
+<Reasoning isStreaming={isReasoningStreaming}>
+  <ReasoningTrigger />
+  <ReasoningContent>{reasoningMarkdown}</ReasoningContent>
+</Reasoning>
+```
+
+## Vercel AI SDK Integration
+
+Use `Reasoning` with [Vercel AI SDK](https://sdk.vercel.ai) by collecting `reasoning` message parts from assistant turns and mapping them to:
+
+- `isStreaming`: true while reasoning parts are still streaming
+- `ReasoningContent` children: merged reasoning text
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+
+</Step>
+<Step>
+<h3>Create your chat API route</h3>
+
+`sendReasoning` is enabled by default in `toUIMessageStreamResponse`, but this example keeps it explicit.
+
+```ts title="app/api/chat/route.ts"
+import { convertToModelMessages, streamText, UIMessage } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: openai("gpt-4o"),
+    messages: await convertToModelMessages(messages),
+  });
+
+  return result.toUIMessageStreamResponse({
+    sendReasoning: true,
+  });
+}
+```
+
+</Step>
+<Step>
+<h3>Render assistant reasoning parts with <code>Reasoning</code></h3>
+
+```tsx
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, isReasoningUIPart, type UIMessage } from "ai";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/nexus-ui/reasoning";
+
+function reasoningPartsFromMessage(message: UIMessage) {
+  return message.parts.filter(isReasoningUIPart);
+}
+
+function reasoningTextFromMessage(message: UIMessage) {
+  return reasoningPartsFromMessage(message).map((p) => p.text).join("");
+}
+
+function reasoningStreamingFromMessage(message: UIMessage) {
+  const parts = reasoningPartsFromMessage(message);
+  return parts.some((p) => p.state === "streaming");
+}
+
+export default function ReasoningWithUseChat() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant) return null;
+
+  const reasoningText = reasoningTextFromMessage(assistant);
+  const isReasoningStreaming = reasoningStreamingFromMessage(assistant);
+
+  if (!reasoningText.trim()) return null;
+
+  return (
+    <Reasoning isStreaming={isReasoningStreaming}>
+      <ReasoningTrigger />
+      <ReasoningContent>{reasoningText}</ReasoningContent>
+    </Reasoning>
+  );
+}
+```
+
+</Step>
+</Steps>
+
+## API Reference
+
+### Reasoning
+
+Root component. Manages streaming timing, open state behavior, and label context for children.
+
+<TypeTable
+  type={{
+    isStreaming: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Controls reasoning stream lifecycle. Drives timing, auto-open/close behavior, and trigger label updates.",
+    },
+    open: {
+      type: "boolean",
+      description:
+        "Controlled open state for the collapsible content. Works with onOpenChange.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      default: "false",
+      description: "Initial open state in uncontrolled mode.",
+    },
+    onOpenChange: {
+      type: "(open: boolean) => void",
+      description:
+        "Called when open state changes (manual toggle or internal stream-driven open/close).",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes for the root collapsible wrapper.",
+    },
+  }}
+/>
+
+### ReasoningTrigger
+
+Trigger row with built-in brain icon, label text, and rotating chevron. If `children` is provided, it replaces the default label text.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Optional custom trigger label. When omitted, uses context label derived from streaming state.",
+    },
+    className: {
+      type: "string",
+      description:
+        "Additional classes merged with the default trigger styling.",
+    },
+  }}
+/>
+
+### ReasoningContent
+
+Collapsible content wrapper with enter/exit animation and markdown rendering via `Streamdown`.
+
+<TypeTable
+  type={{
+    children: {
+      type: "string",
+      description:
+        "Markdown text to render. This component expects a string and passes it to Streamdown.",
+    },
+    className: {
+      type: "string",
+      description:
+        "Additional classes merged with the default content container styles.",
+    },
+  }}
+/>
