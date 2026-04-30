@@ -15,13 +15,13 @@ const SOURCES = [
       "Africa is the second-largest continent in the world by area and population. Algeria has been the largest country in Africa and the Arab world since the division ...Read more",
   },
   {
-    url: "https://nexus-ui.dev/",
+    url: "https://www.worldometers.info/population/countries-in-africa-by-population/",
     title: "African Countries by Population (2026)",
     description:
       "List of countries (or dependencies) in Africa ranked by population, from the most populated. Growth rate, median age, fertility rate, area, density, population density, urbanization, urban population, share of world population.",
   },
   {
-    url: "news.bbc.co.uk",
+    url: "https://developer.mozilla.org/en-US/docs/Web/CSS/flex",
     title: "flex",
     description:
       "The flex CSS shorthand property sets how a flex item will grow or shrink to fit the space available in its flex container.",
