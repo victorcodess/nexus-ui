@@ -262,9 +262,8 @@ function Messages({
           if (isPendingAssistantMessage(m) || assistantIsLoading) {
             mainColumn = (
               <MessageStack className="min-w-0 flex-1">
-                <Reasoning isStreaming className="pl-2">
-                  <ReasoningTrigger />
-                  <ReasoningContent>{""}</ReasoningContent>
+                <Reasoning isStreaming className="ml-2 mb-1">
+                  <ReasoningTrigger>Thinking...</ReasoningTrigger>
                 </Reasoning>
               </MessageStack>
             );
@@ -284,7 +283,10 @@ function Messages({
               >
                 <MessageStack>
                   {hasReasoning ? (
-                    <Reasoning isStreaming={reasoningIsStreaming} className="pl-2">
+                    <Reasoning
+                      isStreaming={reasoningIsStreaming}
+                      className="ml-2 mb-1"
+                    >
                       <ReasoningTrigger />
                       <ReasoningContent>{reasoningText}</ReasoningContent>
                     </Reasoning>
