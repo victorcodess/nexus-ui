@@ -22,6 +22,10 @@ function isPerplexityModelId(
   );
 }
 
+function isAnthropicGatewayModelId(model: string | undefined) {
+  return model == null || model.startsWith("anthropic/");
+}
+
 export async function POST(req: Request) {
   const {
     messages,
@@ -32,13 +36,22 @@ export async function POST(req: Request) {
   const languageModel = usePerplexity
     ? perplexityModel(model)
     : (model ?? DEFAULT_GATEWAY_MODEL);
+  const useAnthropicReasoning = !usePerplexity && isAnthropicGatewayModelId(model);
 
   const result = streamText({
     model: languageModel,
     messages: await convertToModelMessages(messages),
+    providerOptions: useAnthropicReasoning
+      ? {
+          anthropic: {
+            thinking: { type: "enabled", budgetTokens: 1024 },
+          },
+        }
+      : undefined,
   });
 
   return result.toUIMessageStreamResponse({
+    sendReasoning: true,
     sendSources: usePerplexity,
   });
 }
