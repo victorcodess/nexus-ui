@@ -8,6 +8,7 @@ import MessageWithActions from "@/components/nexus-ui/examples/message/with-acti
 import MessageWithAvatar from "@/components/nexus-ui/examples/message/with-avatar";
 import MessageWithAttachments from "@/components/nexus-ui/examples/message/with-attachments";
 import MessageRichText from "@/components/nexus-ui/examples/message/rich-text";
+import { Callout } from "@/components/callout";
 
 Composable **user** and **assistant** chat turns via **`Message`**, **`MessageContent`**, **`MessageMarkdown`** ([Streamdown](https://github.com/vercel/streamdown)), **`MessageAvatar`**, **`MessageActions`**, and **[Attachments](/docs/components/attachments)**.
 
@@ -145,7 +146,11 @@ Use **`CodeBlock`** **`showTitleRow`** to show or hide the fenced-block title ro
 
 Installing **Message** with the **shadcn CLI** should merge **Tailwind `@source`** lines into the CSS file from **`components.json`** so those classes are **not purged**. With a **manual** install, that merge does not run by default.
 
-After either path, **open your global CSS** and **confirm** the **`@source`** entries for **`streamdown`** and **`@streamdown/*`** are present, and that **`../node_modules`** still resolves to the project root from that file’s folder. If anything is missing or the depth is wrong, markdown can look unstyled or code and diagrams can break.
+<Callout type="warning">
+After either path, **open your global CSS** and **confirm** the **`@source`** entries for **`streamdown`** and **`@streamdown/*`** are present, and that **`../node_modules`** still resolves to the project root from that file’s folder.
+
+If `@source` entries for `streamdown` and `@streamdown/*` are missing, markdown may render unstyled and code or diagram blocks can break.
+</Callout>
 
 ## Vercel AI SDK Integration
 

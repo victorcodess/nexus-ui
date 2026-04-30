@@ -9,6 +9,7 @@ import AttachmentsVariantInline from "@/components/nexus-ui/examples/attachments
 import AttachmentsVariantPasted from "@/components/nexus-ui/examples/attachments/variant-pasted";
 import AttachmentsWithPromptInput from "@/components/nexus-ui/examples/attachments/with-prompt-input";
 import AttachmentsWithProgress from "@/components/nexus-ui/examples/attachments/with-progress";
+import { Callout } from "@/components/callout";
 
 Composable attachment UI for chat and messaging: thumbnails, type icons, or a **pasted-text** excerpt depending on **`Attachment`** **`variant`**, plus remove actions and optional upload progress. A controlled **`Attachments`** root owns the hidden file input and **`AttachmentTrigger`**; opt in to page drop (**`windowDrop`**, **`AttachmentsDropOverlay`**) and paste or custom flows via **`useAttachments`** and **`appendFiles`**.
 
@@ -96,9 +97,9 @@ import {
 </Attachments>
 ```
 
-`AttachmentTrigger` and any other component that calls the file picker **must** be rendered **inside** `Attachments` so they receive context from the same provider as the hidden input.
-
-The module also exports **`filesFromDataTransfer`**, **`toAttachmentMeta`**, **`AppendFilesOptions`**, and **`useAttachments`** for paste/drop and advanced wiring (see **With Prompt Input** and the **`useAttachments`** section).
+<Callout type="warning">
+`AttachmentTrigger` and any component that opens the file picker must be rendered inside `Attachments`. If mounted outside, the picker will not open because it cannot access shared context.
+</Callout>
 
 ## Examples
 

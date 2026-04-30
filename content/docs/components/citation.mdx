@@ -8,6 +8,7 @@ import CitationDefault from "@/components/nexus-ui/examples/citation/default";
 import CitationMultipleSources from "@/components/nexus-ui/examples/citation/multiple-sources";
 import CitationTriggerVariants from "@/components/nexus-ui/examples/citation/trigger-variants";
 import CitationInlineWithText from "@/components/nexus-ui/examples/citation/inline-with-text";
+import { Callout } from "@/components/callout";
 
 Inline chip for showing a **source reference** with **hover preview** (favicon, label, and card copy for title, description, and link). Pass **`citations`** as an array of **`{ url, title?, description? }`**—**one entry** gives a single citation; **several entries** pair with **`CitationCarousel`** and **`CitationCarouselItem`** so users can move between sources in the same preview.
 
@@ -112,6 +113,10 @@ The trigger can sit **inline** with surrounding copy—place **`Citation`** wher
 Use **Citation** with [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) when your model returns **sources** as [`UIMessage`](https://ai-sdk.dev/docs/reference/ai-sdk-core/ui-message) **`parts`** (for example **`type: "source-url"`**). The AI SDK does not standardize citation markup across providers, and [Streamdown](https://streamdown.ai/) does not resolve footnotes for you—so you collect URLs from message parts, match them to inline markers like **`[1]`** in the assistant text, and swap those markers for **`Citation`** inside markdown by overriding the anchor renderer.
 
 See [Prompt Input](/docs/components/prompt-input#vercel-ai-sdk-integration) for the same **`POST /api/chat`** shape; below extends it with **`sendSources: true`** and a client-side inline-citation pipeline.
+
+<Callout type="info">
+Citation UI depends on providers and models that emit source parts. If your model returns text only, there are no citations to render.
+</Callout>
 
 <Steps>
 <Step>
