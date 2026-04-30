@@ -49,7 +49,9 @@ function Reasoning({
   ...props
 }: ReasoningProps) {
   const isControlled = openProp !== undefined;
-  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = React.useState(
+    defaultOpen || isStreaming,
+  );
   const open = isControlled ? openProp : internalOpen;
   const [durationLabel, setDurationLabel] = React.useState<string | null>(null);
   const [hasStreamed, setHasStreamed] = React.useState(isStreaming);
@@ -102,12 +104,13 @@ function Reasoning({
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
+      const resolvedOpen = isStreaming ? true : nextOpen;
       if (!isControlled) {
-        setInternalOpen(nextOpen);
+        setInternalOpen(resolvedOpen);
       }
-      onOpenChange?.(nextOpen);
+      onOpenChange?.(resolvedOpen);
     },
-    [isControlled, onOpenChange],
+    [isControlled, isStreaming, onOpenChange],
   );
 
   return (
@@ -133,11 +136,12 @@ function ReasoningTrigger({
   children,
   ...props
 }: ReasoningTriggerProps) {
-  const { label } = useReasoningContext("ReasoningTrigger");
+  const { isStreaming, label } = useReasoningContext("ReasoningTrigger");
 
   return (
     <CollapsibleTrigger
       data-slot="reasoning-trigger"
+      data-streaming={isStreaming ? "true" : "false"}
       className={cn(
         "group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground",
         className,
@@ -153,7 +157,7 @@ function ReasoningTrigger({
       <HugeiconsIcon
         icon={ArrowDown01Icon}
         strokeWidth={2.0}
-        className="ml-0.5 size-4 transition-transform group-data-[state=open]:rotate-180"
+        className="ml-0.5 size-4 opacity-0 transition-all group-data-[state=open]:rotate-180 group-hover:opacity-100 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
       />
     </CollapsibleTrigger>
   );
