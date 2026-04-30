@@ -192,6 +192,25 @@
           "target": "~/components/nexus-ui/citation.tsx"
         }
       ]
+    },
+    {
+      "name": "reasoning",
+      "type": "registry:ui",
+      "title": "Reasoning",
+      "description": "Collapsible AI reasoning block with streaming-aware trigger label and markdown content.",
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons",
+        "streamdown"
+      ],
+      "registryDependencies": ["collapsible"],
+      "files": [
+        {
+          "path": "registry/new-york/reasoning/reasoning.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/reasoning.tsx"
+        }
+      ]
     }
   ]
 }
