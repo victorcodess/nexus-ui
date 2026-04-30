@@ -28,7 +28,7 @@ const messageMarkdownProseClasses = [
   // links
   "[&_[data-streamdown=link]]:text-foreground [&_[data-streamdown=link]]:font-normal [&_[data-streamdown=link]]:underline [&_[data-streamdown=link]]:underline-offset-2",
   // strong
-  "[&_[data-streamdown=strong]]:text-foreground [&_[data-streamdown=strong]]:font-normal [&_[data-streamdown=strong]]:font-[550]",
+  "[&_[data-streamdown=strong]]:text-foreground [&_[data-streamdown=strong]]:font-[550]",
   // lists
   "prose-li:my-[-0.5px] prose-li:marker:text-border prose-ul:my-0 prose-ol:my-0 prose-ol:pl-3",
 ] as const;
