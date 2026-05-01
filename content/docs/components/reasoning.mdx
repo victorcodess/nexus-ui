@@ -46,22 +46,22 @@ bunx shadcn@latest add @nexus-ui/reasoning
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab value="npm">
 ```bash
-npx shadcn@latest add collapsible && npm install @hugeicons/react @hugeicons/core-free-icons streamdown
+npx shadcn@latest add collapsible && npm install @hugeicons/react @hugeicons/core-free-icons streamdown tw-shimmer
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm dlx shadcn@latest add collapsible && pnpm add @hugeicons/react @hugeicons/core-free-icons streamdown
+pnpm dlx shadcn@latest add collapsible && pnpm add @hugeicons/react @hugeicons/core-free-icons streamdown tw-shimmer
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn dlx shadcn@latest add collapsible && yarn add @hugeicons/react @hugeicons/core-free-icons streamdown
+yarn dlx shadcn@latest add collapsible && yarn add @hugeicons/react @hugeicons/core-free-icons streamdown tw-shimmer
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bunx shadcn@latest add collapsible && bun add @hugeicons/react @hugeicons/core-free-icons streamdown
+bunx shadcn@latest add collapsible && bun add @hugeicons/react @hugeicons/core-free-icons streamdown tw-shimmer
 ```
 </Tab>
 </Tabs>
@@ -70,6 +70,13 @@ bunx shadcn@latest add collapsible && bun add @hugeicons/react @hugeicons/core-f
 <h3>Copy and paste the following code into your project.</h3>
 
 <ComponentSource src="registry/new-york/reasoning/reasoning.tsx" title="components/nexus-ui/reasoning.tsx" />
+</Step>
+<Step>
+<h3>Add the shimmer stylesheet import to your global CSS.</h3>
+
+```css title="app/global.css"
+@import "tw-shimmer";
+```
 </Step>
 <Step>
 <h3>Update import paths to match your project setup.</h3>
@@ -237,7 +244,7 @@ Root component. Manages streaming timing, open state behavior, and label context
 
 ### ReasoningTrigger
 
-Trigger row with built-in brain icon, label text, and rotating chevron. If `children` is provided, it replaces the default label text. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger).
+Trigger row with built-in brain icon, label text, and rotating chevron. If `children` is provided, it replaces the default label text. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger). The shimmer label effect is powered by `tw-shimmer`; see [tw-shimmer docs](https://www.assistant-ui.com/tw-shimmer) for customization options.
 
 <TypeTable
   type={{

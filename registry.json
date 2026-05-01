@@ -205,6 +205,7 @@
       ],
       "registryDependencies": ["collapsible"],
       "css": {
+        "@import \"tw-shimmer\"": {},
         "@layer utilities": {
           "@keyframes reasoning-expand": {
             "from": {
