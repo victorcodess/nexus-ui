@@ -1,0 +1,201 @@
+---
+title: Text Shimmer
+description: Animated shimmer effect for loading and streaming states
+---
+
+import TextShimmerDefault from "@/components/nexus-ui/examples/text-shimmer/default";
+import TextShimmerRepeatDelay from "@/components/nexus-ui/examples/text-shimmer/repeat-delay";
+import TextShimmerAngled from "@/components/nexus-ui/examples/text-shimmer/angled";
+import TextShimmerInverted from "@/components/nexus-ui/examples/text-shimmer/inverted";
+import TextShimmerAsParagraph from "@/components/nexus-ui/examples/text-shimmer/as-paragraph";
+import TextShimmerCustomColor from "@/components/nexus-ui/examples/text-shimmer/custom-color";
+import TextShimmerSlowSweep from "@/components/nexus-ui/examples/text-shimmer/slow-sweep";
+import TextShimmerTightBeam from "@/components/nexus-ui/examples/text-shimmer/tight-beam";
+
+An animated shimmer effect for loading and "in progress" feedback. `TextShimmer` renders a moving highlight across text and exposes controls for speed, spread, direction, contrast, and pause between passes.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/text-shimmer/default.tsx"
+  previewClassName="p-0!"
+>
+  <TextShimmerDefault />
+</DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/text-shimmer
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/text-shimmer
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/text-shimmer
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/text-shimmer
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource
+  src="registry/new-york/text-shimmer/text-shimmer.tsx"
+  title="components/nexus-ui/text-shimmer.tsx"
+/>
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
+```
+
+```tsx keepBackground
+<TextShimmer>
+  Running tool calls
+</TextShimmer>
+```
+
+## Examples
+
+### With Repeat Delay
+
+Use `repeatDelay` to create a pause between shimmer passes:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/repeat-delay.tsx">
+  <TextShimmerRepeatDelay />
+</DemoWithCode>
+
+### Angled Shimmer
+
+Tune beam geometry with `spread` and `angle`:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/angled.tsx">
+  <TextShimmerAngled />
+</DemoWithCode>
+
+### Inverted Contrast
+
+Use `invert` for lower-luminance emphasis (often better on lighter text):
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/inverted.tsx">
+  <TextShimmerInverted />
+</DemoWithCode>
+
+### As Custom Element
+
+Render another element type with `as`:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/as-paragraph.tsx">
+  <TextShimmerAsParagraph />
+</DemoWithCode>
+
+### Custom Highlight Color
+
+Use `color` to override the highlight beam for accent-driven states:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/custom-color.tsx">
+  <TextShimmerCustomColor />
+</DemoWithCode>
+
+### Slow Sweep
+
+Increase `duration` for a calmer motion profile:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/slow-sweep.tsx">
+  <TextShimmerSlowSweep />
+</DemoWithCode>
+
+### Tight Beam
+
+Lower `spread` for a narrower, sharper highlight pass:
+
+<DemoWithCode src="components/nexus-ui/examples/text-shimmer/tight-beam.tsx">
+  <TextShimmerTightBeam />
+</DemoWithCode>
+
+## API Reference
+
+### TextShimmer
+
+Animated text wrapper component. Uses a generated keyframe name per instance to avoid collisions and applies shimmer via a gradient background clipped to text.
+
+<TypeTable
+  type={{
+    as: {
+      type: "React.ElementType",
+      default: '"span"',
+      description: "Element or component to render as the wrapper.",
+    },
+    duration: {
+      type: "number",
+      default: "4",
+      description:
+        "Active shimmer movement duration in seconds. Values <= 0 stop movement but keep rendering stable.",
+    },
+    repeatDelay: {
+      type: "number",
+      default: "0",
+      description:
+        "Pause duration in seconds after each shimmer pass before the next pass starts.",
+    },
+    spread: {
+      type: "number",
+      default: "20",
+      description:
+        "Highlight beam width around center in percentage points. Clamped internally to 5..45.",
+    },
+    angle: {
+      type: "number",
+      default: "0",
+      description:
+        "Gradient beam angle in degrees. Positive values tilt the shimmer direction.",
+    },
+    color: {
+      type: "string",
+      description:
+        "Optional highlight color override. Defaults to an OKLCH color derived from current text color.",
+    },
+    invert: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Uses a darker highlight formula instead of the default brighter one.",
+    },
+    className: {
+      type: "string",
+      description:
+        "Additional classes merged into the wrapper element.",
+    },
+    style: {
+      type: "React.CSSProperties",
+      description:
+        "Inline style overrides merged after generated shimmer styles.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Text (or inline content) to render with shimmer treatment.",
+    },
+  }}
+/>

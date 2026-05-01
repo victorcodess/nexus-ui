@@ -13,6 +13,7 @@
     "components/prompt-input",
     "components/reasoning",
     "components/suggestions",
+    "components/text-shimmer",
     "components/thread"
   ]
 }
