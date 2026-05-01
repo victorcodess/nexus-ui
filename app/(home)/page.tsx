@@ -82,7 +82,7 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        <a
+        {/* <a
           href="https://www.producthunt.com/products/nexus-ui?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-nexus-ui"
           target="_blank"
           rel="noopener noreferrer"
@@ -94,7 +94,7 @@ export default function HomePage() {
             height="54"
             src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1133349&amp;theme=neutral&amp;t=1777289219511"
           />
-        </a>
+        </a> */}
       </div>
 
       <HomeDemoSection />
