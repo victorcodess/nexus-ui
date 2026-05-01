@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -36,6 +36,8 @@ npx shadcn@latest add @nexus-ui/attachments
 npx shadcn@latest add @nexus-ui/message
 npx shadcn@latest add @nexus-ui/thread
 npx shadcn@latest add @nexus-ui/citation
+npx shadcn@latest add @nexus-ui/reasoning
+npx shadcn@latest add @nexus-ui/text-shimmer
 ```
 
 Or install directly via URL (no registry config needed):
@@ -64,6 +66,8 @@ Components are installed to `components/nexus-ui/` by default.
 | Message | `message` | Chat message shell with Streamdown markdown, avatar, and action slots |
 | Thread | `thread` | Stick-to-bottom thread viewport with scroll-to-bottom control |
 | Citation | `citation` | Inline citations with hover preview, favicons, and multi-source carousel |
+| Reasoning | `reasoning` | Collapsible reasoning trace with streaming-aware trigger label and markdown body |
+| Text Shimmer | `text-shimmer` | Animated shimmer text for loading and in-progress UI |
 
 ## Component APIs
 
@@ -535,6 +539,67 @@ const sources = [
 </Citation>
 ```
 
+### Reasoning
+
+Collapsible “thinking” block built on shadcn `Collapsible`: the trigger label shifts from streaming copy to a duration summary, and the body renders markdown via [Streamdown](https://github.com/vercel/streamdown).
+
+**Import:**
+
+```tsx
+import {
+  Reasoning,
+  ReasoningTrigger,
+  ReasoningContent,
+} from "@/components/nexus-ui/reasoning";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Reasoning` | Root provider + collapsible root; manages open state vs `isStreaming` and builds the contextual trigger label (`Thinking…` → `Thought for N seconds`). |
+| `ReasoningTrigger` | Row with brain icon, label text (streaming uses `tw-shimmer` utilities on the span), and chevron that rotates when open. |
+| `ReasoningContent` | Expands markdown in `Streamdown` with muted styling and a leading border strip. Requires `children: string` (markdown source). |
+
+**Root props:** On `Reasoning`, optional `isStreaming` (default `false`) drives auto-open while streaming and auto-close plus duration bookkeeping when streaming ends; optional controlled `open` / `defaultOpen` / `onOpenChange` (inherits from collapsible semantics but `Reasoning` omits Radix `open`/`defaultOpen`/`onOpenChange` from its type in favor of the listed props). Accepts remaining `Collapsible`-compatible props plus `className`.
+
+**Props & hooks:** No exported hook (internal context only). `ReasoningTrigger`/`ReasoningContent` must be descendants of `Reasoning`. Registry install pulls `collapsible`, `streamdown`, Hugeicons packages, `@import "tw-shimmer"`, and keyframes for collapsible height animation.
+
+**Usage notes:** Toggle `isStreaming` from your chat transport / part stream. Omit `ReasoningTrigger` children to use the computed label; pass children only when you override the visible label while keeping accessibility in mind.
+
+**Example:**
+
+```tsx
+<Reasoning isStreaming={status === "streaming"}>
+  <ReasoningTrigger />
+  <ReasoningContent>{reasoningMarkdownString}</ReasoningContent>
+</Reasoning>
+```
+
+### Text Shimmer
+
+Single primitive that animates a moving highlight across text (`bg-clip-text` + injected `@keyframes`). No extra UI dependencies beyond `@/lib/utils`.
+
+**Import:**
+
+```tsx
+import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
+```
+
+**Parts:** Single component — `TextShimmer`. Optional polymorphic root via `as` (default `"span"`).
+
+**Root props:** `duration` — active sweep duration in seconds (default `2.5`); `repeatDelay` — pause before the next sweep (default `0`); `spread` — highlight width in percentage points around center, clamped ~5–45 (default `20`); `angle` — degrees added to the gradient axis (default `0`); `color` — override beam stop color; `invert` — flip default light/dark beam contrast; plus standard HTML attributes/`className`/`style`. Children are the label text/node tree.
+
+**Props & hooks:** No context. Injects a unique `@keyframes` name per instance via `useId`.
+
+**Usage notes:** Prefer on short status strings (“Running tools…”). Combine with muted `text-muted-foreground` on the wrapper if the edge color should inherit from typography.
+
+**Example:**
+
+```tsx
+<TextShimmer repeatDelay={0.5}>Running tool calls</TextShimmer>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -628,7 +693,9 @@ components/
 │   ├── message.tsx
 │   ├── codeblock.tsx
 │   ├── thread.tsx
-│   └── citation.tsx
+│   ├── citation.tsx
+│   ├── reasoning.tsx
+│   └── text-shimmer.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -648,11 +715,13 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Message:** `streamdown` + `@streamdown/*` plugins, `radix-ui`, `@radix-ui/react-slot`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `avatar`
 - **Thread:** `@radix-ui/react-slot`, `use-stick-to-bottom`, `@hugeicons/react`, `@hugeicons/core-free-icons`
 - **Citation:** `radix-ui`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `carousel`, `hover-card`
+- **Reasoning:** `streamdown`, `@hugeicons/react`, `@hugeicons/core-free-icons`, `tw-shimmer`, shadcn `collapsible`, registry CSS for shimmer + collapsible height keyframes
+- **Text Shimmer:** `@/lib/utils` only (`cn`)
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt
