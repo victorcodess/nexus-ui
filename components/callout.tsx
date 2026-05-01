@@ -65,7 +65,7 @@ export function CalloutContainer({
   return (
     <div
       className={cn(
-        'my-4 flex items-start gap-3 rounded-[12px] bg-(--callout-bg) px-4 py-3.5 text-[14px] leading-6.5 text-(--callout-color)',
+        'my-4 flex items-start gap-3 rounded-[12px] bg-(--callout-bg) dark:bg-(--callout-color)/8 px-4 py-3.5 text-[14px] leading-6.5 text-(--callout-color)',
         className,
       )}
       style={
