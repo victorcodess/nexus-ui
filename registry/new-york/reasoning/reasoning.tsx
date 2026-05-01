@@ -172,11 +172,13 @@ function ReasoningTrigger({
         strokeWidth={1.75}
         className="size-4"
       />
-      <span className="text-sm leading-6">{children ?? label}</span>
+      <span className="text-sm leading-6 group-data-[streaming=true]:shimmer group-data-[streaming=true]:shimmer-repeat-delay-0 group-data-[streaming=true]:shimmer-spread-50 group-data-[streaming=true]:not-dark:shimmer-invert">
+        {children ?? label}
+      </span>
       <HugeiconsIcon
         icon={ArrowDown01Icon}
         strokeWidth={2.0}
-        className="ml-0.5 size-4 opacity-0 transition-all group-data-[state=open]:rotate-180 group-hover:opacity-100 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
+        className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
       />
     </CollapsibleTrigger>
   );
@@ -211,7 +213,7 @@ function ReasoningContent({
           // strong
           "prose-strong:font-medium prose-strong:text-foreground",
           // lists
-          "**:data-[streamdown=list-item]:pl-4 **:data-[streamdown=list-item]:py-0.25 prose-ol:my-0 prose-ol:pl-3 prose-ul:my-0 prose-li:my-[-0.5px] **:data-[streamdown=list-item]:marker:text-muted-foreground/50",
+          "**:data-[streamdown=list-item]:py-0.25 **:data-[streamdown=list-item]:pl-4 **:data-[streamdown=list-item]:marker:text-muted-foreground/50 prose-ol:my-0 prose-ol:pl-3 prose-ul:my-0 prose-li:my-[-0.5px]",
           "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         )}
       >

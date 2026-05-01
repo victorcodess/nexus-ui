@@ -30,7 +30,7 @@ const messageMarkdownProseClasses = [
   // strong
   "[&_[data-streamdown=strong]]:text-foreground [&_[data-streamdown=strong]]:font-[550]",
   // lists
-  "prose-li:my-[-0.5px] prose-li:marker:text-border prose-ul:my-0 prose-ol:my-0 prose-ol:pl-3",
+  "prose-li:my-[-0.5px] prose-li:marker:text-muted-foreground/50 prose-ul:my-0 prose-ol:my-0 prose-ol:pl-3",
 ] as const;
 
 type MessageFrom = "user" | "assistant";
