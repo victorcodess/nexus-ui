@@ -49,6 +49,7 @@ function Reasoning({
   ...props
 }: ReasoningProps) {
   const isControlled = openProp !== undefined;
+  const hasMountedRef = React.useRef(false);
   const [internalOpen, setInternalOpen] = React.useState(
     defaultOpen || isStreaming,
   );
@@ -61,6 +62,21 @@ function Reasoning({
   const prevStreamingRef = React.useRef(isStreaming);
 
   React.useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      if (isStreaming) {
+        setHasStreamed(true);
+        startedAtRef.current = Date.now();
+        setDurationLabel(null);
+        if (!isControlled) {
+          setInternalOpen(true);
+        }
+        onOpenChange?.(true);
+      }
+      prevStreamingRef.current = isStreaming;
+      return;
+    }
+
     const wasStreaming = prevStreamingRef.current;
     if (!wasStreaming && isStreaming) {
       setHasStreamed(true);
@@ -93,7 +109,10 @@ function Reasoning({
 
   const label = React.useMemo(() => {
     if (!hasStreamed || isStreaming) return "Thinking...";
-    if (durationLabel != null) return `Thought for ${durationLabel} seconds`;
+    if (durationLabel != null) {
+      const unit = durationLabel === "1" ? "second" : "seconds";
+      return `Thought for ${durationLabel} ${unit}`;
+    }
     return "Thought for a few seconds";
   }, [durationLabel, hasStreamed, isStreaming]);
 
