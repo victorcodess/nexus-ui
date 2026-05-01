@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-shimmer",
+  "title": "Text Shimmer",
+  "description": "Animated shimmer text for loading and streaming states.",
+  "files": [
+    {
+      "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport type TextShimmerProps = Omit<\n  React.HTMLAttributes<HTMLElement>,\n  \"color\"\n> & {\n  as?: React.ElementType;\n  /**\n   * Duration in seconds.\n   * @default 4\n   */\n  duration?: number;\n  /**\n   * Spread around center in percent points.\n   * @default 20\n   */\n  spread?: number;\n  /**\n   * Beam angle in degrees.\n   * @default 0\n   */\n  angle?: number;\n  /**\n   * Override highlight color.\n   */\n  color?: string;\n  /**\n   * Invert shimmer contrast.\n   * @default false\n   */\n  invert?: boolean;\n  /**\n   * Delay before the next shimmer pass in seconds.\n   * @default 0\n   */\n  repeatDelay?: number;\n};\n\nfunction TextShimmer({\n  as: Comp = \"span\",\n  className,\n  style,\n  duration = 4,\n  repeatDelay = 0,\n  spread = 20,\n  angle = 0,\n  color,\n  invert = false,\n  children,\n  ...props\n}: TextShimmerProps) {\n  const id = React.useId();\n  const boundedSpread = Math.min(Math.max(spread, 5), 45);\n  const activeDuration = Math.max(duration, 0);\n  const pauseDuration = Math.max(repeatDelay, 0);\n  const totalDuration = Math.max(activeDuration + pauseDuration, 0.001);\n  const movePercent = (activeDuration / totalDuration) * 100;\n  const keyframeName = React.useMemo(\n    () => `nx-text-shimmer-${id.replace(/[^a-zA-Z0-9_-]/g, \"\")}`,\n    [id],\n  );\n  const start = 50 - boundedSpread;\n  const end = 50 + boundedSpread;\n  const edge = \"currentColor\";\n  const beam = invert\n    ? (color ??\n      \"oklch(from currentColor min(calc(l - 0.4), 0.2) c h / calc(alpha + 0.4))\")\n    : (color ??\n      \"oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.35))\");\n  const keyframes = `@keyframes ${keyframeName} {\n    0% { background-position: 200% 50%; }\n    ${movePercent}% { background-position: -200% 50%; }\n    100% { background-position: -200% 50%; }\n  }`;\n\n  return (\n    <>\n      <style>{keyframes}</style>\n      <Comp\n        className={cn(\"bg-size-[200%_auto] bg-clip-text\", className)}\n        style={{\n          backgroundImage: `linear-gradient(${90 + angle}deg, ${edge} ${start}%, ${beam} 50%, ${edge} ${end}%)`,\n          animation: `${keyframeName} ${totalDuration}s linear infinite`,\n          WebkitTextFillColor: \"transparent\",\n          ...style,\n        }}\n        {...props}\n      >\n        {children}\n      </Comp>\n    </>\n  );\n}\n\nexport { TextShimmer };\n",
+      "type": "registry:file",
+      "target": "~/components/nexus-ui/text-shimmer.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

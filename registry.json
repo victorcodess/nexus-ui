@@ -238,6 +238,19 @@
           "target": "~/components/nexus-ui/reasoning.tsx"
         }
       ]
+    },
+    {
+      "name": "text-shimmer",
+      "type": "registry:ui",
+      "title": "Text Shimmer",
+      "description": "Animated shimmer text for loading and streaming states.",
+      "files": [
+        {
+          "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/text-shimmer.tsx"
+        }
+      ]
     }
   ]
 }

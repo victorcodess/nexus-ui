@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -38,11 +40,11 @@ export type TextShimmerProps = Omit<
   repeatDelay?: number;
 };
 
-export function TextShimmer({
+function TextShimmer({
   as: Comp = "span",
   className,
   style,
-  duration = 2.5,
+  duration = 4,
   repeatDelay = 0,
   spread = 20,
   angle = 0,
@@ -93,3 +95,5 @@ export function TextShimmer({
     </>
   );
 }
+
+export { TextShimmer };
