@@ -119,58 +119,7 @@ export function DocsLayout({
     return (
       <>
         <SidebarContent {...rest} className='bg-transparent border-none max-w-fit pr-0 pl-5'>
-          {/* <div className="flex flex-col gap-3 p-4 pb-2 border-2 border-black">
-            <div className="flex">
-              {renderTitleNav(nav, {
-                className: 'inline-flex text-[0.9375rem] items-center gap-2.5 font-medium me-auto',
-              })}
-              {nav.children}
-              {collapsible && (
-                <SidebarCollapseTrigger
-                  className={cn(
-                    buttonVariants({
-                      variant: 'ghost',
-                      size: 'icon-sm',
-                      className: 'mb-auto text-fd-muted-foreground',
-                    }),
-                  )}
-                >
-                  <SidebarIcon />
-                </SidebarCollapseTrigger>
-              )}
-            </div>
-            {searchToggle.enabled !== false &&
-              (searchToggle.components?.lg ?? <LargeSearchToggle hideIfDisabled />)}
-            {tabs.length > 0 && tabMode === 'auto' && <SidebarTabsDropdown options={tabs} />}
-            {banner}
-          </div> */}
           {viewport}
-          {/* {(i18n || iconLinks.length > 0 || themeSwitch?.enabled !== false || footer) && (
-            <div className="flex flex-col border-t p-4 pt-2 empty:hidden">
-              <div className="flex text-fd-muted-foreground items-center empty:hidden">
-                {i18n && (
-                  <LanguageToggle>
-                    <Languages className="size-4.5" />
-                  </LanguageToggle>
-                )}
-                {iconLinks.map((item, i) => (
-                  <LinkItem
-                    key={i}
-                    item={item}
-                    className={cn(buttonVariants({ size: 'icon-sm', variant: 'ghost' }))}
-                    aria-label={item.label}
-                  >
-                    {item.icon}
-                  </LinkItem>
-                ))}
-                {themeSwitch.enabled !== false &&
-                  (themeSwitch.component ?? (
-                    <ThemeToggle className="ms-auto p-0" mode={themeSwitch.mode} />
-                  ))}
-              </div>
-              {footer}
-            </div>
-          )} */}
         </SidebarContent>
         <SidebarDrawer>
           <div className="flex flex-col gap-3 p-4 pb-2">
