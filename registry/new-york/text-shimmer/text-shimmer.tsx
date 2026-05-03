@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -11,7 +9,7 @@ export type TextShimmerProps = Omit<
   as?: React.ElementType;
   /**
    * Duration in seconds.
-   * @default 4
+   * @default 1
    */
   duration?: number;
   /**
@@ -40,11 +38,11 @@ export type TextShimmerProps = Omit<
   repeatDelay?: number;
 };
 
-function TextShimmer({
+export function TextShimmer({
   as: Comp = "span",
   className,
   style,
-  duration = 4,
+  duration = 1,
   repeatDelay = 0,
   spread = 20,
   angle = 0,
@@ -72,9 +70,9 @@ function TextShimmer({
     : (color ??
       "oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.35))");
   const keyframes = `@keyframes ${keyframeName} {
-    0% { background-position: 200% 50%; }
-    ${movePercent}% { background-position: -200% 50%; }
-    100% { background-position: -200% 50%; }
+    0% { background-position: 100% 50%; }
+    ${movePercent}% { background-position: -60% 50%; }
+    100% { background-position: -100% 50%; }
   }`;
 
   return (
@@ -95,5 +93,3 @@ function TextShimmer({
     </>
   );
 }
-
-export { TextShimmer };
