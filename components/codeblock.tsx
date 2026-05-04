@@ -117,8 +117,7 @@ export function CodeBlock({
   const [overflows, setOverflows] = useState(false);
 
   const collapsedHeight = 16 * 24 + 28; // 16 lines × 24px line-height + 28px padding
-  const showCollapse =
-    !noCollapse && overflows && expanded;
+  const showCollapse = !noCollapse && overflows && expanded;
 
   const actionButtons = (
     <>
@@ -179,13 +178,13 @@ export function CodeBlock({
               }}
             />
           ) : (
-            icon ?? (
+            (icon ?? (
               <HugeiconsIcon
                 icon={CodeIcon}
                 strokeWidth={2}
-                className="size-4 shrink-0 -mb-0.5"
+                className="-mb-0.5 size-4 shrink-0"
               />
-            )
+            ))
           )}
           <figcaption className="flex-1 truncate font-mono">{title}</figcaption>
           {Actions({
@@ -217,11 +216,7 @@ export function CodeBlock({
           )}
           style={
             {
-              maxHeight: noCollapse
-                ? "none"
-                : expanded
-                  ? 615
-                  : collapsedHeight,
+              maxHeight: noCollapse ? "none" : expanded ? 615 : collapsedHeight,
               "--padding-right": !title
                 ? "calc(var(--spacing) * 8)"
                 : undefined,
@@ -255,7 +250,7 @@ function CollapseCodeButton({ onClick }: { onClick: () => void }) {
       type="button"
       variant="ghost"
       size="icon-xs"
-      className="size-7 shrink-0 rounded-full text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 mr-2.5 hover:bg-transparent dark:hover:bg-transparent"
+      className="mr-2.5 size-7 shrink-0 rounded-full text-gray-400 transition-colors hover:bg-transparent hover:text-gray-600 dark:text-gray-500 dark:hover:bg-transparent dark:hover:text-gray-300"
       aria-label="Show less"
       onClick={onClick}
     >
@@ -303,7 +298,7 @@ function CopyButton({
         type="button"
         data-checked={checked || undefined}
         className={cn(
-          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full transition-colors",
+          "relative flex size-7 cursor-pointer items-center justify-center rounded-full text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
           className,
         )}
         aria-label={checked ? "Copied Text" : "Copy Text"}
