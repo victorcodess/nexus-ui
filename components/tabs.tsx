@@ -217,7 +217,7 @@ function TabsItemsFramedList({
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute bottom-0 z-[1] h-px bg-gray-900 ease-out dark:bg-gray-50",
+            "pointer-events-none absolute bottom-0 z-1 h-px bg-gray-900 ease-out dark:bg-gray-50",
             "transition-[left,width] duration-200",
             indicator.width <= 0 && "opacity-0",
           )}
@@ -318,7 +318,7 @@ function TabsItemsPillClipList({
         "not-prose relative no-scrollbar block w-full min-w-0 overflow-x-auto overflow-y-hidden text-fd-secondary-foreground dark:border-gray-800",
       )}
     >
-      <div className="relative inline-flex items-center gap-2">
+      <div className="relative inline-flex items-center gap-2 mb-2">
         {label != null && label !== false && (
           <span className="my-auto me-auto shrink-0 text-sm font-medium">
             {label}

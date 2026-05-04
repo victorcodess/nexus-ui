@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   CodeIcon,
+  SourceCodeIcon,
   CollapseIcon,
   Copy01Icon,
   Tick02Icon,
@@ -180,9 +181,9 @@ export function CodeBlock({
           ) : (
             (icon ?? (
               <HugeiconsIcon
-                icon={CodeIcon}
+                icon={SourceCodeIcon}
                 strokeWidth={2}
-                className="-mb-0.5 size-4 shrink-0"
+                className="-mb-0.5 size-4.25 shrink-0"
               />
             ))
           )}
