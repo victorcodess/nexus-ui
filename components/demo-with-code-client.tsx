@@ -17,7 +17,11 @@ export function DemoWithCodeClient({
   previewClassName?: string;
 }) {
   return (
-    <Tabs items={["Preview", "Code"]} className={className}>
+    <Tabs
+      items={["Preview", "Code"]}
+      className={className}
+      showTerminalIcon={false}
+    >
       <Tab value="Preview">
         <ReviewContainer className={cn("", previewClassName)}>{children}</ReviewContainer>
       </Tab>

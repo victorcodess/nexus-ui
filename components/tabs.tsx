@@ -13,6 +13,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { TerminalIcon } from "@hugeicons/core-free-icons";
 import { cn } from "../lib/cn";
 import * as Unstyled from "./ui/tabs";
 
@@ -43,6 +45,13 @@ export interface TabsProps extends Omit<
    * Whether to use a framed style for the tabs.
    */
   framed?: boolean;
+
+  /**
+   * Show terminal icon before tab triggers in framed simple mode.
+   *
+   * @defaultValue true
+   */
+  showTerminalIcon?: boolean;
 }
 
 const TabsContext = createContext<{
@@ -108,10 +117,12 @@ function TabsItemsFramedList({
   items,
   label,
   value,
+  showTerminalIcon,
 }: {
   items: string[];
   label?: ReactNode;
   value: string | undefined;
+  showTerminalIcon: boolean;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const rowRef = React.useRef<HTMLDivElement>(null);
@@ -161,7 +172,7 @@ function TabsItemsFramedList({
   }, [updateIndicator]);
 
   const framedTrigger =
-    "inline-flex h-9 max-h-9 shrink-0 box-border cursor-pointer items-center gap-2 border-b border-transparent px-1 py-2 font-[450] text-[13px] whitespace-nowrap text-gray-400 transition-colors hover:text-gray-900 data-[state=active]:text-gray-900 disabled:pointer-events-none disabled:opacity-50 dark:text-gray-500 dark:data-[state=active]:text-gray-50 [&_svg]:size-4";
+    "inline-flex h-9 max-h-9 shrink-0 box-border cursor-pointer items-center gap-2 border-b border-transparent px-1 py-2 font-[450] text-[13px] whitespace-nowrap text-gray-500 transition-colors hover:text-gray-900 data-[state=active]:text-gray-900 disabled:pointer-events-none disabled:opacity-50 dark:text-gray-500 dark:data-[state=active]:text-gray-50 [&_svg]:size-4";
 
   return (
     <Unstyled.TabsList
@@ -179,6 +190,14 @@ function TabsItemsFramedList({
           <span className="my-auto me-auto shrink-0 text-sm font-medium">
             {label}
           </span>
+        )}
+        {showTerminalIcon && (
+          <HugeiconsIcon
+            icon={TerminalIcon}
+            strokeWidth={2}
+            aria-hidden
+            className="size-4 shrink-0 text-fd-muted-foreground"
+          />
         )}
         {items.map((item) => {
           const v = escapeValue(item);
@@ -353,6 +372,7 @@ export function Tabs({
   defaultIndex = 0,
   defaultValue = items ? escapeValue(items[defaultIndex]) : undefined,
   framed = true,
+  showTerminalIcon = true,
   ...props
 }: TabsProps) {
   const [value, setValue] = useState(defaultValue);
@@ -377,7 +397,12 @@ export function Tabs({
     >
       {items &&
         (framed ? (
-          <TabsItemsFramedList items={items} label={label} value={value} />
+          <TabsItemsFramedList
+            items={items}
+            label={label}
+            value={value}
+            showTerminalIcon={showTerminalIcon}
+          />
         ) : (
           <TabsItemsPillClipList items={items} label={label} value={value} />
         ))}

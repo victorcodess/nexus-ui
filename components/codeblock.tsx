@@ -1,7 +1,12 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import {
+  CodeIcon,
+  CollapseIcon,
+  Copy01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import {
   type ComponentProps,
   createContext,
@@ -34,7 +39,8 @@ export interface CodeBlockProps extends ComponentProps<"figure"> {
   /**
    * Icon of code block
    *
-   * When passed as a string, it assumes the value is the HTML of icon
+   * When passed as a string, it assumes the value is the HTML of icon.
+   * When omitted, a default code icon is shown.
    */
   icon?: ReactNode;
 
@@ -111,6 +117,28 @@ export function CodeBlock({
   const [overflows, setOverflows] = useState(false);
 
   const collapsedHeight = 16 * 24 + 28; // 16 lines × 24px line-height + 28px padding
+  const showCollapse =
+    !noCollapse && overflows && expanded;
+
+  const actionButtons = (
+    <>
+      {showCollapse && (
+        <CollapseCodeButton
+          onClick={() => {
+            setExpanded(false);
+            areaRef.current?.scrollTo({ top: 0 });
+          }}
+        />
+      )}
+      {allowCopy && (
+        <CopyButton
+          containerRef={areaRef}
+          showGlow={!title}
+          keepBackground={keepBackground}
+        />
+      )}
+    </>
+  );
 
   useEffect(() => {
     if (noCollapse) return;
@@ -151,25 +179,25 @@ export function CodeBlock({
               }}
             />
           ) : (
-            icon
+            icon ?? (
+              <HugeiconsIcon
+                icon={CodeIcon}
+                strokeWidth={2}
+                className="size-4 shrink-0 -mb-0.5"
+              />
+            )
           )}
-          <figcaption className="flex-1 truncate">{title}</figcaption>
+          <figcaption className="flex-1 truncate font-mono">{title}</figcaption>
           {Actions({
-            className: "-me-2",
-            children: allowCopy && <CopyButton containerRef={areaRef} />,
+            className: "-me-2 flex items-center gap-0.5",
+            children: actionButtons,
           })}
         </div>
       ) : (
         Actions({
           className:
-            "absolute top-3 right-3 z-2 rounded-lg text-gray-400 hover:text-gray-600",
-          children: allowCopy && (
-            <CopyButton
-              containerRef={areaRef}
-              showGlow
-              keepBackground={keepBackground}
-            />
-          ),
+            "absolute top-3 right-3 z-2 flex items-center gap-0.5 rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+          children: actionButtons,
         })
       )}
       <div className="relative overflow-hidden rounded-xl bg-white dark:bg-gray-900">
@@ -221,6 +249,21 @@ export function CodeBlock({
   );
 }
 
+function CollapseCodeButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-xs"
+      className="size-7 shrink-0 rounded-full text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 mr-2.5 hover:bg-transparent dark:hover:bg-transparent"
+      aria-label="Show less"
+      onClick={onClick}
+    >
+      <HugeiconsIcon icon={CollapseIcon} strokeWidth={2} className="size-4.5" />
+    </Button>
+  );
+}
+
 function CopyButton({
   className,
   containerRef,
@@ -260,7 +303,7 @@ function CopyButton({
         type="button"
         data-checked={checked || undefined}
         className={cn(
-          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+          "relative flex size-7 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full transition-colors",
           className,
         )}
         aria-label={checked ? "Copied Text" : "Copy Text"}
@@ -277,7 +320,7 @@ function CopyButton({
               >
                 <HugeiconsIcon
                   icon={Tick02Icon}
-                  strokeWidth={1.75}
+                  strokeWidth={2}
                   className="size-4.5"
                 />
               </motion.span>
@@ -289,7 +332,7 @@ function CopyButton({
               >
                 <HugeiconsIcon
                   icon={Copy01Icon}
-                  strokeWidth={1.75}
+                  strokeWidth={2}
                   className="size-4"
                 />
               </motion.span>
