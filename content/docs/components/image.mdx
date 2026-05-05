@@ -132,6 +132,104 @@ Render `Image` without `base64` or `uint8Array` source to show the built-in plac
   <ImageNoSourcePlaceholder />
 </DemoWithCode>
 
+## Vercel AI SDK Integration
+
+Use `Image` with OpenAI image generation by returning `base64` and `mediaType` from your API route, then passing them directly to `Image`.
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/openai
+```
+
+</Step>
+<Step>
+<h3>Create your chat route</h3>
+
+```ts title="app/api/chat/route.ts"
+import { openai } from "@ai-sdk/openai";
+import { generateImage } from "ai";
+
+export async function POST(req: Request) {
+  const { prompt }: { prompt: string } = await req.json();
+
+  const { image } = await generateImage({
+    model: openai.image("dall-e-3"),
+    prompt: prompt,
+    size: "1024x1024",
+  });
+
+  return Response.json({
+    base64: image.base64,
+    uint8Array: image.uint8Array ? Array.from(image.uint8Array) : undefined,
+    mediaType: image.mediaType,
+  });
+}
+```
+
+</Step>
+<Step>
+<h3>Call the route and render the generated image</h3>
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Image } from "@/components/nexus-ui/image";
+
+type GeneratedImage = {
+  base64?: string;
+  uint8Array?: number[];
+  mediaType?: string;
+};
+
+export function ChatWithImages() {
+  const [prompt, setPrompt] = useState("A futuristic city skyline at sunset");
+  const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(null);
+  const binaryImage = generatedImage?.uint8Array
+    ? new Uint8Array(generatedImage.uint8Array)
+    : undefined;
+
+  async function onGenerate() {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+    const data = (await response.json()) as GeneratedImage;
+    setGeneratedImage(data);
+  }
+
+  return (
+    <div className="space-y-3">
+      <input
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        className="w-full rounded-md border px-3 py-2"
+      />
+      <button className="rounded-md border px-3 py-2" onClick={onGenerate}>
+        Generate
+      </button>
+
+      {generatedImage?.base64 || binaryImage ? (
+        <Image
+          base64={generatedImage.base64}
+          uint8Array={binaryImage}
+          mediaType={generatedImage.mediaType ?? "image/png"}
+          alt="Generated image"
+          className="h-64 w-full"
+        />
+      ) : null}
+    </div>
+  );
+}
+```
+
+</Step>
+</Steps>
+
 ## API Reference
 
 ### Image
