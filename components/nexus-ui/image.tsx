@@ -13,7 +13,13 @@ type ImageData = {
 };
 
 function resolveBase64MediaType(base64: string, fallback: string) {
-  const normalized = base64.replace(/\s+/g, "").slice(0, 120);
+  const trimmed = base64.trim();
+
+  if (trimmed.startsWith("data:")) {
+    return /^data:([^;,]+)/i.exec(trimmed)?.[1] ?? fallback;
+  }
+
+  const normalized = trimmed.replace(/\s+/g, "").slice(0, 120);
 
   if (normalized.startsWith("iVBORw0KGgo")) return "image/png";
   if (normalized.startsWith("/9j/")) return "image/jpeg";
@@ -152,9 +158,7 @@ function ImagePreview({
   }, [resolvedSrc, setHasError]);
 
   if (!resolvedSrc) {
-    return (
-      <ImageLoader forceVisible aria-hidden className={cn("", className)} />
-    );
+    return <ImageLoader aria-hidden className={cn("", className)} />;
   }
 
   return (
@@ -181,15 +185,9 @@ function ImagePreview({
   );
 }
 
-export type ImageLoaderProps = React.HTMLAttributes<HTMLDivElement> & {
-  forceVisible?: boolean;
-};
+export type ImageLoaderProps = React.HTMLAttributes<HTMLDivElement>;
 
-function ImageLoader({
-  className,
-  forceVisible = false,
-  ...props
-}: ImageLoaderProps) {
+function ImageLoader({ className, ...props }: ImageLoaderProps) {
   const { hasError } = useImageContext("ImageLoader");
 
   return (
@@ -197,7 +195,6 @@ function ImageLoader({
       data-slot="image-loader"
       className={cn(
         "size-full animate-pulse rounded-lg bg-input transition-opacity",
-        !forceVisible && "opacity-100",
         hasError && "bg-destructive/20",
         className,
       )}
