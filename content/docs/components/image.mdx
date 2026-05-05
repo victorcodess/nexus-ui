@@ -1,6 +1,6 @@
 ---
 title: Image
-description: Composable AI image renderer for base64 and Uint8Array payloads
+description: Composable image renderer for AI generated images with base64 and Uint8Array payloads
 ---
 
 import ImageWithActions from "@/components/nexus-ui/examples/image/with-actions";
@@ -8,7 +8,7 @@ import ImageDefault from "@/components/nexus-ui/examples/image/default";
 import ImageNoSourcePlaceholder from "@/components/nexus-ui/examples/image/no-source-placeholder";
 import ImageExternalSrc from "@/components/nexus-ui/examples/image/external-src";
 
-Composable image primitives for multimodal chat UIs. `Image` accepts AI-generated payloads (`base64` or `uint8Array`) and exposes `ImagePreview`, `ImageLoader`, and optional action slots.
+Composable image primitives for multimodal UIs. `Image` accepts AI-generated payloads (`base64` or `uint8Array`) and exposes `ImagePreview`, `ImageLoader`, and optional action slots.
 
 <DemoWithCode src="components/nexus-ui/examples/image/default.tsx">
   <ImageDefault />
@@ -109,7 +109,10 @@ import {
 
 Compose `ImagePreview` with `ImageActions`, `ImageActionGroup`, and `ImageAction` for top/bottom/side controls.
 
-<DemoWithCode src="components/nexus-ui/examples/image/with-actions.tsx" previewClassName="h-auto sm:h-[412px]">
+<DemoWithCode
+  src="components/nexus-ui/examples/image/with-actions.tsx"
+  previewClassName="h-auto sm:h-[412px]"
+>
   <ImageWithActions />
 </DemoWithCode>
 
@@ -120,7 +123,6 @@ Use `src` for regular image URLs when you want `Image` to behave like a standard
 <DemoWithCode src="components/nexus-ui/examples/image/external-src.tsx">
   <ImageExternalSrc />
 </DemoWithCode>
-
 
 ### No Source Placeholder
 
@@ -150,8 +152,7 @@ Root container that resolves image source from `base64` or `uint8Array`, manages
     },
     uint8Array: {
       type: "Uint8Array",
-      description:
-        "Binary image payload used when `base64` is not provided.",
+      description: "Binary image payload used when `base64` is not provided.",
     },
     mediaType: {
       type: "string",
@@ -218,8 +219,7 @@ Pulsing loader surface used by `ImagePreview` (both as background while image pa
     forceVisible: {
       type: "boolean",
       default: "false",
-      description:
-        "Forces visible loader style in empty-source states.",
+      description: "Forces visible loader style in empty-source states.",
     },
     className: {
       type: "string",
