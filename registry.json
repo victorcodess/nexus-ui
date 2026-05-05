@@ -194,6 +194,20 @@
       ]
     },
     {
+      "name": "image",
+      "type": "registry:ui",
+      "title": "Image",
+      "description": "Composable AI image renderer for base64 and Uint8Array payloads with preview, loader, and action slots.",
+      "dependencies": ["@radix-ui/react-slot"],
+      "files": [
+        {
+          "path": "registry/new-york/image/image.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/image.tsx"
+        }
+      ]
+    },
+    {
       "name": "reasoning",
       "type": "registry:ui",
       "title": "Reasoning",
