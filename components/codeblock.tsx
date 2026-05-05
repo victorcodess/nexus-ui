@@ -2,8 +2,10 @@
 import { AnimatePresence, motion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  CodeIcon,
   SourceCodeIcon,
+  ThirdBracketIcon,
+  ThirdBracketSquareIcon,
+  ThirdBracketCircleIcon,
   CollapseIcon,
   Copy01Icon,
   Tick02Icon,
@@ -14,6 +16,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
   type RefObject,
+  isValidElement,
   use,
   useEffect,
   useMemo,
@@ -82,6 +85,38 @@ export interface CodeBlockProps extends ComponentProps<"figure"> {
   Actions?: (props: { className?: string; children?: ReactNode }) => ReactNode;
 }
 
+function languageFromClassName(className: unknown): string | undefined {
+  const str =
+    typeof className === "string"
+      ? className
+      : Array.isArray(className)
+        ? className.filter((p): p is string => typeof p === "string").join(" ")
+        : undefined;
+  if (!str) return;
+  const m = str.match(/\blanguage-([\w-]+)\b/);
+  return m?.[1]?.toLowerCase();
+}
+
+/** Shiki leaves `language-*` on the inner `<code>`; MDX nests it under `<Pre>`. */
+function findCodeLanguageInTree(node: ReactNode): string | undefined {
+  if (node == null || typeof node === "boolean") return;
+  if (typeof node === "string" || typeof node === "number") return;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const lang = findCodeLanguageInTree(item);
+      if (lang) return lang;
+    }
+    return;
+  }
+  if (!isValidElement(node)) return;
+
+  const props = node.props as { className?: unknown; children?: ReactNode };
+  const lang = languageFromClassName(props.className);
+  if (lang) return lang;
+
+  return findCodeLanguageInTree(props.children);
+}
+
 const TabsContext = createContext<{
   containerRef: RefObject<HTMLDivElement | null>;
   nested: boolean;
@@ -119,6 +154,38 @@ export function CodeBlock({
 
   const collapsedHeight = 16 * 24 + 28; // 16 lines × 24px line-height + 28px padding
   const showCollapse = !noCollapse && overflows && expanded;
+
+  const codeLang = useMemo(() => findCodeLanguageInTree(children), [children]);
+  const isJsonBlock =
+    codeLang === "json" ||
+    codeLang === "jsonc" ||
+    (typeof title === "string" && /\.jsonc?$/i.test(title.trim()));
+
+  const titleRowIcon =
+    typeof icon === "string" ? (
+      isJsonBlock ? (
+        <HugeiconsIcon
+          icon={ThirdBracketIcon}
+          strokeWidth={2}
+          className="-mb-0.5 size-4.25 shrink-0"
+        />
+      ) : (
+        <div
+          className="[&_svg]:size-3.5"
+          dangerouslySetInnerHTML={{
+            __html: icon,
+          }}
+        />
+      )
+    ) : icon != null ? (
+      icon
+    ) : (
+      <HugeiconsIcon
+        icon={isJsonBlock ? ThirdBracketSquareIcon : SourceCodeIcon}
+        strokeWidth={2}
+        className="-mb-0.5 size-4.25 shrink-0"
+      />
+    );
 
   const actionButtons = (
     <>
@@ -171,22 +238,7 @@ export function CodeBlock({
     >
       {title ? (
         <div className="flex h-9.5 items-center gap-2 px-4 text-fd-muted-foreground">
-          {typeof icon === "string" ? (
-            <div
-              className="[&_svg]:size-3.5"
-              dangerouslySetInnerHTML={{
-                __html: icon,
-              }}
-            />
-          ) : (
-            (icon ?? (
-              <HugeiconsIcon
-                icon={SourceCodeIcon}
-                strokeWidth={2}
-                className="-mb-0.5 size-4.25 shrink-0"
-              />
-            ))
-          )}
+          {titleRowIcon}
           <figcaption className="flex-1 truncate font-mono">{title}</figcaption>
           {Actions({
             className: "-me-2 flex items-center gap-0.5",

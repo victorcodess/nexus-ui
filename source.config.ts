@@ -22,6 +22,8 @@ export const docs = defineDocs({
 export default defineConfig({
   mdxOptions: {
     rehypeCodeOptions: {
+      /** Let CodeBlock use Hugeicons; avoid inline SVG in `icon` */
+      icon: false,
       parseMetaString(meta: string) {
         const parsed = parseCodeBlockAttributes(meta, [
           'title',
