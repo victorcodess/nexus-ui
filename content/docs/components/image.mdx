@@ -1,13 +1,279 @@
 ---
 title: Image
-description: Image display for multimodal chats
-
+description: Composable AI image renderer for base64 and Uint8Array payloads
 ---
 
+import ImageWithActions from "@/components/nexus-ui/examples/image/with-actions";
 import ImageDefault from "@/components/nexus-ui/examples/image/default";
+import ImageNoSourcePlaceholder from "@/components/nexus-ui/examples/image/no-source-placeholder";
+import ImageExternalSrc from "@/components/nexus-ui/examples/image/external-src";
 
-Image component with loading state and error handling. Pass **`src`** as the image URL and **`alt`** as the alt text.
+Composable image primitives for multimodal chat UIs. `Image` accepts AI-generated payloads (`base64` or `uint8Array`) and exposes `ImagePreview`, `ImageLoader`, and optional action slots.
 
 <DemoWithCode src="components/nexus-ui/examples/image/default.tsx">
   <ImageDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/image
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/image
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/image
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/image
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npm install @radix-ui/react-slot
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @radix-ui/react-slot
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/image/image.tsx" title="components/nexus-ui/image.tsx" />
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Image,
+  ImagePreview,
+  ImageLoader,
+  ImageActions,
+  ImageActionGroup,
+  ImageAction,
+} from "@/components/nexus-ui/image";
+```
+
+```tsx keepBackground
+<Image
+  base64={base64Image}
+  mediaType="image/png"
+  uint8Array={new Uint8Array([])}
+  alt="Generated image"
+/>
+```
+
+## Examples
+
+### With Overlay Actions
+
+Compose `ImagePreview` with `ImageActions`, `ImageActionGroup`, and `ImageAction` for top/bottom/side controls.
+
+<DemoWithCode src="components/nexus-ui/examples/image/with-actions.tsx" previewClassName="h-auto sm:h-[412px]">
+  <ImageWithActions />
+</DemoWithCode>
+
+### External URL
+
+Use `src` for regular image URLs when you want `Image` to behave like a standard `<img>` source renderer.
+
+<DemoWithCode src="components/nexus-ui/examples/image/external-src.tsx">
+  <ImageExternalSrc />
+</DemoWithCode>
+
+
+### No Source Placeholder
+
+Render `Image` without `base64` or `uint8Array` source to show the built-in placeholder loader.
+
+<DemoWithCode src="components/nexus-ui/examples/image/no-source-placeholder.tsx">
+  <ImageNoSourcePlaceholder />
+</DemoWithCode>
+
+## API Reference
+
+### Image
+
+Root container that resolves image source from `base64` or `uint8Array`, manages shared context, and renders `ImagePreview` by default when no children are provided.
+
+<TypeTable
+  type={{
+    src: {
+      type: "string",
+      description:
+        "Standard image URL source (e.g. external or local path). Used when `base64` and `uint8Array` are not provided.",
+    },
+    base64: {
+      type: "string",
+      description:
+        "Raw base64 payload or a full data URL (`data:image/...;base64,...`).",
+    },
+    uint8Array: {
+      type: "Uint8Array",
+      description:
+        "Binary image payload used when `base64` is not provided.",
+    },
+    mediaType: {
+      type: "string",
+      default: '"image/png"',
+      description:
+        "Preferred MIME type when creating the data URL/blob. Ignored when `base64` is a full `data:` URL.",
+    },
+    alt: {
+      type: "string",
+      default: '""',
+      description: "Default alt text used by `ImagePreview`.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the image root container.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Optional custom composition. When omitted, `<ImagePreview />` is rendered.",
+    },
+  }}
+/>
+
+### ImagePreview
+
+Renders the `<img>` element using source/alt from `Image` context. If there is no resolved source, it renders the loader placeholder.
+
+<TypeTable
+  type={{
+    src: {
+      type: "string",
+      description:
+        "Optional `img` source override for this preview instance. Falls back to `Image` root source when omitted.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the preview image/wrapper.",
+    },
+    alt: {
+      type: "string",
+      description:
+        "Optional alt override. Falls back to `Image` root `alt` when omitted.",
+    },
+    onLoad: {
+      type: "React.ReactEventHandler<HTMLImageElement>",
+      description: "Called when the image successfully loads.",
+    },
+    onError: {
+      type: "React.ReactEventHandler<HTMLImageElement>",
+      description: "Called when image loading fails.",
+    },
+  }}
+/>
+
+Also extends standard `img` props.
+
+### ImageLoader
+
+Pulsing loader surface used by `ImagePreview` (both as background while image paints and as placeholder when no source exists).
+
+<TypeTable
+  type={{
+    forceVisible: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Forces visible loader style in empty-source states.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the loader element.",
+    },
+  }}
+/>
+
+### ImageActions
+
+Absolute-positioned actions container for overlay controls.
+
+<TypeTable
+  type={{
+    align: {
+      type: '"inline-start" | "inline-end" | "block-start" | "block-end"',
+      default: '"block-end"',
+      description: "Placement of the action bar around the image frame.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the actions container.",
+    },
+  }}
+/>
+
+### ImageActionGroup
+
+Horizontal grouping wrapper for related overlay actions.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the group.",
+    },
+  }}
+/>
+
+### ImageAction
+
+Wrapper for one action item. Supports polymorphism via `asChild`.
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description:
+        "When true, merges props onto the child element instead of rendering a div.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the action wrapper.",
+    },
+  }}
+/>

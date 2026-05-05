@@ -6,6 +6,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 type ImageData = {
+  src?: string;
   base64?: string;
   uint8Array?: Uint8Array;
   mediaType?: string;
@@ -61,6 +62,7 @@ export type ImageProps = Omit<
   };
 
 function Image({
+  src: externalSrc,
   base64,
   uint8Array,
   mediaType,
@@ -78,8 +80,9 @@ function Image({
     if (base64) {
       return toDataUrl(base64, resolvedMediaType);
     }
-    return blobSrc;
-  }, [base64, resolvedMediaType, blobSrc]);
+    if (blobSrc) return blobSrc;
+    return externalSrc;
+  }, [base64, resolvedMediaType, blobSrc, externalSrc]);
 
   React.useEffect(() => {
     if (base64 || uint8Array == null || uint8Array.length === 0) {
@@ -131,39 +134,38 @@ function Image({
   );
 }
 
-export type ImagePreviewProps = Omit<
-  React.ImgHTMLAttributes<HTMLImageElement>,
-  "src"
->;
+export type ImagePreviewProps = React.ImgHTMLAttributes<HTMLImageElement>;
 
 function ImagePreview({
   className,
+  src: srcProp,
   alt: altProp,
   onLoad,
   onError,
   ...props
 }: ImagePreviewProps) {
-  const { src, alt, setHasError } = useImageContext("ImagePreview");
+  const { src: contextSrc, alt, setHasError } = useImageContext("ImagePreview");
+  const resolvedSrc = srcProp ?? contextSrc;
 
-  if (!src) {
+  React.useEffect(() => {
+    setHasError(false);
+  }, [resolvedSrc, setHasError]);
+
+  if (!resolvedSrc) {
     return (
-      <ImageLoader
-        forceVisible
-        aria-hidden
-        className={cn("h-40 w-full", className)}
-      />
+      <ImageLoader forceVisible aria-hidden className={cn("", className)} />
     );
   }
 
   return (
-    <div data-slot="image-preview" className="relative max-w-full">
-      <ImageLoader className="absolute inset-0 z-0 h-full w-full rounded-md" />
+    <div data-slot="image-preview" className="relative size-full max-w-full">
+      <ImageLoader className="absolute inset-0 z-0" />
       <img
         {...props}
-        src={src}
+        src={resolvedSrc}
         alt={altProp ?? alt}
         className={cn(
-          "relative z-10 h-auto max-w-full overflow-hidden rounded-md w-full",
+          "relative z-10 size-full max-w-full overflow-hidden rounded-md object-cover",
           className,
         )}
         onLoad={(e) => {
@@ -194,7 +196,7 @@ function ImageLoader({
     <div
       data-slot="image-loader"
       className={cn(
-        "size-full animate-pulse rounded-[20px] bg-input transition-opacity",
+        "size-full animate-pulse rounded-lg bg-input transition-opacity",
         !forceVisible && "opacity-100",
         hasError && "bg-destructive/20",
         className,

@@ -6,6 +6,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 type ImageData = {
+  src?: string;
   base64?: string;
   uint8Array?: Uint8Array;
   mediaType?: string;
@@ -61,6 +62,7 @@ export type ImageProps = Omit<
   };
 
 function Image({
+  src: externalSrc,
   base64,
   uint8Array,
   mediaType,
@@ -78,8 +80,9 @@ function Image({
     if (base64) {
       return toDataUrl(base64, resolvedMediaType);
     }
-    return blobSrc;
-  }, [base64, resolvedMediaType, blobSrc]);
+    if (blobSrc) return blobSrc;
+    return externalSrc;
+  }, [base64, resolvedMediaType, blobSrc, externalSrc]);
 
   React.useEffect(() => {
     if (base64 || uint8Array == null || uint8Array.length === 0) {
@@ -131,21 +134,24 @@ function Image({
   );
 }
 
-export type ImagePreviewProps = Omit<
-  React.ImgHTMLAttributes<HTMLImageElement>,
-  "src"
->;
+export type ImagePreviewProps = React.ImgHTMLAttributes<HTMLImageElement>;
 
 function ImagePreview({
   className,
+  src: srcProp,
   alt: altProp,
   onLoad,
   onError,
   ...props
 }: ImagePreviewProps) {
-  const { src, alt, setHasError } = useImageContext("ImagePreview");
+  const { src: contextSrc, alt, setHasError } = useImageContext("ImagePreview");
+  const resolvedSrc = srcProp ?? contextSrc;
 
-  if (!src) {
+  React.useEffect(() => {
+    setHasError(false);
+  }, [resolvedSrc, setHasError]);
+
+  if (!resolvedSrc) {
     return (
       <ImageLoader
         forceVisible
@@ -160,7 +166,7 @@ function ImagePreview({
       <ImageLoader className="absolute inset-0 z-0 h-full w-full rounded-md" />
       <img
         {...props}
-        src={src}
+        src={resolvedSrc}
         alt={altProp ?? alt}
         className={cn(
           "relative z-10 h-auto max-w-full overflow-hidden rounded-md w-full",
