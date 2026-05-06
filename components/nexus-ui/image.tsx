@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ export type ImageProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > &
+  Omit<React.ComponentProps<typeof DialogPrimitive.Root>, "children"> &
   ImageData & {
     alt?: string;
     children?: React.ReactNode;
@@ -72,6 +74,10 @@ function Image({
   base64,
   uint8Array,
   mediaType,
+  open,
+  defaultOpen,
+  onOpenChange,
+  modal,
   alt = "",
   className,
   children,
@@ -81,11 +87,11 @@ function Image({
   const { resolvedMediaType, resolvedSrc } = React.useMemo(() => {
     const nextResolvedMediaType = base64
       ? resolveBase64MediaType(base64, mediaType ?? "image/png")
-      : mediaType ?? "image/png";
+      : (mediaType ?? "image/png");
 
     const nextResolvedSrc = base64
       ? toDataUrl(base64, nextResolvedMediaType)
-      : blobSrc ?? src;
+      : (blobSrc ?? src);
 
     return {
       resolvedMediaType: nextResolvedMediaType,
@@ -129,16 +135,23 @@ function Image({
 
   return (
     <ImageContext.Provider value={contextValue}>
-      <div
-        data-slot="image"
-        className={cn(
-          "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-[20px] border dark:border-muted",
-          className,
-        )}
-        {...props}
+      <DialogPrimitive.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        modal={modal}
       >
-        {children ?? <ImagePreview />}
-      </div>
+        <div
+          data-slot="image"
+          className={cn(
+            "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-[20px] border dark:border-muted",
+            className,
+          )}
+          {...props}
+        >
+          {children ?? <ImagePreview />}
+        </div>
+      </DialogPrimitive.Root>
     </ImageContext.Provider>
   );
 }
@@ -165,26 +178,126 @@ function ImagePreview({
   }
 
   return (
-    <div data-slot="image-preview" className="relative size-full max-w-full">
-      <ImageLoader className="absolute inset-0 z-0" />
+    <DialogPrimitive.Trigger data-slot="image-preview-trigger" asChild>
+      <div data-slot="image-preview" className="relative size-full max-w-full">
+        <ImageLoader className="absolute inset-0 z-0" />
+        <img
+          {...props}
+          src={resolvedSrc}
+          alt={altProp ?? alt}
+          className={cn(
+            "relative z-1 size-full max-w-full overflow-hidden rounded-md object-cover",
+            className,
+          )}
+          onLoad={(e) => {
+            setHasError(false);
+            onLoad?.(e);
+          }}
+          onError={(e) => {
+            setHasError(true);
+            onError?.(e);
+          }}
+        />
+      </div>
+    </DialogPrimitive.Trigger>
+  );
+}
+
+export type ImageLightboxProps = React.ComponentProps<
+  typeof DialogPrimitive.Portal
+>;
+
+function ImageLightbox(props: ImageLightboxProps) {
+  return <DialogPrimitive.Portal data-slot="image-lightbox" {...props} />;
+}
+
+export type ImageLightboxOverlayProps = React.ComponentProps<
+  typeof DialogPrimitive.Overlay
+>;
+
+function ImageLightboxOverlay({
+  className,
+  ...props
+}: ImageLightboxOverlayProps) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="image-lightbox-overlay"
+      className={cn(
+        "fixed inset-0 z-50 bg-background/50 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export type ImageLightboxPreviewProps = React.ComponentProps<
+  typeof DialogPrimitive.Content
+> & {
+  src?: string;
+  alt?: string;
+};
+
+function ImageLightboxPreview({
+  className,
+  children,
+  onInteractOutside,
+  ...props
+}: ImageLightboxPreviewProps) {
+  const { src: contextSrc, alt } = useImageContext("ImageLightboxPreview");
+  const resolvedSrc = contextSrc;
+  return (
+    <DialogPrimitive.Content
+      data-slot="image-lightbox-preview"
+      className={cn(
+        "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-2xl duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
+        className,
+      )}
+      onInteractOutside={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('[data-slot="image-actions"]')) {
+          e.preventDefault();
+        }
+        onInteractOutside?.(e);
+      }}
+      {...props}
+    >
       <img
-        {...props}
+        data-slot="image-lightbox-image"
         src={resolvedSrc}
-        alt={altProp ?? alt}
-        className={cn(
-          "relative z-1 size-full max-w-full overflow-hidden rounded-md object-cover",
-          className,
-        )}
-        onLoad={(e) => {
-          setHasError(false);
-          onLoad?.(e);
-        }}
-        onError={(e) => {
-          setHasError(true);
-          onError?.(e);
-        }}
+        alt={alt}
+        className={cn("size-full object-contain")}
       />
-    </div>
+      {children}
+      <ImageLightboxTitle>{alt || "Image"}</ImageLightboxTitle>
+    </DialogPrimitive.Content>
+  );
+}
+
+export type ImageLightboxCloseProps = React.ComponentProps<
+  typeof DialogPrimitive.Close
+>;
+
+function ImageLightboxClose(props: ImageLightboxCloseProps) {
+  return (
+    <DialogPrimitive.Close
+      data-slot="image-lightbox-close"
+      className="sr-only"
+      {...props}
+    />
+  );
+}
+
+function ImageLightboxTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Title>) {
+  return (
+    <DialogPrimitive.Title
+      data-slot="image-lightbox-title"
+      className={cn("sr-only", className)}
+      {...props}
+    />
   );
 }
 
@@ -274,6 +387,10 @@ function ImageAction({
 
 Image.displayName = "Image";
 ImagePreview.displayName = "ImagePreview";
+ImageLightbox.displayName = "ImageLightbox";
+ImageLightboxOverlay.displayName = "ImageLightboxOverlay";
+ImageLightboxPreview.displayName = "ImageLightboxPreview";
+ImageLightboxClose.displayName = "ImageLightboxClose";
 ImageLoader.displayName = "ImageLoader";
 ImageActions.displayName = "ImageActions";
 ImageActionGroup.displayName = "ImageActionGroup";
@@ -282,6 +399,10 @@ ImageAction.displayName = "ImageAction";
 export {
   Image,
   ImagePreview,
+  ImageLightbox,
+  ImageLightboxOverlay,
+  ImageLightboxPreview,
+  ImageLightboxClose,
   ImageLoader,
   ImageActions,
   ImageActionGroup,
