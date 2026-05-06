@@ -68,7 +68,7 @@ export type ImageProps = Omit<
   };
 
 function Image({
-  src: externalSrc,
+  src,
   base64,
   uint8Array,
   mediaType,
@@ -78,17 +78,20 @@ function Image({
   ...props
 }: ImageProps) {
   const [blobSrc, setBlobSrc] = React.useState<string>();
-  const resolvedMediaType = React.useMemo(() => {
-    if (!base64) return mediaType ?? "image/png";
-    return resolveBase64MediaType(base64, mediaType ?? "image/png");
-  }, [base64, mediaType]);
-  const src = React.useMemo(() => {
-    if (base64) {
-      return toDataUrl(base64, resolvedMediaType);
-    }
-    if (blobSrc) return blobSrc;
-    return externalSrc;
-  }, [base64, resolvedMediaType, blobSrc, externalSrc]);
+  const { resolvedMediaType, resolvedSrc } = React.useMemo(() => {
+    const nextResolvedMediaType = base64
+      ? resolveBase64MediaType(base64, mediaType ?? "image/png")
+      : mediaType ?? "image/png";
+
+    const nextResolvedSrc = base64
+      ? toDataUrl(base64, nextResolvedMediaType)
+      : blobSrc ?? src;
+
+    return {
+      resolvedMediaType: nextResolvedMediaType,
+      resolvedSrc: nextResolvedSrc,
+    };
+  }, [base64, mediaType, blobSrc, src]);
 
   React.useEffect(() => {
     if (base64 || uint8Array == null || uint8Array.length === 0) {
@@ -96,9 +99,9 @@ function Image({
       return;
     }
 
-    const bytes = uint8Array;
-    const buffer = Uint8Array.from(bytes).buffer;
-    const blob = new Blob([buffer], { type: mediaType ?? "image/png" });
+    const blob = new Blob([Uint8Array.from(uint8Array).buffer], {
+      type: mediaType ?? "image/png",
+    });
     const objectUrl = URL.createObjectURL(blob);
     setBlobSrc(objectUrl);
 
@@ -111,17 +114,17 @@ function Image({
 
   React.useEffect(() => {
     setHasError(false);
-  }, [src]);
+  }, [resolvedSrc]);
 
   const contextValue = React.useMemo<ImageContextValue>(
     () => ({
-      src,
+      src: resolvedSrc,
       alt,
       mediaType: resolvedMediaType,
       hasError,
       setHasError,
     }),
-    [src, alt, resolvedMediaType, hasError],
+    [resolvedSrc, alt, resolvedMediaType, hasError],
   );
 
   return (
@@ -199,7 +202,7 @@ function ImageLoader({ className, ...props }: ImageLoaderProps) {
     <div
       data-slot="image-loader"
       className={cn(
-        "size-full animate-pulse rounded-[20px] bg-input transition-opacity",
+        "size-full animate-pulse rounded-[20px] bg-input",
         hasError && "bg-destructive/20",
         className,
       )}
