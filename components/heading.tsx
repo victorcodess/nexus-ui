@@ -32,7 +32,7 @@ export function Heading<T extends Types = "h1">({
         icon={Link02Icon}
         strokeWidth={2}
         aria-hidden
-        className="absolute -left-1 size-4 shrink-0 -translate-x-full text-ring opacity-0 transition-opacity peer-hover:opacity-100"
+        className="size-4 shrink-0 text-ring opacity-0 transition-opacity peer-hover:opacity-100 md:absolute md:-left-1.5 md:-translate-x-full"
       />
     </As>
   );
