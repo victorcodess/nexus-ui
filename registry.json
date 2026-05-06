@@ -4,20 +4,6 @@
   "homepage": "https://nexus-ui.dev",
   "items": [
     {
-      "name": "nexus-ui-theme",
-      "type": "registry:theme",
-      "title": "Nexus UI theme",
-      "description": "Tailwind v4 shadow and scale tokens used by Nexus UI components.",
-      "cssVars": {
-        "theme": {
-          "shadow-sm": "0 2px 4px -2px rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(0, 0, 0, 0.06)",
-          "shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)",
-          "scale-97": "0.97",
-          "scale-99": "0.99"
-        }
-      }
-    },
-    {
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
@@ -38,7 +24,12 @@
       "title": "Suggestions",
       "description": "Composable prompt suggestion chips for guiding user input.",
       "dependencies": ["@radix-ui/react-slot"],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme", "button"],
+      "registryDependencies": ["button"],
+      "css": {
+        "@theme inline": {
+          "--scale-99": "0.99"
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/suggestions/suggestions.tsx",
@@ -58,7 +49,11 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme"],
+      "css": {
+        "@theme inline": {
+          "--scale-97": "0.97"
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/attachments/attachments.tsx",
@@ -77,7 +72,11 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme"],
+      "css": {
+        "@theme inline": {
+          "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/model-selector/model-selector.tsx",
@@ -160,7 +159,11 @@
         "@hugeicons/core-free-icons",
         "use-stick-to-bottom"
       ],
-      "registryDependencies": ["@nexus-ui/nexus-ui-theme"],
+      "css": {
+        "@theme inline": {
+          "--shadow-sm": "0 2px 4px -2px rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(0, 0, 0, 0.06)"
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/thread/thread.tsx",
@@ -181,10 +184,14 @@
         "tldts"
       ],
       "registryDependencies": [
-        "@nexus-ui/nexus-ui-theme",
         "carousel",
         "hover-card"
       ],
+      "css": {
+        "@theme inline": {
+          "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/citation/citation.tsx",

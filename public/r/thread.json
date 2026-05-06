@@ -9,9 +9,11 @@
     "@hugeicons/core-free-icons",
     "use-stick-to-bottom"
   ],
-  "registryDependencies": [
-    "@nexus-ui/nexus-ui-theme"
-  ],
+  "css": {
+    "@theme inline": {
+      "--shadow-sm": "0 2px 4px -2px rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(0, 0, 0, 0.06)"
+    }
+  },
   "files": [
     {
       "path": "registry/new-york/thread/thread.tsx",

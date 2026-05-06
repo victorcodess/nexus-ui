@@ -7,9 +7,13 @@
     "@radix-ui/react-slot"
   ],
   "registryDependencies": [
-    "@nexus-ui/nexus-ui-theme",
     "button"
   ],
+  "css": {
+    "@theme inline": {
+      "--scale-99": "0.99"
+    }
+  },
   "files": [
     {
       "path": "registry/new-york/suggestions/suggestions.tsx",
