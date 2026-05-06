@@ -76,20 +76,20 @@ const imgAssistant = "/assets/nexus-avatar.png";
 
 const models = [
   {
-    value: "openai/gpt-image-1",
+    value: "gpt-image-1",
     icon: ChatgptIcon,
     title: "GPT Image 1",
     description: "High quality image generation",
   },
   {
-    value: "openai/dall-e-3",
+    value: "dall-e-3",
     icon: ChatgptIcon,
     title: "DALL-E 3",
     description: "Creative image generation",
   },
 ] as const;
 
-const DEFAULT_MODEL = "openai/gpt-image-1";
+const DEFAULT_MODEL = "gpt-image-1";
 
 function hasImagePayload(image?: GeneratedImage) {
   return Boolean(image?.base64 || image?.uint8Array?.length);
@@ -240,8 +240,8 @@ export default function ImageDemo() {
   console.log("messages image", messages);
 
   return (
-    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-20">
-      <Thread className="h-[75vh]">
+    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-10">
+      <Thread className="h-[80vh]">
         <ThreadContent className="mx-auto max-w-2xl pb-40">
           {messages.map((message, index) => {
             const isLast = index === messages.length - 1;
