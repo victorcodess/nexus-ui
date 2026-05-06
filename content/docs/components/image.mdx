@@ -7,6 +7,7 @@ import ImageWithActions from "@/components/nexus-ui/examples/image/with-actions"
 import ImageDefault from "@/components/nexus-ui/examples/image/default";
 import ImageNoSourcePlaceholder from "@/components/nexus-ui/examples/image/no-source-placeholder";
 import ImageExternalSrc from "@/components/nexus-ui/examples/image/external-src";
+import ImageLightboxExample from "@/components/nexus-ui/examples/image/lightbox";
 
 Composable image primitives for multimodal UIs. `Image` accepts AI-generated payloads (`base64` or `uint8Array`) and exposes `ImagePreview`, `ImageLoader`, and optional action slots.
 
@@ -87,6 +88,10 @@ bun add @radix-ui/react-slot
 import {
   Image,
   ImagePreview,
+  ImageLightbox,
+  ImageLightboxOverlay,
+  ImageLightboxPreview,
+  ImageLightboxClose,
   ImageLoader,
   ImageActions,
   ImageActionGroup,
@@ -130,6 +135,14 @@ Render `Image` without `base64` or `uint8Array` source to show the built-in plac
 
 <DemoWithCode src="components/nexus-ui/examples/image/no-source-placeholder.tsx">
   <ImageNoSourcePlaceholder />
+</DemoWithCode>
+
+### Lightbox Preview
+
+`ImagePreview` acts as the trigger, while `ImageLightbox` renders portal primitives (`ImageLightboxOverlay`, `ImageLightboxPreview`) and `ImageLightboxClose` can be placed externally in overlay actions.
+
+<DemoWithCode src="components/nexus-ui/examples/image/lightbox.tsx">
+  <ImageLightboxExample />
 </DemoWithCode>
 
 ## Vercel AI SDK Integration
@@ -234,7 +247,7 @@ export function ChatWithImages() {
 
 ### Image
 
-Root container that resolves image source from `base64` or `uint8Array`, manages shared context, and renders `ImagePreview` by default when no children are provided.
+Root container that resolves image source from `base64` or `uint8Array`, manages shared context, and wraps [Dialog Root](https://www.radix-ui.com/primitives/docs/components/dialog#root) for lightbox state.
 
 <TypeTable
   type={{
@@ -258,6 +271,23 @@ Root container that resolves image source from `base64` or `uint8Array`, manages
       description:
         "Preferred MIME type when creating the data URL/blob. Ignored when `base64` is a full `data:` URL.",
     },
+    open: {
+      type: "boolean",
+      description: "Controlled open state for the internal dialog root.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      description: "Initial uncontrolled open state for the internal dialog root.",
+    },
+    onOpenChange: {
+      type: "(open: boolean) => void",
+      description: "Callback fired when dialog open state changes.",
+    },
+    modal: {
+      type: "boolean",
+      default: "true",
+      description: "Whether the dialog should behave as a modal.",
+    },
     alt: {
       type: "string",
       default: '""',
@@ -277,7 +307,7 @@ Root container that resolves image source from `base64` or `uint8Array`, manages
 
 ### ImagePreview
 
-Renders the `<img>` element using source/alt from `Image` context. If there is no resolved source, it renders the loader placeholder.
+Renders the `<img>` element using source/alt from `Image` context and wraps [Dialog Trigger](https://www.radix-ui.com/primitives/docs/components/dialog#trigger). If there is no resolved source, it renders the loader placeholder.
 
 <TypeTable
   type={{
@@ -307,6 +337,93 @@ Renders the `<img>` element using source/alt from `Image` context. If there is n
 />
 
 Also extends standard `img` props.
+
+### ImageLightbox
+
+Portal root for lightbox content. Wraps [Dialog Portal](https://www.radix-ui.com/primitives/docs/components/dialog#portal).
+
+<TypeTable
+  type={{
+    container: {
+      type: "HTMLElement",
+      description: "Optional custom portal container element.",
+    },
+    forceMount: {
+      type: "boolean",
+      default: "false",
+      description: "Forces portal subtree to stay mounted.",
+    },
+  }}
+/>
+
+### ImageLightboxOverlay
+
+Backdrop layer for the lightbox. Wraps [Dialog Overlay](https://www.radix-ui.com/primitives/docs/components/dialog#overlay).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional CSS classes for the overlay.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLDivElement>",
+      description: "Optional click handler for the overlay element.",
+    },
+  }}
+/>
+
+### ImageLightboxPreview
+
+Centered lightbox content surface that renders the image and optional children. Wraps [Dialog Content](https://www.radix-ui.com/primitives/docs/components/dialog#content).
+
+<TypeTable
+  type={{
+    src: {
+      type: "string",
+      description:
+        "Optional source override for the lightbox image. Falls back to `Image` context source.",
+    },
+    alt: {
+      type: "string",
+      description:
+        "Optional alt override for the lightbox image. Falls back to `Image` context alt.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes for the content surface.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Optional overlay content rendered inside the preview content (e.g. actions).",
+    },
+    onInteractOutside: {
+      type: "(event) => void",
+      description:
+        "Called when interacting outside content. Built-in handling keeps `ImageActions` interactions from dismissing.",
+    },
+  }}
+/>
+
+### ImageLightboxClose
+
+Close control primitive for the lightbox. Wraps [Dialog Close](https://www.radix-ui.com/primitives/docs/components/dialog#close).
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description:
+        "When true, composes close behavior onto the child element instead of rendering a button.",
+    },
+    className: {
+      type: "string",
+      description: "Additional CSS classes on the close trigger.",
+    },
+  }}
+/>
 
 ### ImageLoader
 
