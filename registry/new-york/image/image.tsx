@@ -132,7 +132,7 @@ function Image({
       <div
         data-slot="image"
         className={cn(
-          "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-[20px] border",
+          "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-[20px] border dark:border-muted",
           className,
         )}
         {...props}
@@ -161,23 +161,18 @@ function ImagePreview({
   }, [resolvedSrc, setHasError]);
 
   if (!resolvedSrc) {
-    return (
-      <ImageLoader
-        aria-hidden
-        className={cn("h-40 w-full", className)}
-      />
-    );
+    return <ImageLoader aria-hidden className={className} />;
   }
 
   return (
-    <div data-slot="image-preview" className="relative max-w-full">
-      <ImageLoader className="absolute inset-0 z-0 h-full w-full rounded-md" />
+    <div data-slot="image-preview" className="relative size-full max-w-full">
+      <ImageLoader className="absolute inset-0 z-0" />
       <img
         {...props}
         src={resolvedSrc}
         alt={altProp ?? alt}
         className={cn(
-          "relative z-10 h-auto max-w-full overflow-hidden rounded-md w-full",
+          "relative z-1 size-full max-w-full overflow-hidden rounded-md object-cover",
           className,
         )}
         onLoad={(e) => {
@@ -202,7 +197,7 @@ function ImageLoader({ className, ...props }: ImageLoaderProps) {
     <div
       data-slot="image-loader"
       className={cn(
-        "size-full animate-pulse rounded-[20px] bg-input",
+        "size-full animate-pulse rounded-lg bg-input",
         hasError && "bg-destructive/20",
         className,
       )}
