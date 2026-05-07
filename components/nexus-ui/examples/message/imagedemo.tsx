@@ -14,6 +14,7 @@ import {
   SquareIcon,
   ThumbsDownIcon,
   ThumbsUpIcon,
+  Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,6 +22,10 @@ import {
   ImageAction,
   ImageActionGroup,
   ImageActions,
+  ImageLightboxClose,
+  ImageLightbox,
+  ImageLightboxOverlay,
+  ImageLightboxPreview,
   ImagePreview,
 } from "@/components/nexus-ui/image";
 import {
@@ -89,7 +94,7 @@ const models = [
   },
 ] as const;
 
-const DEFAULT_MODEL = "gpt-image-1";
+const DEFAULT_MODEL = "dall-e-3";
 
 function hasImagePayload(image?: GeneratedImage) {
   return Boolean(image?.base64 || image?.uint8Array?.length);
@@ -125,7 +130,9 @@ export default function ImageDemo() {
         ? image.base64
         : `data:${mediaType};base64,${image.base64}`;
     } else if (image.uint8Array?.length) {
-      const blob = new Blob([new Uint8Array(image.uint8Array)], { type: mediaType });
+      const blob = new Blob([new Uint8Array(image.uint8Array)], {
+        type: mediaType,
+      });
       url = URL.createObjectURL(blob);
       shouldRevokeObjectUrl = true;
     }
@@ -324,7 +331,10 @@ export default function ImageDemo() {
                             className="w-full overflow-hidden rounded-xl border"
                           >
                             <ImagePreview />
-                            <ImageActions align="block-start" className="justify-end opacity-0 group-hover/image:opacity-100 transition-opacity">
+                            <ImageActions
+                              align="block-start"
+                              className="justify-end opacity-0 transition-opacity group-hover/image:opacity-100"
+                            >
                               <ImageActionGroup>
                                 <ImageAction asChild>
                                   <Button
@@ -359,7 +369,10 @@ export default function ImageDemo() {
                                 </ImageAction>
                               </ImageActionGroup>
                             </ImageActions>
-                            <ImageActions align="block-end" className="justify-end opacity-0 group-hover/image:opacity-100 transition-opacity">
+                            <ImageActions
+                              align="block-end"
+                              className="justify-end opacity-0 transition-opacity group-hover/image:opacity-100"
+                            >
                               <ImageActionGroup>
                                 <ImageAction asChild>
                                   <Button
@@ -368,7 +381,9 @@ export default function ImageDemo() {
                                     variant="secondary"
                                     className="cursor-pointer rounded-full bg-card/90 text-primary backdrop-blur-lg hover:bg-card active:scale-97"
                                     aria-label="Download image"
-                                    onClick={() => handleDownloadImage(message.image)}
+                                    onClick={() =>
+                                      handleDownloadImage(message.image)
+                                    }
                                   >
                                     <HugeiconsIcon
                                       icon={Download01Icon}
@@ -379,6 +394,34 @@ export default function ImageDemo() {
                                 </ImageAction>
                               </ImageActionGroup>
                             </ImageActions>
+
+                            <ImageLightbox>
+                              <ImageLightboxOverlay />
+                              <ImageLightboxPreview className="w-800" />
+                              <ImageActions
+                                align="block-start"
+                                className="fixed z-60 justify-end"
+                              >
+                                <ImageActionGroup>
+                                  <ImageAction asChild>
+                                    <ImageLightboxClose asChild>
+                                      <Button
+                                        type="button"
+                                        size="icon-sm"
+                                        variant="secondary"
+                                        className="cursor-pointer rounded-full bg-secondary text-[13px] text-primary backdrop-blur-lg hover:bg-card active:scale-97"
+                                      >
+                                        <HugeiconsIcon
+                                          icon={Cancel01Icon}
+                                          strokeWidth={2.0}
+                                          className="size-4"
+                                        />
+                                      </Button>
+                                    </ImageLightboxClose>
+                                  </ImageAction>
+                                </ImageActionGroup>
+                              </ImageActions>
+                            </ImageLightbox>
                           </Image>
                         ) : (
                           <MessageMarkdown>{message.text}</MessageMarkdown>

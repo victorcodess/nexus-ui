@@ -22,7 +22,7 @@ export default function ImageLightboxExample() {
       alt="Preview that opens in a lightbox"
       className="aspect-square w-1/2"
     >
-      <ImagePreview />
+      <ImagePreview className="cursor-pointer" />
       <ImageLightbox>
         <ImageLightboxOverlay />
         <ImageLightboxPreview />
@@ -34,7 +34,7 @@ export default function ImageLightboxExample() {
                   type="button"
                   size="icon-sm"
                   variant="secondary"
-                  className="cursor-pointer rounded-full bg-secondary text-[13px] text-primary backdrop-blur-lg hover:bg-card active:scale-97"
+                  className="cursor-pointer rounded-full bg-secondary text-[13px] text-primary backdrop-blur-lg hover:bg-secondary/80 active:scale-97"
                 >
                   <HugeiconsIcon
                     icon={Cancel01Icon}
