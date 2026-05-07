@@ -18,7 +18,8 @@
   <a href="https://nexus-ui.dev/docs/components/thread">Thread</a> ·
   <a href="https://nexus-ui.dev/docs/components/citation">Citation</a> ·
   <a href="https://nexus-ui.dev/docs/components/reasoning">Reasoning</a> ·
-  <a href="https://nexus-ui.dev/docs/components/text-shimmer">Text Shimmer</a>
+  <a href="https://nexus-ui.dev/docs/components/text-shimmer">Text Shimmer</a> ·
+  <a href="https://nexus-ui.dev/docs/components/image">Image</a>
 </p>
 
 ---
@@ -46,6 +47,7 @@ Copy-paste components into your project. You own the code.
 | `Citation`      | Inline citations with hover preview, favicons, and multi-source carousel    |
 | `Reasoning`     | Collapsible reasoning trace with streaming labels and markdown content        |
 | `TextShimmer`   | Animated shimmer text for loading and in-progress states                    |
+| `Image`         | AI image UI for URLs, base64, and bytes with preview, loader, lightbox, and actions |
 
 ## Quick Start
 
@@ -71,6 +73,7 @@ npx shadcn@latest add @nexus-ui/thread
 npx shadcn@latest add @nexus-ui/citation
 npx shadcn@latest add @nexus-ui/reasoning
 npx shadcn@latest add @nexus-ui/text-shimmer
+npx shadcn@latest add @nexus-ui/image
 ```
 
 **Option 2: Direct URL**
@@ -84,7 +87,7 @@ npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```bash
 npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation reasoning text-shimmer
+npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation reasoning text-shimmer image
 ```
 
 To use the `@nexus-ui` scope with a custom registry, add to your `components.json`:

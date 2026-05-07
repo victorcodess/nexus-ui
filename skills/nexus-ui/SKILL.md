@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -38,6 +38,7 @@ npx shadcn@latest add @nexus-ui/thread
 npx shadcn@latest add @nexus-ui/citation
 npx shadcn@latest add @nexus-ui/reasoning
 npx shadcn@latest add @nexus-ui/text-shimmer
+npx shadcn@latest add @nexus-ui/image
 ```
 
 Or install directly via URL (no registry config needed):
@@ -68,6 +69,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Citation | `citation` | Inline citations with hover preview, favicons, and multi-source carousel |
 | Reasoning | `reasoning` | Collapsible reasoning trace with streaming-aware trigger label and markdown body |
 | Text Shimmer | `text-shimmer` | Animated shimmer text for loading and in-progress UI |
+| Image | `image` | URLs, base64, or `Uint8Array` image payloads with preview, loader, lightbox (Radix Dialog), and action slots |
 
 ## Component APIs
 
@@ -600,6 +602,60 @@ import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
 <TextShimmer repeatDelay={0.5}>Running tool calls</TextShimmer>
 ```
 
+### Image
+
+Composable image tile for multimodal models: accepts `src`, `base64`, or `uint8Array` (+ `mediaType`), wraps content in a Radix **Dialog** root for lightbox viewing, and exposes loader + absolute action regions.
+
+**Import:**
+
+```tsx
+import {
+  Image,
+  ImagePreview,
+  ImageLightbox,
+  ImageLightboxOverlay,
+  ImageLightboxPreview,
+  ImageLightboxClose,
+  ImageLoader,
+  ImageActions,
+  ImageActionGroup,
+  ImageAction,
+} from "@/components/nexus-ui/image";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Image` | Root `div` inside `Dialog`; resolves `src` / data URL from `base64` / object URL from `uint8Array`; provides context; default child is `ImagePreview`. |
+| `ImagePreview` | Thumbnail; wraps an `<img>` in `Dialog` **Trigger** when `src` resolves; shows `ImageLoader` while empty. |
+| `ImageLightbox` | `Dialog.Portal` wrapper. |
+| `ImageLightboxOverlay` | Modal backdrop. |
+| `ImageLightboxPreview` | `Dialog.Content` with large `<img>` (`object-contain`) and screen-reader title. |
+| `ImageLightboxClose` | Visually hidden close control (sr-only). |
+| `ImageLoader` | Pulse skeleton; reflects error state via context. |
+| `ImageActions` | Absolutely positioned action strip; `align`: `inline-start` \| `inline-end` \| `block-start` \| `block-end`. |
+| `ImageActionGroup` / `ImageAction` | Grouped controls; `ImageAction` supports `asChild` + `Slot`. |
+
+**Root props:** On `Image`, pass one of `src`, `base64`, or `uint8Array`; optional `mediaType`, `alt`; plus Radix dialog root props (`open`, `defaultOpen`, `onOpenChange`, `modal`) and normal `div` HTML attributes / `className`.
+
+**Props & hooks:** Internal context only (no exported hook). Nested parts must sit under `Image`.
+
+**Usage notes:** Omit `children` on `Image` to get the default preview. Compose `ImageLightbox*` as siblings of the root card (typical pattern from docs) so clicking the preview opens the modal. Use `ImageActions` + `ImageAction asChild` around `Button` for download or share.
+
+**Example (minimal):**
+
+```tsx
+<Image base64={modelImageBase64} alt="Generated scene">
+  <ImagePreview />
+  <ImageLightbox>
+    <ImageLightboxOverlay />
+    <ImageLightboxPreview />
+    <ImageLightboxClose />
+  </ImageLightbox>
+</Image>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -695,7 +751,8 @@ components/
 │   ├── thread.tsx
 │   ├── citation.tsx
 │   ├── reasoning.tsx
-│   └── text-shimmer.tsx
+│   ├── text-shimmer.tsx
+│   └── image.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -717,11 +774,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Citation:** `radix-ui`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `carousel`, `hover-card`
 - **Reasoning:** `streamdown`, `@hugeicons/react`, `@hugeicons/core-free-icons`, `tw-shimmer`, shadcn `collapsible`, registry CSS for shimmer + collapsible height keyframes
 - **Text Shimmer:** `@/lib/utils` only (`cn`)
+- **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, `@/lib/utils`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt

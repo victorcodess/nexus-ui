@@ -201,20 +201,6 @@
       ]
     },
     {
-      "name": "image",
-      "type": "registry:ui",
-      "title": "Image",
-      "description": "Composable AI image renderer for base64 and Uint8Array payloads with preview, loader, and action slots.",
-      "dependencies": ["@radix-ui/react-slot"],
-      "files": [
-        {
-          "path": "registry/new-york/image/image.tsx",
-          "type": "registry:file",
-          "target": "~/components/nexus-ui/image.tsx"
-        }
-      ]
-    },
-    {
       "name": "reasoning",
       "type": "registry:ui",
       "title": "Reasoning",
@@ -270,6 +256,20 @@
           "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/text-shimmer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "image",
+      "type": "registry:ui",
+      "title": "Image",
+      "description": "Composable AI image renderer for URLs, base64, and Uint8Array payloads with preview, loader, lightbox, and action slots.",
+      "dependencies": ["@radix-ui/react-dialog", "@radix-ui/react-slot"],
+      "files": [
+        {
+          "path": "registry/new-york/image/image.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/image.tsx"
         }
       ]
     }

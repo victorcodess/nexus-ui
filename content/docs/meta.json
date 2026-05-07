@@ -8,13 +8,13 @@
     "---Components---",
     "components/attachments",
     "components/citation",
-    "components/image",
     "components/message",
     "components/model-selector",
     "components/prompt-input",
     "components/reasoning",
     "components/suggestions",
     "components/text-shimmer",
-    "components/thread"
+    "components/thread",
+    "components/image"
   ]
 }
