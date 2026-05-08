@@ -6,6 +6,7 @@ import { cn } from "../../lib/cn";
 import { type ButtonProps, buttonVariants } from "../ui/button";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 interface SearchToggleProps
   extends Omit<ComponentProps<"button">, "variant">, ButtonProps {
@@ -67,16 +68,16 @@ export function LargeSearchToggle({
     >
       <HugeiconsIcon icon={Search01Icon} className="size-4" strokeWidth={2} />
       {text.search}
-      <div className="ms-auto inline-flex gap-1">
+      <KbdGroup className="ms-auto inline-flex gap-1">
         {hotKey.map((k, i) => (
-          <kbd
+          <Kbd
             key={i}
-            className="inline-flex size-5 items-center justify-center rounded-sm bg-gray-800 text-sm text-gray-400"
+            className="size-5 items-center justify-center rounded-sm bg-gray-800 text-sm text-gray-400"
           >
             {k.display}
-          </kbd>
+          </Kbd>
         ))}
-      </div>
+      </KbdGroup>
     </button>
   );
 }

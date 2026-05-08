@@ -29,7 +29,7 @@ export default function ImageWithActions() {
         <ImagePreview />
         <ImageActions align="block-start" className="justify-start">
           <ImageActionGroup>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip="Share image">
               <Button
                 type="button"
                 size="icon-sm"
@@ -43,7 +43,7 @@ export default function ImageWithActions() {
                 />
               </Button>
             </ImageAction>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip={{ content: "Copy image", shortcut: "C" }}>
               <Button
                 type="button"
                 size="icon-sm"
@@ -62,7 +62,7 @@ export default function ImageWithActions() {
 
         <ImageActions align="block-end">
           <ImageActionGroup>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip={{ content: "Edit", side: "top" }}>
               <Button
                 type="button"
                 variant="secondary"
@@ -74,7 +74,10 @@ export default function ImageWithActions() {
           </ImageActionGroup>
 
           <ImageActionGroup>
-            <ImageAction asChild>
+            <ImageAction
+              asChild
+              tooltip={{ content: "Download image", side: "left", shortcut: "D" }}
+            >
               <Button
                 type="button"
                 size="icon-sm"
@@ -102,7 +105,7 @@ export default function ImageWithActions() {
         <ImagePreview />
         <ImageActions align="inline-start" className="justify-center">
           <ImageActionGroup className="flex-col">
-            <ImageAction asChild>
+            <ImageAction asChild tooltip={{ content: "Share image", side: "right" }}>
               <Button
                 type="button"
                 size="icon-sm"
@@ -116,7 +119,7 @@ export default function ImageWithActions() {
                 />
               </Button>
             </ImageAction>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip="Copy image">
               <Button
                 type="button"
                 size="icon-sm"
@@ -135,7 +138,7 @@ export default function ImageWithActions() {
 
         <ImageActions align="inline-end" className="items-end">
           <ImageActionGroup>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip="Edit">
               <Button
                 type="button"
                 variant="secondary"
@@ -147,7 +150,7 @@ export default function ImageWithActions() {
           </ImageActionGroup>
 
           <ImageActionGroup>
-            <ImageAction asChild>
+            <ImageAction asChild tooltip={{ content: "Download image", shortcut: "D" }}>
               <Button
                 type="button"
                 size="icon-sm"

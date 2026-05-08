@@ -99,11 +99,11 @@ import {
 | `PromptInputTextarea` | Auto-resizing textarea (max height ~160px) inside shadcn `ScrollArea`. |
 | `PromptInputActions` | Bottom bar; `justify-between` for left vs right action groups. |
 | `PromptInputActionGroup` | Horizontal group of actions (`gap-2`). |
-| `PromptInputAction` | Slot for one control; use `asChild` with `Button`. |
+| `PromptInputAction` | Slot for one control; supports `asChild` and optional built-in tooltip via `tooltip` (string or object). |
 
-**Root props:** None beyond normal DOM attributes / `className` on `PromptInput` (it is only a layout wrapper).
+**Root props:** Optional `onSubmit(value: string)` on `PromptInput` for Enter-to-submit from `PromptInputTextarea` (Shift+Enter adds newline), plus normal DOM attributes / `className`.
 
-**Props & hooks:** Every part accepts `className`. `PromptInputTextarea` accepts standard textarea props. `PromptInputAction` supports `asChild`. There is no context hook.
+**Props & hooks:** Every part accepts `className`. `PromptInputTextarea` accepts standard textarea props. `PromptInputAction` supports `asChild` and `tooltip?: string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }` (no tooltip renders when `content` is missing). There is no context hook.
 
 **Usage notes:** Put attach/tools in the first `PromptInputActionGroup` and send in the second so `justify-between` separates them. Prefer `PromptInputAction asChild` around `Button` rather than using `PromptInputAction` as the clickable element itself.
 
@@ -358,12 +358,12 @@ import {
 | `MessageMarkdown` | Renders markdown with Streamdown plugins (code, math, mermaid, CJK). |
 | `MessageActions` | Action row container. |
 | `MessageActionGroup` | Groups action buttons. |
-| `MessageAction` | Single action; supports `asChild`. |
+| `MessageAction` | Single action; supports `asChild` and optional built-in tooltip via `tooltip` (string or object). |
 | `MessageAvatar` | Avatar column; `src`, optional `fallback`, `alt`, `size`, `delayMs`. |
 
 **Root props:** On `Message`, required `from`: `"user"` \| `"assistant"`. Standard `HTMLAttributes<HTMLDivElement>` apply to the article wrapper. Default `aria-label` is `"User message"` or `"Assistant message"` unless you pass `aria-label` or `aria-labelledby`.
 
-**Props & hooks:** No exported context hook. Descendants (`MessageStack`, `MessageContent`, `MessageActions`, etc.) read `from` from internal context (fallback `assistant` if used outside `Message`). `MessageMarkdown` accepts [Streamdown](https://github.com/vercel/streamdown) props (`ComponentProps<typeof Streamdown>`): e.g. markdown via `children`, optional `components` merged over built-in `code` / `table` / `inlineCode` defaults, plus `className`. `MessageAction` supports `asChild` (Radix `Slot`). `MessageAvatar`: required `src`; optional `alt`, `fallback`, `delayMs`, `size`, `className`.
+**Props & hooks:** No exported context hook. Descendants (`MessageStack`, `MessageContent`, `MessageActions`, etc.) read `from` from internal context (fallback `assistant` if used outside `Message`). `MessageMarkdown` accepts [Streamdown](https://github.com/vercel/streamdown) props (`ComponentProps<typeof Streamdown>`): e.g. markdown via `children`, optional `components` merged over built-in `code` / `table` / `inlineCode` defaults, plus `className`. `MessageAction` supports `asChild` (Radix `Slot`) and `tooltip?: string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }` (no tooltip renders when `content` is missing). `MessageAvatar`: required `src`; optional `alt`, `fallback`, `delayMs`, `size`, `className`.
 
 **Usage notes:** Registry install adds `codeblock.tsx` next to `message.tsx`. Merge Streamdown-related CSS from the registry item when installing manually. Prefer `MessageAction asChild` around `Button` for actions.
 
@@ -635,13 +635,13 @@ import {
 | `ImageLightboxClose` | Visually hidden close control (sr-only). |
 | `ImageLoader` | Pulse skeleton; reflects error state via context. |
 | `ImageActions` | Absolutely positioned action strip; `align`: `inline-start` \| `inline-end` \| `block-start` \| `block-end`. |
-| `ImageActionGroup` / `ImageAction` | Grouped controls; `ImageAction` supports `asChild` + `Slot`. |
+| `ImageActionGroup` / `ImageAction` | Grouped controls; `ImageAction` supports `asChild` + `Slot` and optional built-in tooltip via `tooltip` (string or object). |
 
 **Root props:** On `Image`, pass one of `src`, `base64`, or `uint8Array`; optional `mediaType`, `alt`; plus Radix dialog root props (`open`, `defaultOpen`, `onOpenChange`, `modal`) and normal `div` HTML attributes / `className`.
 
 **Props & hooks:** Internal context only (no exported hook). Nested parts must sit under `Image`.
 
-**Usage notes:** Omit `children` on `Image` to get the default preview. Compose `ImageLightbox*` as siblings of the root card (typical pattern from docs) so clicking the preview opens the modal. Use `ImageActions` + `ImageAction asChild` around `Button` for download or share.
+**Usage notes:** Omit `children` on `Image` to get the default preview. Compose `ImageLightbox*` as siblings of the root card (typical pattern from docs) so clicking the preview opens the modal. Use `ImageActions` + `ImageAction asChild` around `Button` for download or share; add `tooltip` to `ImageAction` for labels, side placement, and optional shortcuts.
 
 **Example (minimal):**
 
@@ -765,16 +765,16 @@ components/
 
 Registry items pull these in as needed (shadcn CLI installs registry dependencies):
 
-- **Prompt Input:** `@radix-ui/react-slot`, shadcn `textarea`, `scroll-area`, `@/lib/utils`
+- **Prompt Input:** `@radix-ui/react-slot`, shadcn `textarea`, `scroll-area`, `tooltip`, `kbd`, `@/lib/utils`
 - **Suggestions:** `@radix-ui/react-presence`, `@radix-ui/react-slot`, `class-variance-authority`, shadcn `button`
 - **Model Selector:** `radix-ui` (DropdownMenu), `class-variance-authority`, `@hugeicons/react`, `@hugeicons/core-free-icons`
 - **Attachments:** `@radix-ui/react-slot`, `class-variance-authority`, `@hugeicons/react`, `@hugeicons/core-free-icons`
-- **Message:** `streamdown` + `@streamdown/*` plugins, `radix-ui`, `@radix-ui/react-slot`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `avatar`
+- **Message:** `streamdown` + `@streamdown/*` plugins, `radix-ui`, `@radix-ui/react-slot`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `avatar`, `tooltip`, `kbd`
 - **Thread:** `@radix-ui/react-slot`, `use-stick-to-bottom`, `@hugeicons/react`, `@hugeicons/core-free-icons`
 - **Citation:** `radix-ui`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `carousel`, `hover-card`
 - **Reasoning:** `streamdown`, `@hugeicons/react`, `@hugeicons/core-free-icons`, `tw-shimmer`, shadcn `collapsible`, registry CSS for shimmer + collapsible height keyframes
 - **Text Shimmer:** `@/lib/utils` only (`cn`)
-- **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, `@/lib/utils`
+- **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 
 ## Documentation
 

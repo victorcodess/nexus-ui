@@ -51,22 +51,22 @@ bunx shadcn@latest add @nexus-ui/message
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab value="npm">
 ```bash
-npx shadcn@latest add button avatar && npm install streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+npx shadcn@latest add button avatar tooltip kbd && npm install streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm dlx shadcn@latest add button avatar && pnpm add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+pnpm dlx shadcn@latest add button avatar tooltip kbd && pnpm add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn dlx shadcn@latest add button avatar && yarn add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+yarn dlx shadcn@latest add button avatar tooltip kbd && yarn add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bunx shadcn@latest add button avatar && bun add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
+bunx shadcn@latest add button avatar tooltip kbd && bun add streamdown @streamdown/cjk @streamdown/code @streamdown/math @streamdown/mermaid radix-ui @radix-ui/react-slot @hugeicons/react @hugeicons/core-free-icons hast
 ```
 </Tab>
 </Tabs>
@@ -115,7 +115,7 @@ import {
 
 ### With Actions
 
-Use **`MessageActions`** and **`MessageActionGroup`** for a row of controls. **`MessageAction`** is a thin **Slot** for individual action buttons.
+Use **`MessageActions`** and **`MessageActionGroup`** for a row of controls. **`MessageAction`** supports built-in tooltips via `tooltip` as either a string or object (`content`, optional `side`, optional `shortcut`).
 
 <DemoWithCode src="components/nexus-ui/examples/message/with-actions.tsx">
   <MessageWithActions />
@@ -394,7 +394,7 @@ Groups related action buttons together with a horizontal layout.
 
 ### MessageAction
 
-A wrapper for individual action buttons. Supports polymorphism via `asChild`.
+A wrapper for individual action buttons. Supports polymorphism via `asChild` and optional built-in tooltip rendering.
 
 <TypeTable
   type={{
@@ -407,6 +407,11 @@ A wrapper for individual action buttons. Supports polymorphism via `asChild`.
       type: "string",
       description:
         "Additional CSS classes to apply to the action.",
+    },
+    tooltip: {
+      type: 'string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }',
+      description:
+        "Tooltip config. String form maps to tooltip content. Object form supports content, side, and keyboard shortcut. If content is omitted, no tooltip is rendered.",
     },
   }}
 />

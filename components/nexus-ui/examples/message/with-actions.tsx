@@ -29,7 +29,7 @@ const MessageWithActions = () => {
           </MessageContent>
           <MessageActions>
             <MessageActionGroup>
-              <MessageAction asChild>
+              <MessageAction asChild tooltip={{ content: "Edit", shortcut: "E" }}>
                 <Button
                   type="button"
                   variant="ghost"
@@ -43,7 +43,7 @@ const MessageWithActions = () => {
                   />
                 </Button>
               </MessageAction>
-              <MessageAction asChild>
+              <MessageAction asChild tooltip="Copy">
                 <Button
                   type="button"
                   variant="ghost"
@@ -71,7 +71,7 @@ const MessageWithActions = () => {
           </MessageContent>
           <MessageActions>
             <MessageActionGroup>
-              <MessageAction asChild>
+              <MessageAction asChild tooltip="Copy response">
                 <Button
                   type="button"
                   variant="ghost"
@@ -85,7 +85,10 @@ const MessageWithActions = () => {
                   />
                 </Button>
               </MessageAction>
-              <MessageAction asChild>
+              <MessageAction
+                asChild
+                tooltip={{ content: "Like", side: "top", shortcut: "L" }}
+              >
                 <Button
                   type="button"
                   variant="ghost"
@@ -99,7 +102,7 @@ const MessageWithActions = () => {
                   />
                 </Button>
               </MessageAction>
-              <MessageAction asChild>
+              <MessageAction asChild tooltip="Dislike">
                 <Button
                   type="button"
                   variant="ghost"
@@ -113,7 +116,7 @@ const MessageWithActions = () => {
                   />
                 </Button>
               </MessageAction>
-              <MessageAction asChild>
+              <MessageAction asChild tooltip={{ content: "Regenerate", side: "right" }}>
                 <Button
                   type="button"
                   variant="ghost"

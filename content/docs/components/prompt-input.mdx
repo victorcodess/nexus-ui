@@ -50,22 +50,22 @@ bunx shadcn@latest add @nexus-ui/prompt-input
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab value="npm">
 ```bash
-npx shadcn@latest add textarea scroll-area && npm install @radix-ui/react-slot
+npx shadcn@latest add textarea scroll-area tooltip kbd && npm install @radix-ui/react-slot
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm dlx shadcn@latest add textarea scroll-area && pnpm add @radix-ui/react-slot
+pnpm dlx shadcn@latest add textarea scroll-area tooltip kbd && pnpm add @radix-ui/react-slot
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn dlx shadcn@latest add textarea scroll-area && yarn add @radix-ui/react-slot
+yarn dlx shadcn@latest add textarea scroll-area tooltip kbd && yarn add @radix-ui/react-slot
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bunx shadcn@latest add textarea scroll-area && bun add @radix-ui/react-slot
+bunx shadcn@latest add textarea scroll-area tooltip kbd && bun add @radix-ui/react-slot
 ```
 </Tab>
 </Tabs>
@@ -128,7 +128,7 @@ Combine multiple action buttons in a single group.
 
 ### With Tooltips
 
-Action buttons wrapped in shadcn tooltips for descriptive hover labels.
+Action buttons using `PromptInputAction`'s built-in `tooltip` prop with both string and object syntax (`content`, optional `side`, and optional `shortcut`).
 
 <DemoWithCode src="components/nexus-ui/examples/prompt-input/with-tooltips.tsx">
   <PromptInputWithTooltips />
@@ -338,7 +338,7 @@ Groups related action buttons together with a horizontal layout.
 
 ### PromptInputAction
 
-A wrapper for individual action buttons. Supports polymorphism via `asChild`.
+A wrapper for individual action buttons. Supports polymorphism via `asChild` and optional built-in tooltip rendering.
 
 <TypeTable
   type={{
@@ -351,6 +351,11 @@ A wrapper for individual action buttons. Supports polymorphism via `asChild`.
     className: {
       type: "string",
       description: "Additional CSS classes to apply to the action.",
+    },
+    tooltip: {
+      type: 'string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }',
+      description:
+        "Tooltip config. A string maps to tooltip content. Object form supports content, side, and keyboard shortcut. If content is not provided, no tooltip is rendered.",
     },
   }}
 />

@@ -50,22 +50,22 @@ bunx shadcn@latest add @nexus-ui/image
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab value="npm">
 ```bash
-npm install @radix-ui/react-slot
+npx shadcn@latest add tooltip kbd && npm install @radix-ui/react-slot @radix-ui/react-dialog
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm add @radix-ui/react-slot
+pnpm dlx shadcn@latest add tooltip kbd && pnpm add @radix-ui/react-slot @radix-ui/react-dialog
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn add @radix-ui/react-slot
+yarn dlx shadcn@latest add tooltip kbd && yarn add @radix-ui/react-slot @radix-ui/react-dialog
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bun add @radix-ui/react-slot
+bunx shadcn@latest add tooltip kbd && bun add @radix-ui/react-slot @radix-ui/react-dialog
 ```
 </Tab>
 </Tabs>
@@ -112,7 +112,7 @@ import {
 
 ### With Overlay Actions
 
-Compose `ImagePreview` with `ImageActions`, `ImageActionGroup`, and `ImageAction` for top/bottom/side controls.
+Compose `ImagePreview` with `ImageActions`, `ImageActionGroup`, and `ImageAction` for top/bottom/side controls. `ImageAction` supports built-in tooltips via `tooltip` as a string or object (`content`, optional `side`, optional `shortcut`).
 
 <DemoWithCode
   src="components/nexus-ui/examples/image/with-actions.tsx"
@@ -471,7 +471,7 @@ Horizontal grouping wrapper for related overlay actions.
 
 ### ImageAction
 
-Wrapper for one action item. Supports polymorphism via `asChild`.
+Wrapper for one action item. Supports polymorphism via `asChild` and optional built-in tooltip rendering.
 
 <TypeTable
   type={{
@@ -484,6 +484,11 @@ Wrapper for one action item. Supports polymorphism via `asChild`.
     className: {
       type: "string",
       description: "Additional CSS classes on the action wrapper.",
+    },
+    tooltip: {
+      type: 'string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }',
+      description:
+        "Tooltip config. String form maps to tooltip content. Object form supports content, side, and keyboard shortcut. If content is omitted, no tooltip is rendered.",
     },
   }}
 />
