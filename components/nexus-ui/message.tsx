@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 
 const streamdownPlugins = { cjk, code, math, mermaid } as const;
 
-/** Typography (prose) classes for MessageMarkdown. **/
 const messageMarkdownProseClasses = [
   "prose max-w-none text-primary font-normal text-sm leading-6.5",
   // headings
@@ -116,7 +115,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
       className={cn(
         "rounded-[20px] text-sm leading-6.5 text-primary",
         from === "user"
-          ? "w-fit bg-muted px-4 py-2"
+          ? "w-fit bg-secondary px-4 py-2"
           : "mb-2 w-full bg-transparent px-2",
         className,
       )}
@@ -252,7 +251,6 @@ function MessageAction({ asChild = false, ...props }: MessageActionProps) {
 export type MessageAvatarProps = {
   src: string;
   alt?: string;
-  /** Shown while the image loads and when it fails to load. */
   fallback?: React.ReactNode;
   delayMs?: React.ComponentProps<typeof AvatarFallback>["delayMs"];
   size?: React.ComponentProps<typeof Avatar>["size"];
