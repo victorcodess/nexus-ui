@@ -9,7 +9,7 @@
       "title": "Prompt Input",
       "description": "A composable AI chat input component with auto-resizing textarea and action slots.",
       "dependencies": ["@radix-ui/react-slot"],
-      "registryDependencies": ["textarea", "scroll-area"],
+      "registryDependencies": ["textarea", "scroll-area", "tooltip", "kbd"],
       "files": [
         {
           "path": "registry/new-york/prompt-input/prompt-input.tsx",
@@ -101,7 +101,7 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "registryDependencies": ["button", "avatar"],
+      "registryDependencies": ["button", "avatar", "tooltip", "kbd"],
       "css": {
         "@source \"../node_modules/streamdown/dist/index.js\"": {},
         "@source \"../node_modules/@streamdown/code/dist/*.js\"": {},
@@ -201,6 +201,21 @@
       ]
     },
     {
+      "name": "image",
+      "type": "registry:ui",
+      "title": "Image",
+      "description": "Composable AI image renderer for base64 and Uint8Array payloads with preview, loader, and action slots.",
+      "dependencies": ["@radix-ui/react-slot", "@radix-ui/react-dialog"],
+      "registryDependencies": ["tooltip", "kbd"],
+      "files": [
+        {
+          "path": "registry/new-york/image/image.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/image.tsx"
+        }
+      ]
+    },
+    {
       "name": "reasoning",
       "type": "registry:ui",
       "title": "Reasoning",
@@ -256,20 +271,6 @@
           "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/text-shimmer.tsx"
-        }
-      ]
-    },
-    {
-      "name": "image",
-      "type": "registry:ui",
-      "title": "Image",
-      "description": "Composable AI image renderer for URLs, base64, and Uint8Array payloads with preview, loader, lightbox, and action slots.",
-      "dependencies": ["@radix-ui/react-dialog", "@radix-ui/react-slot"],
-      "files": [
-        {
-          "path": "registry/new-york/image/image.tsx",
-          "type": "registry:file",
-          "target": "~/components/nexus-ui/image.tsx"
         }
       ]
     }

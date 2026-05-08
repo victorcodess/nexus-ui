@@ -13,11 +13,6 @@
     "carousel",
     "hover-card"
   ],
-  "css": {
-    "@theme inline": {
-      "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
-    }
-  },
   "files": [
     {
       "path": "registry/new-york/citation/citation.tsx",
@@ -26,5 +21,10 @@
       "target": "~/components/nexus-ui/citation.tsx"
     }
   ],
+  "css": {
+    "@theme inline": {
+      "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
+    }
+  },
   "type": "registry:ui"
 }

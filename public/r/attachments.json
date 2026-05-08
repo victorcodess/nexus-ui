@@ -9,11 +9,6 @@
     "@hugeicons/react",
     "@hugeicons/core-free-icons"
   ],
-  "css": {
-    "@theme inline": {
-      "--scale-97": "0.97"
-    }
-  },
   "files": [
     {
       "path": "registry/new-york/attachments/attachments.tsx",
@@ -22,5 +17,10 @@
       "target": "~/components/nexus-ui/attachments.tsx"
     }
   ],
+  "css": {
+    "@theme inline": {
+      "--scale-97": "0.97"
+    }
+  },
   "type": "registry:ui"
 }

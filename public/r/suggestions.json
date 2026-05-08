@@ -9,11 +9,6 @@
   "registryDependencies": [
     "button"
   ],
-  "css": {
-    "@theme inline": {
-      "--scale-99": "0.99"
-    }
-  },
   "files": [
     {
       "path": "registry/new-york/suggestions/suggestions.tsx",
@@ -22,5 +17,10 @@
       "target": "~/components/nexus-ui/suggestions.tsx"
     }
   ],
+  "css": {
+    "@theme inline": {
+      "--scale-99": "0.99"
+    }
+  },
   "type": "registry:ui"
 }
