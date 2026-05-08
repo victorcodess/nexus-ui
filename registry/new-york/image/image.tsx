@@ -4,6 +4,13 @@ import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Slot } from "@radix-ui/react-slot";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
 
 type ImageData = {
@@ -368,20 +375,51 @@ function ImageActionGroup({ className, ...props }: ImageActionGroupProps) {
 
 export type ImageActionProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
+  tooltip?:
+    | string
+    | {
+        content?: string;
+        side?: "top" | "right" | "bottom" | "left";
+        shortcut?: string;
+      };
 };
 
 function ImageAction({
   asChild = false,
+  tooltip,
   className,
   ...props
 }: ImageActionProps) {
   const Comp = asChild ? Slot : "div";
+  const { content, side, shortcut } =
+    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
+
+  if (!content) {
+    return (
+      <Comp
+        data-slot="image-action"
+        className={cn("pointer-events-auto", className)}
+        {...props}
+      />
+    );
+  }
+
   return (
-    <Comp
-      data-slot="image-action"
-      className={cn("pointer-events-auto", className)}
-      {...props}
-    />
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Comp
+            data-slot="image-action"
+            className={cn("pointer-events-auto", className)}
+            {...props}
+          />
+        </TooltipTrigger>
+        <TooltipContent className="rounded-full" side={side}>
+          {content}
+          {shortcut ? <Kbd className="rounded-md!">{shortcut}</Kbd> : null}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 

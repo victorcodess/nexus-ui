@@ -10,6 +10,13 @@ import { mermaid } from "@streamdown/mermaid";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CodeBlock } from "@/components/nexus-ui/codeblock";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
 
 const streamdownPlugins = { cjk, code, math, mermaid } as const;
@@ -240,12 +247,41 @@ function MessageActionGroup({ className, ...props }: MessageActionGroupProps) {
 
 type MessageActionProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
+  tooltip?:
+    | string
+    | {
+        content?: string;
+        side?: "top" | "right" | "bottom" | "left";
+        shortcut?: string;
+      };
 };
 
-function MessageAction({ asChild = false, ...props }: MessageActionProps) {
+function MessageAction({
+  asChild = false,
+  tooltip,
+  ...props
+}: MessageActionProps) {
   const Comp = asChild ? Slot : "div";
+  const { content, side, shortcut } =
+    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
 
-  return <Comp data-slot="message-action" {...props} />;
+  if (!content) {
+    return <Comp data-slot="message-action" {...props} />;
+  }
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Comp data-slot="message-action" {...props} />
+        </TooltipTrigger>
+        <TooltipContent className="rounded-full" side={side}>
+          {content}
+          {shortcut ? <Kbd className="rounded-md!">{shortcut}</Kbd> : null}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }
 
 export type MessageAvatarProps = {

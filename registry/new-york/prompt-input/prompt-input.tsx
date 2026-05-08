@@ -7,6 +7,13 @@ import { mergeRefs } from "@/lib/merge-refs";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea, ScrollViewport } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd";
 
 type PromptInputContextValue = {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -60,18 +67,20 @@ function PromptInput({
   );
 
   return (
-    <PromptInputContext.Provider value={contextValue}>
-      <div
-        role="group"
-        aria-label="Chat input"
-        className={cn(
-          "relative flex h-auto w-full cursor-text flex-col gap-0 overflow-hidden rounded-[24px] border border-border dark:border-border/50 bg-card dark:bg-input/30",
-          className,
-        )}
-        onClick={handleClick}
-        {...props}
-      />
-    </PromptInputContext.Provider>
+    <TooltipProvider delayDuration={100}>
+      <PromptInputContext.Provider value={contextValue}>
+        <div
+          role="group"
+          aria-label="Chat input"
+          className={cn(
+            "relative flex h-auto w-full cursor-text flex-col gap-0 overflow-hidden rounded-[24px] border border-border bg-card dark:border-border/50 dark:bg-input/30",
+            className,
+          )}
+          onClick={handleClick}
+          {...props}
+        />
+      </PromptInputContext.Provider>
+    </TooltipProvider>
   );
 }
 
@@ -153,15 +162,39 @@ function PromptInputActionGroup({
 
 type PromptInputActionProps = React.HTMLAttributes<HTMLDivElement> & {
   asChild?: boolean;
+  tooltip?:
+    | string
+    | {
+        content?: string;
+        side?: "top" | "right" | "bottom" | "left";
+        shortcut?: string;
+      };
 };
 
 function PromptInputAction({
   asChild = false,
+  tooltip,
   ...props
 }: PromptInputActionProps) {
   const Comp = asChild ? Slot : "div";
+  const { content, side, shortcut } =
+    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
 
-  return <Comp {...props} />;
+  if (!content) {
+    return <Comp {...props} />;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Comp {...props} />
+      </TooltipTrigger>
+      <TooltipContent className="rounded-full" side={side}>
+        {content}
+        {shortcut ? <Kbd className="rounded-md!">{shortcut}</Kbd> : null}
+      </TooltipContent>
+    </Tooltip>
+  );
 }
 
 export {
