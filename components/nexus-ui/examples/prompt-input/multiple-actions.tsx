@@ -11,9 +11,10 @@ import {
 } from "@/components/nexus-ui/prompt-input";
 import {
   ArrowUp02Icon,
-  SquareIcon,
+  Image01Icon,
   Mic02Icon,
   PlusSignIcon,
+  SquareIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -46,29 +47,60 @@ export default function PromptInputMultipleActions() {
       />
       <PromptInputActions>
         <PromptInputActionGroup>
-          <PromptInputAction asChild>
+          <PromptInputAction asChild tooltip="Attach file">
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
               className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
             >
-              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
+              <HugeiconsIcon
+                icon={PlusSignIcon}
+                strokeWidth={2.0}
+                className="size-4"
+              />
             </Button>
           </PromptInputAction>
-          <PromptInputAction asChild>
+          <PromptInputAction
+            asChild
+            tooltip={{ content: "Upload image", side: "bottom" }}
+          >
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
               className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
             >
-              <HugeiconsIcon icon={Mic02Icon} strokeWidth={2.0} className="size-4" />
+              <HugeiconsIcon
+                icon={Image01Icon}
+                strokeWidth={2.0}
+                className="size-4"
+              />
+            </Button>
+          </PromptInputAction>
+          <PromptInputAction
+            asChild
+            tooltip={{ content: "Voice input", shortcut: "V", side: "right" }}
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
+            >
+              <HugeiconsIcon
+                icon={Mic02Icon}
+                strokeWidth={2.0}
+                className="size-4"
+              />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
         <PromptInputActionGroup>
-          <PromptInputAction asChild>
+          <PromptInputAction
+            asChild
+            tooltip={{ content: "Send message", shortcut: "Enter" }}
+          >
             <Button
               type="button"
               size="icon-sm"
@@ -77,9 +109,17 @@ export default function PromptInputMultipleActions() {
               onClick={() => input.trim() && doSubmit(input)}
             >
               {isLoading ? (
-                <HugeiconsIcon icon={SquareIcon} strokeWidth={2.0} className="size-3.5 fill-current" />
+                <HugeiconsIcon
+                  icon={SquareIcon}
+                  strokeWidth={2.0}
+                  className="size-3.5 fill-current"
+                />
               ) : (
-                <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
+                <HugeiconsIcon
+                  icon={ArrowUp02Icon}
+                  strokeWidth={2.0}
+                  className="size-4"
+                />
               )}
             </Button>
           </PromptInputAction>

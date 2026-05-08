@@ -7,7 +7,6 @@ import PromptInputDefault from "@/components/nexus-ui/examples/prompt-input/defa
 import PromptInputBasic from "@/components/nexus-ui/examples/prompt-input/basic";
 import GeminiInput from "@/components/nexus-ui/examples/prompt-input/gemini-input";
 import PromptInputMultipleActions from "@/components/nexus-ui/examples/prompt-input/multiple-actions";
-import PromptInputWithTooltips from "@/components/nexus-ui/examples/prompt-input/with-tooltips";
 
 A flexible, composable input component for building chat interfaces. Includes an auto-resizing textarea with scroll support and customizable action slots for buttons like send, attach, and more.
 
@@ -120,18 +119,10 @@ A minimal prompt input with just a textarea and send button.
 
 ### With Multiple Actions
 
-Combine multiple action buttons in a single group.
+Combine multiple action buttons in a single group and add built-in tooltips using `PromptInputAction`'s `tooltip` prop (string or object with `content`, optional `side`, and optional `shortcut`).
 
 <DemoWithCode src="components/nexus-ui/examples/prompt-input/multiple-actions.tsx">
   <PromptInputMultipleActions />
-</DemoWithCode>
-
-### With Tooltips
-
-Action buttons using `PromptInputAction`'s built-in `tooltip` prop with both string and object syntax (`content`, optional `side`, and optional `shortcut`).
-
-<DemoWithCode src="components/nexus-ui/examples/prompt-input/with-tooltips.tsx">
-  <PromptInputWithTooltips />
 </DemoWithCode>
 
 ## Vercel AI SDK Integration
