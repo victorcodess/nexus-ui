@@ -8,6 +8,7 @@
     "---Components---",
     "components/attachments",
     "components/citation",
+    "components/feedback-bar",
     "components/image",
     "components/message",
     "components/model-selector",
