@@ -80,41 +80,52 @@ export default async function InstallsDashboardPage({
 
   const days = toDays(params.days);
   const summary = await getInstallSummary(days);
-  const components = [...summary.components].sort(
-    (a, b) => b.installs - a.installs,
+  const components = [...summary.componentMetrics].sort(
+    (a, b) => b.confirmedInstalls - a.confirmedInstalls,
   );
-  const daily = [...summary.daily];
+  const daily = [...summary.dailyMetrics];
   const recentWindow = daily.slice(-7);
   const previousWindow = daily.slice(-14, -7);
   const today = daily[daily.length - 1] ?? {
     date: "n/a",
-    installs: 0,
+    rawRequests: 0,
+    dedupedIntents: 0,
+    confirmedInstalls: 0,
     uniqueInstallers: 0,
   };
-  const topComponent = components[0] ?? { name: "n/a", installs: 0 };
-  const uniqueRate = percent(today.uniqueInstallers, today.installs);
-  const installsLast7 = sum(recentWindow.map((item) => item.installs));
-  const installsPrev7 = sum(previousWindow.map((item) => item.installs));
+  const topComponent = components[0] ?? {
+    name: "n/a",
+    rawRequests: 0,
+    dedupedIntents: 0,
+    confirmedInstalls: 0,
+  };
+  const uniqueRate = percent(today.uniqueInstallers, today.confirmedInstalls);
+  const installsLast7 = sum(recentWindow.map((item) => item.confirmedInstalls));
+  const installsPrev7 = sum(previousWindow.map((item) => item.confirmedInstalls));
   const trendPercent =
     installsPrev7 <= 0
       ? installsLast7 > 0
         ? 100
         : 0
       : ((installsLast7 - installsPrev7) / installsPrev7) * 100;
-  const avgInstallsPerDay = averagePerDay(summary.totalInstalls, daily.length);
+  const avgInstallsPerDay = averagePerDay(summary.metrics.confirmedInstalls, daily.length);
   const top5Share = percent(
-    sum(components.slice(0, 5).map((item) => item.installs)),
-    Math.max(summary.totalInstalls, 1),
+    sum(components.slice(0, 5).map((item) => item.confirmedInstalls)),
+    Math.max(summary.metrics.confirmedInstalls, 1),
   );
   const peakDay = daily.reduce(
-    (best, current) => (current.installs > best.installs ? current : best),
+    (best, current) =>
+      current.confirmedInstalls > best.confirmedInstalls ? current : best,
     today,
   );
   const maxComponentInstalls = Math.max(
     1,
-    ...components.map((item) => item.installs),
+    ...components.map((item) => item.confirmedInstalls),
   );
-  const maxDailyInstalls = Math.max(1, ...daily.map((item) => item.installs));
+  const maxDailyInstalls = Math.max(
+    1,
+    ...daily.map((item) => item.confirmedInstalls),
+  );
   const ranges = [7, 14, 30, 60, 90].filter((range) => range <= 90);
   const makeRangeHref = (range: number): string => {
     const search = new URLSearchParams();
@@ -158,7 +169,7 @@ export default async function InstallsDashboardPage({
               Window: {days} days
             </span>
             <span className="rounded-full border bg-muted px-2 py-1">
-              Dedupe-aware installs
+              Primary metric: confirmed installs
             </span>
           </div>
 
@@ -171,10 +182,10 @@ export default async function InstallsDashboardPage({
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border bg-card p-4 shadow-sm">
           <p className="text-xs font-medium text-muted-foreground uppercase">
-            Total installs
+            Confirmed installs
           </p>
           <p className="mt-2 text-2xl font-semibold">
-            {summary.totalInstalls.toLocaleString()}
+            {summary.metrics.confirmedInstalls.toLocaleString()}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Avg {avgInstallsPerDay.toFixed(1)} installs/day
@@ -185,7 +196,7 @@ export default async function InstallsDashboardPage({
             Installs today
           </p>
           <p className="mt-2 text-2xl font-semibold">
-            {today.installs.toLocaleString()}
+            {today.confirmedInstalls.toLocaleString()}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             7d momentum: {formatSignedPercent(trendPercent)}
@@ -208,7 +219,7 @@ export default async function InstallsDashboardPage({
           </p>
           <p className="mt-2 text-base font-semibold">{topComponent.name}</p>
           <p className="text-sm text-muted-foreground">
-            {topComponent.installs.toLocaleString()} installs
+            {topComponent.confirmedInstalls.toLocaleString()} installs
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Top 5 share: {formatPercent(top5Share)}
@@ -220,7 +231,7 @@ export default async function InstallsDashboardPage({
         <article className="rounded-xl border bg-card p-4 md:p-6 xl:col-span-2">
           <h2 className="text-base font-semibold">Component distribution</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ranked by total deduped installs with share of total.
+            Ranked by confirmed installs with share of total.
           </p>
 
           {components.length === 0 ? (
@@ -231,8 +242,8 @@ export default async function InstallsDashboardPage({
             <div className="mt-6 space-y-4">
               {components.map((item, index) => {
                 const share = percent(
-                  item.installs,
-                  Math.max(summary.totalInstalls, 1),
+                  item.confirmedInstalls,
+                  Math.max(summary.metrics.confirmedInstalls, 1),
                 );
                 return (
                   <div key={item.name} className="space-y-1">
@@ -244,7 +255,7 @@ export default async function InstallsDashboardPage({
                         <span className="font-medium">{item.name}</span>
                       </div>
                       <span className="text-muted-foreground tabular-nums">
-                        {item.installs.toLocaleString()} ({formatPercent(share)}
+                        {item.confirmedInstalls.toLocaleString()} ({formatPercent(share)}
                         )
                       </span>
                     </div>
@@ -252,7 +263,7 @@ export default async function InstallsDashboardPage({
                       <div
                         className="h-full rounded-full bg-primary"
                         style={{
-                          width: toPercent(item.installs, maxComponentInstalls),
+                          width: toPercent(item.confirmedInstalls, maxComponentInstalls),
                         }}
                       />
                     </div>
@@ -275,7 +286,7 @@ export default async function InstallsDashboardPage({
               </dt>
               <dd className="mt-1 text-sm font-medium">
                 {formatDateLabel(peakDay.date)} (
-                {peakDay.installs.toLocaleString()} installs)
+                {peakDay.confirmedInstalls.toLocaleString()} installs)
               </dd>
             </div>
             <div>
@@ -317,7 +328,7 @@ export default async function InstallsDashboardPage({
       <section className="rounded-xl border bg-card p-4 md:p-6">
         <h2 className="text-base font-semibold">Daily trend</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Each row shows installs, uniques, and daily unique rate.
+          Each row shows confirmed installs, deduped intents, raw requests, and unique rate.
         </p>
 
         {daily.length === 0 ? (
@@ -329,7 +340,7 @@ export default async function InstallsDashboardPage({
             {daily.map((day) => {
               const dayUniqueRate = percent(
                 day.uniqueInstallers,
-                Math.max(day.installs, 1),
+                Math.max(day.confirmedInstalls, 1),
               );
               return (
                 <div key={day.date} className="space-y-1">
@@ -338,7 +349,9 @@ export default async function InstallsDashboardPage({
                       {formatDateLabel(day.date)}
                     </span>
                     <span className="text-muted-foreground tabular-nums">
-                      {day.installs.toLocaleString()} installs |{" "}
+                      {day.confirmedInstalls.toLocaleString()} confirmed |{" "}
+                      {day.dedupedIntents.toLocaleString()} intent |{" "}
+                      {day.rawRequests.toLocaleString()} raw |{" "}
                       {day.uniqueInstallers.toLocaleString()} unique |{" "}
                       {formatPercent(dayUniqueRate)} unique rate
                     </span>
@@ -348,7 +361,7 @@ export default async function InstallsDashboardPage({
                       <div
                         className="h-full rounded-full bg-foreground/80"
                         style={{
-                          width: toPercent(day.installs, maxDailyInstalls),
+                          width: toPercent(day.confirmedInstalls, maxDailyInstalls),
                         }}
                       />
                     </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile, access } from "fs/promises";
 import { join } from "path";
-import { recordInstall } from "@/lib/install-tracking";
+import { recordInstall, recordInstallFileFetch } from "@/lib/install-tracking";
 
 const REGISTRY_BASE = process.cwd();
 const R_DIR = join(REGISTRY_BASE, "public", "r");
@@ -39,9 +39,25 @@ export async function GET(
       pathSegments[0] !== "registry.json"
     ) {
       const componentName = pathSegments[0].replace(/\.json$/, "");
-      await recordInstall(componentName, _request);
       const content = await readFile(join(R_DIR, pathSegments[0]), "utf-8");
-      return NextResponse.json(JSON.parse(content), {
+      const parsed = JSON.parse(content);
+      const requiredFiles = Array.isArray(parsed.files) ? parsed.files.length : 1;
+      const hasInlineContent =
+        Array.isArray(parsed.files) &&
+        parsed.files.length > 0 &&
+        parsed.files.every(
+          (file: unknown) =>
+            typeof file === "object" &&
+            file !== null &&
+            "content" in file &&
+            typeof (file as { content?: unknown }).content === "string" &&
+            (file as { content: string }).content.length > 0,
+        );
+      await recordInstall(componentName, _request, {
+        requiredFiles,
+        confirmOnIntent: hasInlineContent,
+      });
+      return NextResponse.json(parsed, {
         headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
       });
     }
@@ -62,6 +78,11 @@ export async function GET(
       }
 
       const content = await readFile(path, "utf-8");
+      const filePathSegments = filePath.split("/").filter(Boolean);
+      const componentName = filePathSegments[1];
+      if (componentName) {
+        await recordInstallFileFetch(componentName, filePath, _request);
+      }
       const ext = filePath.split(".").pop();
       const contentType =
         ext === "tsx" || ext === "ts"
