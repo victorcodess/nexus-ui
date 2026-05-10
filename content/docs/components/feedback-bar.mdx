@@ -1,12 +1,404 @@
 ---
 title: Feedback Bar
-description: Feedback Bar UI for chat inputs and messages
+description: Composable feedback prompt bar with action and close slots
 ---
 
 import FeedbackBarDefault from "@/components/nexus-ui/examples/feedback-bar/default";
+import FeedbackBarCompactMinimal from "@/components/nexus-ui/examples/feedback-bar/compact-minimal";
 
-Feedback Bar UI for chat inputs and messages
+Compact feedback prompt for assistant responses. Compose custom actions (like/dislike, quick ratings, regenerate) while keeping a consistent container layout.
 
 <DemoWithCode src="components/nexus-ui/examples/feedback-bar/default.tsx">
   <FeedbackBarDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/feedback-bar
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/feedback-bar
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/feedback-bar
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/feedback-bar
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add tooltip kbd && npm install @radix-ui/react-slot
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add tooltip kbd && pnpm add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add tooltip kbd && yarn add @radix-ui/react-slot
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add tooltip kbd && bun add @radix-ui/react-slot
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/feedback-bar/feedback-bar.tsx" title="components/nexus-ui/feedback-bar.tsx" />
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  FeedbackBar,
+  FeedbackBarContent,
+  FeedbackBarPrompt,
+  FeedbackBarLabel,
+  FeedbackBarActions,
+  FeedbackBarAction,
+  FeedbackBarClose,
+} from "@/components/nexus-ui/feedback-bar";
+```
+
+```tsx keepBackground
+<FeedbackBar>
+  <FeedbackBarContent>
+    <FeedbackBarPrompt>
+      <InfoIcon />
+      <FeedbackBarLabel>Is this helpful?</FeedbackBarLabel>
+    </FeedbackBarPrompt>
+    <FeedbackBarActions>
+      <FeedbackBarAction asChild>
+        <Button type="button">Like</Button>
+      </FeedbackBarAction>
+    </FeedbackBarActions>
+  </FeedbackBarContent>
+  <FeedbackBarClose>
+    <Button type="button">Close</Button>
+  </FeedbackBarClose>
+</FeedbackBar>
+```
+
+## Examples
+
+### Icon-only Variant
+
+Use icon-only actions with a close control for tight layouts and quick response feedback.
+
+<DemoWithCode src="components/nexus-ui/examples/feedback-bar/compact-minimal.tsx">
+  <FeedbackBarCompactMinimal />
+</DemoWithCode>
+
+## Vercel AI SDK Integration
+
+`FeedbackBar` is intentionally neutral, so you can place it at two different feedback scopes:
+
+- **Response-based feedback:** capture sentiment for one assistant message.
+- **Conversation-based feedback:** capture sentiment for the entire chat.
+
+### Response-based feedback
+
+Attach feedback to a specific assistant message id.
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ThumbsUpIcon, ThumbsDownIcon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
+import {
+  FeedbackBar,
+  FeedbackBarAction,
+  FeedbackBarActions,
+  FeedbackBarContent,
+  FeedbackBarLabel,
+  FeedbackBarPrompt,
+} from "@/components/nexus-ui/feedback-bar";
+
+type Vote = "up" | "down";
+
+export default function MessageFeedback() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+  const [votes, setVotes] = useState<Record<string, Vote>>({});
+
+  async function submitMessageFeedback(messageId: string, vote: Vote) {
+    setVotes((prev) => ({ ...prev, [messageId]: vote }));
+
+    await fetch("/api/feedback/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messageId, vote }),
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {messages
+        .filter((m) => m.role === "assistant")
+        .map((m) => (
+          <FeedbackBar key={m.id}>
+            <FeedbackBarContent>
+              <FeedbackBarPrompt>
+                <FeedbackBarLabel>
+                  {votes[m.id] ? "Thanks for your feedback." : "Was this response helpful?"}
+                </FeedbackBarLabel>
+              </FeedbackBarPrompt>
+              <FeedbackBarActions>
+                <FeedbackBarAction asChild>
+                  <Button
+                    type="button"
+                    variant={votes[m.id] === "up" ? "secondary" : "ghost"}
+                    size="icon-sm"
+                    onClick={() => submitMessageFeedback(m.id, "up")}
+                    aria-label="Helpful"
+                  >
+                    <HugeiconsIcon icon={ThumbsUpIcon} strokeWidth={2.0} className="size-4" />
+                  </Button>
+                </FeedbackBarAction>
+                <FeedbackBarAction asChild>
+                  <Button
+                    type="button"
+                    variant={votes[m.id] === "down" ? "secondary" : "ghost"}
+                    size="icon-sm"
+                    onClick={() => submitMessageFeedback(m.id, "down")}
+                    aria-label="Not helpful"
+                  >
+                    <HugeiconsIcon icon={ThumbsDownIcon} strokeWidth={2.0} className="size-4" />
+                  </Button>
+                </FeedbackBarAction>
+              </FeedbackBarActions>
+            </FeedbackBarContent>
+          </FeedbackBar>
+        ))}
+    </div>
+  );
+}
+```
+
+### Conversation-based feedback
+
+Show one feedback bar for the whole conversation (for example at the end of the thread).
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ThumbsUpIcon, ThumbsDownIcon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
+import {
+  FeedbackBar,
+  FeedbackBarAction,
+  FeedbackBarActions,
+  FeedbackBarContent,
+  FeedbackBarLabel,
+  FeedbackBarPrompt,
+} from "@/components/nexus-ui/feedback-bar";
+
+type Vote = "up" | "down";
+
+export default function ConversationFeedback() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+  const conversationId = "replace-with-your-session-id";
+  const [vote, setVote] = useState<Vote | null>(null);
+
+  const hasAssistantReply = messages.some((m) => m.role === "assistant");
+  if (!hasAssistantReply) return null;
+
+  async function submitConversationFeedback(nextVote: Vote) {
+    setVote(nextVote);
+
+    await fetch("/api/feedback/conversation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversationId, vote: nextVote }),
+    });
+  }
+
+  return (
+    <FeedbackBar>
+      <FeedbackBarContent>
+        <FeedbackBarPrompt>
+          <FeedbackBarLabel>
+            {vote ? "Thanks for rating this conversation." : "How was this conversation?"}
+          </FeedbackBarLabel>
+        </FeedbackBarPrompt>
+        <FeedbackBarActions>
+          <FeedbackBarAction asChild>
+            <Button
+              type="button"
+              variant={vote === "up" ? "secondary" : "ghost"}
+              size="icon-sm"
+              onClick={() => submitConversationFeedback("up")}
+              aria-label="Good conversation"
+            >
+              <HugeiconsIcon icon={ThumbsUpIcon} strokeWidth={2.0} className="size-4" />
+            </Button>
+          </FeedbackBarAction>
+          <FeedbackBarAction asChild>
+            <Button
+              type="button"
+              variant={vote === "down" ? "secondary" : "ghost"}
+              size="icon-sm"
+              onClick={() => submitConversationFeedback("down")}
+              aria-label="Poor conversation"
+            >
+              <HugeiconsIcon icon={ThumbsDownIcon} strokeWidth={2.0} className="size-4" />
+            </Button>
+          </FeedbackBarAction>
+        </FeedbackBarActions>
+      </FeedbackBarContent>
+    </FeedbackBar>
+  );
+}
+```
+
+## API Reference
+
+### FeedbackBar
+
+Root container for the feedback row.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the root container.",
+    },
+  }}
+/>
+
+### FeedbackBarContent
+
+Main area that holds info and actions.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the main layout row.",
+    },
+  }}
+/>
+
+### FeedbackBarPrompt
+
+Left-side info section for icon and question copy.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the info section.",
+    },
+  }}
+/>
+
+### FeedbackBarLabel
+
+Text label for the feedback prompt.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the label text.",
+    },
+  }}
+/>
+
+### FeedbackBarActions
+
+Container for action controls.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the actions row.",
+    },
+  }}
+/>
+
+### FeedbackBarAction
+
+Wrapper for a single action item. Use `asChild` to render your own interactive control directly (for example, a `Button`). Supports built-in tooltips via `tooltip` as either a string or object (`content`, optional `side`, optional `shortcut`).
+
+<TypeTable
+  type={{
+    asChild: {
+      type: "boolean",
+      default: "false",
+      description: "Render as the child element instead of a div.",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes for the action wrapper.",
+    },
+    tooltip: {
+      type: 'string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }',
+      description:
+        "Tooltip config. String form maps to tooltip content. Object form supports content, side, and keyboard shortcut. If content is omitted, no tooltip is rendered.",
+    },
+  }}
+/>
+
+### FeedbackBarClose
+
+Right-side close section with a left divider.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for the close section wrapper.",
+    },
+    tooltip: {
+      type: 'string | { content?: string; side?: "top" | "right" | "bottom" | "left"; shortcut?: string }',
+      description:
+        "Tooltip config for the close action. String form maps to tooltip content. Object form supports content, side, and keyboard shortcut. If content is omitted, no tooltip is rendered.",
+    },
+  }}
+/>

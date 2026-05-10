@@ -2,7 +2,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ThumbsUpIcon,
   ThumbsDownIcon,
-  InformationCircleIcon,
   Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
@@ -12,25 +11,14 @@ import {
   FeedbackBarActions,
   FeedbackBarClose,
   FeedbackBarContent,
-  FeedbackBarLabel,
-  FeedbackBarPrompt,
 } from "@/components/nexus-ui/feedback-bar";
 
-function FeedbackBarDefault() {
+function FeedbackBarCompactMinimal() {
   return (
-    <FeedbackBar>
+    <FeedbackBar className="w-auto">
       <FeedbackBarContent>
-        <FeedbackBarPrompt>
-          <HugeiconsIcon
-            icon={InformationCircleIcon}
-            strokeWidth={2.0}
-            className="size-4 shrink-0"
-          />
-          <FeedbackBarLabel>Is this response helpful?</FeedbackBarLabel>
-        </FeedbackBarPrompt>
-
         <FeedbackBarActions>
-          <FeedbackBarAction asChild>
+          <FeedbackBarAction asChild tooltip="Helpful">
             <Button
               type="button"
               variant="ghost"
@@ -45,7 +33,7 @@ function FeedbackBarDefault() {
               />
             </Button>
           </FeedbackBarAction>
-          <FeedbackBarAction asChild>
+          <FeedbackBarAction asChild tooltip="Not helpful">
             <Button
               type="button"
               variant="ghost"
@@ -63,7 +51,7 @@ function FeedbackBarDefault() {
         </FeedbackBarActions>
       </FeedbackBarContent>
 
-      <FeedbackBarClose>
+      <FeedbackBarClose tooltip="Close">
         <Button
           type="button"
           variant="ghost"
@@ -82,4 +70,4 @@ function FeedbackBarDefault() {
   );
 }
 
-export default FeedbackBarDefault;
+export default FeedbackBarCompactMinimal;
