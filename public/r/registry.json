@@ -262,6 +262,19 @@
       ]
     },
     {
+      "name": "text-shimmer",
+      "type": "registry:ui",
+      "title": "Text Shimmer",
+      "description": "Animated shimmer text for loading and streaming states.",
+      "files": [
+        {
+          "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/text-shimmer.tsx"
+        }
+      ]
+    },
+    {
       "name": "feedback-bar",
       "type": "registry:ui",
       "title": "Feedback Bar",
@@ -278,19 +291,6 @@
           "path": "registry/new-york/feedback-bar/feedback-bar.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/feedback-bar.tsx"
-        }
-      ]
-    },
-    {
-      "name": "text-shimmer",
-      "type": "registry:ui",
-      "title": "Text Shimmer",
-      "description": "Animated shimmer text for loading and streaming states.",
-      "files": [
-        {
-          "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
-          "type": "registry:file",
-          "target": "~/components/nexus-ui/text-shimmer.tsx"
         }
       ]
     }

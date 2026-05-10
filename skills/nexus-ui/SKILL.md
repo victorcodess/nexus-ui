@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -39,6 +39,7 @@ npx shadcn@latest add @nexus-ui/citation
 npx shadcn@latest add @nexus-ui/reasoning
 npx shadcn@latest add @nexus-ui/text-shimmer
 npx shadcn@latest add @nexus-ui/image
+npx shadcn@latest add @nexus-ui/feedback-bar
 ```
 
 Or install directly via URL (no registry config needed):
@@ -70,6 +71,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Reasoning | `reasoning` | Collapsible reasoning trace with streaming-aware trigger label and markdown body |
 | Text Shimmer | `text-shimmer` | Animated shimmer text for loading and in-progress UI |
 | Image | `image` | URLs, base64, or `Uint8Array` image payloads with preview, loader, lightbox (Radix Dialog), and action slots |
+| Feedback Bar | `feedback-bar` | Inline feedback prompt with label, action slots, optional Radix tooltips (+ shortcuts), and bordered close region |
 
 ## Component APIs
 
@@ -656,6 +658,62 @@ import {
 </Image>
 ```
 
+### Feedback Bar
+
+Compact bar for “Was this helpful?”-style flows on a message or thread: compose a **prompt** (label) on the left, **actions** (e.g. thumbs) on the right, and an optional **close** column. `FeedbackBarAction` can wrap real buttons via `asChild` and show a **tooltip** with optional **keyboard shortcut** chips (shadcn `Tooltip` + `Kbd`).
+
+**Import:**
+
+```tsx
+import {
+  FeedbackBar,
+  FeedbackBarContent,
+  FeedbackBarPrompt,
+  FeedbackBarLabel,
+  FeedbackBarActions,
+  FeedbackBarAction,
+  FeedbackBarClose,
+} from "@/components/nexus-ui/feedback-bar";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `FeedbackBar` | Root `role="group"` strip; default `h-12`, full width (max ~`28rem`), bordered `rounded-[12px]` surface. |
+| `FeedbackBarContent` | `justify-between` flex row filling the bar. |
+| `FeedbackBarPrompt` | Left cluster (default `pl-4`) for copy + leading content. |
+| `FeedbackBarLabel` | Primary prompt text (`font-[350]`). |
+| `FeedbackBarActions` | Right cluster for control groups (`gap-1.5`). |
+| `FeedbackBarAction` | Single control shell; `asChild` + `Slot`; optional `tooltip`: `string` or `{ content?, side?, shortcut? }`. |
+| `FeedbackBarClose` | Narrow right column with leading border; uses `FeedbackBarAction` + `asChild` around a host `div`; pass close `Button`/`IconButton` as children. |
+
+**Root props:** Plain `HTMLAttributes` on each part; slot parts accept `className`. `FeedbackBarAction` / `FeedbackBarClose`: see tooltips above.
+
+**Props & hooks:** No context. Tooltips render a local `TooltipProvider` per action that has `tooltip.content`.
+
+**Usage notes:** Put icon buttons inside `FeedbackBarAction asChild` for hit targets. Prefer `shortcut` in `tooltip` when mirroring real keyboard affordances.
+
+**Example:**
+
+```tsx
+<FeedbackBar>
+  <FeedbackBarContent>
+    <FeedbackBarPrompt>
+      <FeedbackBarLabel>Was this response helpful?</FeedbackBarLabel>
+    </FeedbackBarPrompt>
+    <FeedbackBarActions>
+      <FeedbackBarAction asChild tooltip={{ content: "Helpful", shortcut: "⌘Y" }}>
+        <button type="button" aria-label="Helpful">…</button>
+      </FeedbackBarAction>
+    </FeedbackBarActions>
+    <FeedbackBarClose>
+      <button type="button" aria-label="Dismiss">…</button>
+    </FeedbackBarClose>
+  </FeedbackBarContent>
+</FeedbackBar>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -752,7 +810,8 @@ components/
 │   ├── citation.tsx
 │   ├── reasoning.tsx
 │   ├── text-shimmer.tsx
-│   └── image.tsx
+│   ├── image.tsx
+│   └── feedback-bar.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -775,11 +834,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Reasoning:** `streamdown`, `@hugeicons/react`, `@hugeicons/core-free-icons`, `tw-shimmer`, shadcn `collapsible`, registry CSS for shimmer + collapsible height keyframes
 - **Text Shimmer:** `@/lib/utils` only (`cn`)
 - **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
+- **Feedback Bar:** `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt
