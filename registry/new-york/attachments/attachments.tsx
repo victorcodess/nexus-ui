@@ -999,7 +999,7 @@ function AttachmentPreview({
 }
 
 const removeButtonVariants = cva(
-  "z-10 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-secondary text-muted-foreground sm:opacity-0 transition-all group-hover:opacity-100 hover:bg-border hover:text-primary active:scale-97",
+  "z-10 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-secondary text-muted-foreground sm:opacity-0 transition-all group-hover:opacity-100 hover:bg-border hover:text-primary active:scale-[0.97]",
   {
     variants: {
       position: {

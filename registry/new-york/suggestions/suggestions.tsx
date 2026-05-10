@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const suggestionVariants = cva(
-  "h-8 gap-1.5 rounded-full px-4 text-sm font-normal shadow-none outline-0 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring active:scale-99",
+  "h-8 gap-1.5 rounded-full px-4 text-sm font-normal shadow-none outline-0 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.99]",
   {
     variants: {
       variant: {

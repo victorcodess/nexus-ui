@@ -370,7 +370,7 @@ function CitationContent({
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "flex w-66 flex-col overflow-hidden rounded-[12px] border-border p-0 shadow-modal dark:border-accent",
+        "flex w-66 flex-col overflow-hidden rounded-[12px] border-border p-0 shadow-[0_-4px_12px_4px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] dark:border-accent",
         className,
       )}
       {...props}

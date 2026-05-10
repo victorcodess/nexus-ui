@@ -221,7 +221,7 @@ function ModelSelectorContent({
         data-slot="model-selector-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-h-[min(var(--model-selector-content-max-height,500px),var(--radix-dropdown-menu-content-available-height))] min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto overscroll-none rounded-lg border border-accent bg-popover p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=closed]:duration-0 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "z-50 max-h-[min(var(--model-selector-content-max-height,500px),var(--radix-dropdown-menu-content-available-height))] min-w-48 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto overscroll-none rounded-lg border border-accent bg-popover p-1 text-popover-foreground shadow-[0_-4px_12px_4px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-[state=closed]:duration-0 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className,
         )}
         {...props}
@@ -719,7 +719,7 @@ function ModelSelectorSubContent({
     <DropdownMenuPrimitive.SubContent
       data-slot="model-selector-sub-content"
       className={cn(
-        "z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden overscroll-none rounded-lg border border-accent bg-popover p-1 text-popover-foreground shadow-modal duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:duration-0 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+        "z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden overscroll-none rounded-lg border border-accent bg-popover p-1 text-popover-foreground shadow-[0_-4px_12px_4px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] duration-200 ease-out data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:duration-0 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
         className,
       )}
       {...props}
