@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   getInstallDashboardKey,
   getInstallSummary,
+  getInstallTimeline,
 } from "@/lib/install-tracking";
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 type DashboardSearchParams = {
   days?: string;
   key?: string;
+  date?: string;
 };
 
 function toDays(raw: string | undefined): number {
@@ -67,6 +69,23 @@ function formatDateLabel(isoDate: string): string {
     year: "numeric",
     timeZone: "UTC",
   }).format(parsed);
+}
+
+function formatTimeLabel(timestamp: number): string {
+  const parsed = new Date(timestamp);
+  if (Number.isNaN(parsed.getTime())) return "Invalid time";
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  }).format(parsed);
+}
+
+function isIsoDate(value: string | undefined): value is string {
+  if (!value) return false;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
 export default async function InstallsDashboardPage({
@@ -134,6 +153,22 @@ export default async function InstallsDashboardPage({
     return `/internal/installs?${search.toString()}`;
   };
   const refreshHref = makeRangeHref(days);
+  const selectedDate = isIsoDate(params.date) ? params.date : null;
+  const selectedDayInWindow =
+    selectedDate && daily.some((day) => day.date === selectedDate)
+      ? selectedDate
+      : null;
+  const selectedTimeline = selectedDayInWindow
+    ? await getInstallTimeline(selectedDayInWindow, 300)
+    : [];
+  const makeDayHref = (day: string): string => {
+    const search = new URLSearchParams();
+    search.set("days", String(days));
+    if (params.key) search.set("key", params.key);
+    search.set("date", day);
+    return `/internal/installs?${search.toString()}`;
+  };
+  const clearDayHref = makeRangeHref(days);
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-8">
@@ -325,63 +360,111 @@ export default async function InstallsDashboardPage({
         </article>
       </section>
 
-      <section className="rounded-xl border bg-card p-4 md:p-6">
-        <h2 className="text-base font-semibold">Daily trend</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Each row shows confirmed installs, deduped intents, raw requests, and unique rate.
-        </p>
-
-        {daily.length === 0 ? (
-          <p className="mt-6 text-sm text-muted-foreground">
-            No daily data yet.
+      <section className="grid gap-4 xl:grid-cols-2">
+        <article className="rounded-xl border bg-card p-4 md:p-6">
+          <h2 className="text-base font-semibold">Daily trend</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Click a day to inspect a detailed install timeline.
           </p>
-        ) : (
-          <div className="mt-6 space-y-4">
-            {daily.map((day) => {
-              const dayUniqueRate = percent(
-                day.uniqueInstallers,
-                Math.max(day.confirmedInstalls, 1),
-              );
-              return (
-                <div key={day.date} className="space-y-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                    <span className="font-medium">
-                      {formatDateLabel(day.date)}
-                    </span>
-                    <span className="text-muted-foreground tabular-nums">
-                      {day.confirmedInstalls.toLocaleString()} confirmed |{" "}
-                      {day.dedupedIntents.toLocaleString()} intent |{" "}
-                      {day.rawRequests.toLocaleString()} raw |{" "}
-                      {day.uniqueInstallers.toLocaleString()} unique |{" "}
-                      {formatPercent(dayUniqueRate)} unique rate
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-foreground/80"
-                        style={{
-                          width: toPercent(day.confirmedInstalls, maxDailyInstalls),
-                        }}
-                      />
+
+          {daily.length === 0 ? (
+            <p className="mt-6 text-sm text-muted-foreground">
+              No daily data yet.
+            </p>
+          ) : (
+            <div className="mt-6 space-y-4">
+              {daily.map((day) => {
+                const dayUniqueRate = percent(
+                  day.uniqueInstallers,
+                  Math.max(day.confirmedInstalls, 1),
+                );
+                const isSelected = selectedDayInWindow === day.date;
+                return (
+                  <div key={day.date} className="space-y-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                      <Link
+                        href={makeDayHref(day.date)}
+                        className={`font-medium underline-offset-4 hover:underline ${
+                          isSelected ? "text-primary" : ""
+                        }`}
+                      >
+                        {formatDateLabel(day.date)}
+                      </Link>
+                      <span className="text-muted-foreground tabular-nums">
+                        {day.confirmedInstalls.toLocaleString()} confirmed |{" "}
+                        {day.dedupedIntents.toLocaleString()} intent |{" "}
+                        {day.rawRequests.toLocaleString()} raw |{" "}
+                        {day.uniqueInstallers.toLocaleString()} unique |{" "}
+                        {formatPercent(dayUniqueRate)} unique rate
+                      </span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-primary/70"
-                        style={{
-                          width: toPercent(
-                            day.uniqueInstallers,
-                            maxDailyInstalls,
-                          ),
-                        }}
-                      />
+                    <div className="flex gap-2">
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-foreground/80"
+                          style={{
+                            width: toPercent(day.confirmedInstalls, maxDailyInstalls),
+                          }}
+                        />
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary/70"
+                          style={{
+                            width: toPercent(
+                              day.uniqueInstallers,
+                              maxDailyInstalls,
+                            ),
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+          )}
+        </article>
+
+        <article className="rounded-xl border bg-card p-4 md:p-6">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold">Selected day timeline</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Confirmed installs by UTC timestamp.
+              </p>
+            </div>
+            {selectedDayInWindow ? (
+              <Button asChild size="sm" variant="outline">
+                <Link href={clearDayHref}>Clear</Link>
+              </Button>
+            ) : null}
           </div>
-        )}
+
+          {!selectedDayInWindow ? (
+            <p className="mt-6 text-sm text-muted-foreground">
+              Select a day from the trend list to reveal its timeline.
+            </p>
+          ) : selectedTimeline.length === 0 ? (
+            <p className="mt-6 text-sm text-muted-foreground">
+              No confirmed install events stored for {formatDateLabel(selectedDayInWindow)}.
+            </p>
+          ) : (
+            <div className="mt-6 space-y-2">
+              {selectedTimeline.map((event, index) => (
+                <div
+                  key={`${event.timestamp}-${event.component}-${index}`}
+                  className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2 text-sm"
+                >
+                  <span className="font-medium">{event.component}</span>
+                  <span className="text-muted-foreground tabular-nums">
+                    {formatTimeLabel(event.timestamp)} UTC
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
       </section>
     </main>
   );

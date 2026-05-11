@@ -20,6 +20,7 @@ const DEDUPE_KEY_PREFIX = "installs:dedupe";
 const SESSION_REQUIRED_PREFIX = "installs:session:required";
 const SESSION_FILES_PREFIX = "installs:session:files";
 const SESSION_CONFIRMED_PREFIX = "installs:session:confirmed";
+const TIMELINE_KEY_PREFIX = "installs:timeline";
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 5;
 
 type SummaryDay = {
@@ -54,6 +55,11 @@ type SummaryDailyMetrics = {
   uniqueInstallers: number;
 };
 
+export type InstallTimelineEvent = {
+  component: string;
+  timestamp: number;
+};
+
 export type InstallSummary = {
   enabled: boolean;
   storage: "upstash" | "memory" | "disabled";
@@ -85,6 +91,7 @@ type InMemoryInstallStore = {
   uniqueDailyInstallers: Map<string, Set<string>>;
   dedupe: Map<string, number>;
   sessions: Map<string, InMemoryInstallSession>;
+  timelineByDay: Map<string, InstallTimelineEvent[]>;
 };
 
 declare global {
@@ -158,6 +165,7 @@ function getInMemoryStore(): InMemoryInstallStore | null {
       uniqueDailyInstallers: new Map(),
       dedupe: new Map(),
       sessions: new Map(),
+      timelineByDay: new Map(),
     };
   }
 
@@ -167,6 +175,9 @@ function getInMemoryStore(): InMemoryInstallStore | null {
   }
   if (!globalThis.__nexusInMemoryInstallStore.sessions) {
     globalThis.__nexusInMemoryInstallStore.sessions = new Map();
+  }
+  if (!globalThis.__nexusInMemoryInstallStore.timelineByDay) {
+    globalThis.__nexusInMemoryInstallStore.timelineByDay = new Map();
   }
 
   return globalThis.__nexusInMemoryInstallStore;
@@ -228,6 +239,19 @@ function bumpCount(map: Map<string, number>, item: string, amount = 1): void {
   map.set(item, (map.get(item) ?? 0) + amount);
 }
 
+function appendTimelineEventInMemory(
+  store: InMemoryInstallStore,
+  day: string,
+  event: InstallTimelineEvent,
+): void {
+  const events = store.timelineByDay.get(day) ?? [];
+  events.push(event);
+  if (events.length > 5000) {
+    events.shift();
+  }
+  store.timelineByDay.set(day, events);
+}
+
 export async function recordInstall(
   componentName: string,
   request: NextRequest,
@@ -272,6 +296,10 @@ export async function recordInstall(
       inMemoryStore.confirmedTotalInstalls += 1;
       bumpCount(inMemoryStore.confirmedComponents, componentName);
       bumpCount(inMemoryStore.confirmedDailyInstalls, day);
+      appendTimelineEventInMemory(inMemoryStore, day, {
+        component: componentName,
+        timestamp: nowMs,
+      });
       return;
     }
 
@@ -331,10 +359,19 @@ export async function recordInstall(
     if (confirmOnIntent) {
       const confirmedComponentKey = key(CONFIRMED_COMPONENT_KEY_PREFIX, componentName);
       const confirmedDayKey = key(CONFIRMED_DAILY_KEY_PREFIX, day);
+      const timelineDayKey = key(TIMELINE_KEY_PREFIX, day);
       pipeline.incr(CONFIRMED_TOTAL_INSTALLS_KEY);
       pipeline.incr(confirmedComponentKey);
       pipeline.incr(confirmedDayKey);
       pipeline.expire(confirmedDayKey, DAILY_TTL_SECONDS);
+      pipeline.rpush(
+        timelineDayKey,
+        JSON.stringify({
+          component: componentName,
+          timestamp: nowMs,
+        } satisfies InstallTimelineEvent),
+      );
+      pipeline.expire(timelineDayKey, DAILY_TTL_SECONDS);
     } else {
       pipeline.set(sessionRequiredKey, String(requiredFiles), {
         ex: sessionTtlSeconds,
@@ -377,6 +414,10 @@ export async function recordInstallFileFetch(
     inMemoryStore.confirmedTotalInstalls += 1;
     bumpCount(inMemoryStore.confirmedComponents, componentName);
     bumpCount(inMemoryStore.confirmedDailyInstalls, day);
+    appendTimelineEventInMemory(inMemoryStore, day, {
+      component: componentName,
+      timestamp: nowMs,
+    });
     return;
   }
   if (!redis) return;
@@ -386,6 +427,7 @@ export async function recordInstallFileFetch(
   const sessionConfirmedKey = key(SESSION_CONFIRMED_PREFIX, sessionKey);
   const confirmedComponentKey = key(CONFIRMED_COMPONENT_KEY_PREFIX, componentName);
   const confirmedDayKey = key(CONFIRMED_DAILY_KEY_PREFIX, day);
+  const timelineDayKey = key(TIMELINE_KEY_PREFIX, day);
 
   try {
     const requiredRaw = await redis.get<number | string | null>(sessionRequiredKey);
@@ -408,6 +450,14 @@ export async function recordInstallFileFetch(
     pipeline.incr(confirmedComponentKey);
     pipeline.incr(confirmedDayKey);
     pipeline.expire(confirmedDayKey, DAILY_TTL_SECONDS);
+    pipeline.rpush(
+      timelineDayKey,
+      JSON.stringify({
+        component: componentName,
+        timestamp: nowMs,
+      } satisfies InstallTimelineEvent),
+    );
+    pipeline.expire(timelineDayKey, DAILY_TTL_SECONDS);
     await pipeline.exec();
   } catch (error) {
     console.error("[install-tracking] failed to confirm install", error);
@@ -583,4 +633,39 @@ export async function getInstallSummary(days = 14): Promise<InstallSummary> {
     componentMetrics,
     dailyMetrics,
   };
+}
+
+export async function getInstallTimeline(
+  day: string,
+  limit = 250,
+): Promise<InstallTimelineEvent[]> {
+  const maxItems = Math.max(1, Math.min(1000, Math.round(limit)));
+  const redis = getRedisClient();
+  const inMemoryStore = redis ? null : getInMemoryStore();
+
+  if (inMemoryStore) {
+    const events = inMemoryStore.timelineByDay.get(day) ?? [];
+    return [...events].slice(-maxItems).reverse();
+  }
+  if (!redis) return [];
+
+  const timelineDayKey = key(TIMELINE_KEY_PREFIX, day);
+  const raw = await redis.lrange<string>(timelineDayKey, -maxItems, -1);
+  return (raw ?? [])
+    .map((item) => {
+      try {
+        const parsed = JSON.parse(item) as InstallTimelineEvent;
+        if (
+          typeof parsed?.component !== "string" ||
+          typeof parsed?.timestamp !== "number"
+        ) {
+          return null;
+        }
+        return parsed;
+      } catch {
+        return null;
+      }
+    })
+    .filter((item): item is InstallTimelineEvent => item !== null)
+    .reverse();
 }
