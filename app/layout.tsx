@@ -52,11 +52,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon-light.ico",
-        media: "(prefers-color-scheme: light)",
+        // Keep a default icon and version it to bust aggressive favicon caches.
+        url: "/favicon.ico?v=2",
       },
       {
-        url: "/favicon.ico",
+        url: "/favicon.ico?v=2",
         media: "(prefers-color-scheme: dark)",
       },
     ],
