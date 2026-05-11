@@ -80,7 +80,10 @@ function FeedbackBarActions({ className, ...props }: FeedbackBarActionsProps) {
   return (
     <div
       data-slot="feedback-bar-actions"
-      className={cn("flex h-full items-center justify-center gap-1.5 px-2", className)}
+      className={cn(
+        "flex h-full items-center justify-center gap-1.5 px-2",
+        className,
+      )}
       {...props}
     />
   );
@@ -99,7 +102,7 @@ function FeedbackBarAction({
 }: FeedbackBarActionProps) {
   const Comp = asChild ? Slot : "div";
   const { content, side, shortcut } =
-    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
+    typeof tooltip === "string" ? { content: tooltip } : (tooltip ?? {});
 
   if (!content) {
     return (
