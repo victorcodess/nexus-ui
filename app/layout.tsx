@@ -49,18 +49,6 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   manifest: "/site.webmanifest",
-  icons: {
-    icon: [
-      {
-        // Keep a default icon and version it to bust aggressive favicon caches.
-        url: "/favicon.ico?v=2",
-      },
-      {
-        url: "/favicon.ico?v=2",
-        media: "(prefers-color-scheme: dark)",
-      },
-    ],
-  },
 };
 
 const jsonLd = {
