@@ -79,6 +79,7 @@ export async function GET(
 
       const content = await readFile(path, "utf-8");
       const filePathSegments = filePath.split("/").filter(Boolean);
+      // filePath shape is usually: new-york/<component>/<file>.tsx
       const componentName = filePathSegments[1];
       if (componentName) {
         await recordInstallFileFetch(componentName, filePath, _request);

@@ -17,10 +17,5 @@
       "target": "~/components/nexus-ui/attachments.tsx"
     }
   ],
-  "css": {
-    "@theme inline": {
-      "--scale-97": "0.97"
-    }
-  },
   "type": "registry:ui"
 }

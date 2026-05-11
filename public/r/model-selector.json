@@ -16,10 +16,5 @@
       "target": "~/components/nexus-ui/model-selector.tsx"
     }
   ],
-  "css": {
-    "@theme inline": {
-      "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
-    }
-  },
   "type": "registry:ui"
 }
