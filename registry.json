@@ -25,11 +25,6 @@
       "description": "Composable prompt suggestion chips for guiding user input.",
       "dependencies": ["@radix-ui/react-slot"],
       "registryDependencies": ["button"],
-      "css": {
-        "@theme inline": {
-          "--scale-99": "0.99"
-        }
-      },
       "files": [
         {
           "path": "registry/new-york/suggestions/suggestions.tsx",
@@ -49,11 +44,6 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "css": {
-        "@theme inline": {
-          "--scale-97": "0.97"
-        }
-      },
       "files": [
         {
           "path": "registry/new-york/attachments/attachments.tsx",
@@ -72,11 +62,6 @@
         "@hugeicons/react",
         "@hugeicons/core-free-icons"
       ],
-      "css": {
-        "@theme inline": {
-          "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
-        }
-      },
       "files": [
         {
           "path": "registry/new-york/model-selector/model-selector.tsx",
@@ -159,11 +144,6 @@
         "@hugeicons/core-free-icons",
         "use-stick-to-bottom"
       ],
-      "css": {
-        "@theme inline": {
-          "--shadow-sm": "0 2px 4px -2px rgba(0, 0, 0, 0.06), 0 4px 4px -2px rgba(0, 0, 0, 0.06)"
-        }
-      },
       "files": [
         {
           "path": "registry/new-york/thread/thread.tsx",
@@ -187,11 +167,6 @@
         "carousel",
         "hover-card"
       ],
-      "css": {
-        "@theme inline": {
-          "--shadow-modal": "0 -4px 12px 4px rgba(0, 0, 0, 0.04), 0 4px 12px -4px rgba(0, 0, 0, 0.06)"
-        }
-      },
       "files": [
         {
           "path": "registry/new-york/citation/citation.tsx",
