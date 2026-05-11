@@ -211,8 +211,12 @@ function isLikelyBrowserNavigation(request: NextRequest): boolean {
   const userAgent = (request.headers.get("user-agent") ?? "").toLowerCase();
   const secFetchDest = (request.headers.get("sec-fetch-dest") ?? "").toLowerCase();
   const secFetchMode = (request.headers.get("sec-fetch-mode") ?? "").toLowerCase();
+  const secFetchSite = (request.headers.get("sec-fetch-site") ?? "").toLowerCase();
   const accept = (request.headers.get("accept") ?? "").toLowerCase();
 
+  // Browsers attach sec-fetch-* headers for both navigations and XHR/fetch.
+  // We only want CLI/package-manager traffic for install intent metrics.
+  if (secFetchDest || secFetchMode || secFetchSite) return true;
   if (secFetchDest === "document" || secFetchMode === "navigate") return true;
   if (userAgent.includes("mozilla/5.0") && accept.includes("text/html")) return true;
   return false;
