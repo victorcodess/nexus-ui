@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   },
 };
 
+const DASHBOARD_TIME_ZONE = "Africa/Lagos";
+const DASHBOARD_TIME_ZONE_LABEL = "WAT";
+
 type DashboardSearchParams = {
   days?: string;
   key?: string;
@@ -67,7 +70,7 @@ function formatDateLabel(isoDate: string): string {
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: DASHBOARD_TIME_ZONE,
   }).format(parsed);
 }
 
@@ -79,7 +82,7 @@ function formatTimeLabel(timestamp: number): string {
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
-    timeZone: "UTC",
+    timeZone: DASHBOARD_TIME_ZONE,
   }).format(parsed);
 }
 
@@ -154,10 +157,14 @@ export default async function InstallsDashboardPage({
   };
   const refreshHref = makeRangeHref(days);
   const selectedDate = isIsoDate(params.date) ? params.date : null;
+  const latestDayInWindow = daily[daily.length - 1]?.date ?? null;
   const selectedDayInWindow =
     selectedDate && daily.some((day) => day.date === selectedDate)
       ? selectedDate
-      : null;
+      : latestDayInWindow;
+  const hasExplicitDaySelection = Boolean(
+    selectedDate && selectedDayInWindow === selectedDate,
+  );
   const selectedTimeline = selectedDayInWindow
     ? await getInstallTimeline(selectedDayInWindow, 300)
     : [];
@@ -169,6 +176,9 @@ export default async function InstallsDashboardPage({
     return `/internal/installs?${search.toString()}`;
   };
   const clearDayHref = makeRangeHref(days);
+  const selectedDayLabel = selectedDayInWindow
+    ? formatDateLabel(selectedDayInWindow)
+    : null;
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-8">
@@ -204,6 +214,9 @@ export default async function InstallsDashboardPage({
               Window: {days} days
             </span>
             <span className="rounded-full border bg-muted px-2 py-1">
+              Timezone: {DASHBOARD_TIME_ZONE_LABEL}
+            </span>
+            <span className="rounded-full border bg-muted px-2 py-1">
               Primary metric: confirmed installs
             </span>
           </div>
@@ -228,7 +241,7 @@ export default async function InstallsDashboardPage({
         </article>
         <article className="rounded-xl border bg-card p-4 shadow-sm">
           <p className="text-xs font-medium text-muted-foreground uppercase">
-            Installs today
+            Installs today ({DASHBOARD_TIME_ZONE_LABEL})
           </p>
           <p className="mt-2 text-2xl font-semibold">
             {today.confirmedInstalls.toLocaleString()}
@@ -360,8 +373,8 @@ export default async function InstallsDashboardPage({
         </article>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-2">
-        <article className="rounded-xl border bg-card p-4 md:p-6">
+      <section className="grid gap-4 xl:grid-cols-3">
+        <article className="rounded-xl border bg-card p-4 md:p-6 xl:col-span-2">
           <h2 className="text-base font-semibold">Daily trend</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Click a day to inspect a detailed install timeline.
@@ -380,16 +393,24 @@ export default async function InstallsDashboardPage({
                 );
                 const isSelected = selectedDayInWindow === day.date;
                 return (
-                  <div key={day.date} className="space-y-1">
+                  <Link
+                    key={day.date}
+                    href={makeDayHref(day.date)}
+                    aria-current={isSelected ? "date" : undefined}
+                    className={`block rounded-xl border p-3 transition-colors ${
+                      isSelected
+                        ? "border-primary/40 bg-primary/5"
+                        : "border-transparent hover:border-border hover:bg-muted/40 active:bg-muted/60"
+                    }`}
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                      <Link
-                        href={makeDayHref(day.date)}
-                        className={`font-medium underline-offset-4 hover:underline ${
-                          isSelected ? "text-primary" : ""
+                      <span
+                        className={`font-medium ${
+                          isSelected ? "text-primary" : "text-foreground"
                         }`}
                       >
                         {formatDateLabel(day.date)}
-                      </Link>
+                      </span>
                       <span className="text-muted-foreground tabular-nums">
                         {day.confirmedInstalls.toLocaleString()} confirmed |{" "}
                         {day.dedupedIntents.toLocaleString()} intent |{" "}
@@ -398,7 +419,7 @@ export default async function InstallsDashboardPage({
                         {formatPercent(dayUniqueRate)} unique rate
                       </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="mt-2 flex gap-2">
                       <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                         <div
                           className="h-full rounded-full bg-foreground/80"
@@ -419,7 +440,7 @@ export default async function InstallsDashboardPage({
                         />
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -431,10 +452,16 @@ export default async function InstallsDashboardPage({
             <div>
               <h2 className="text-base font-semibold">Selected day timeline</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Confirmed installs by UTC timestamp.
+                Confirmed installs by {DASHBOARD_TIME_ZONE_LABEL} timestamp.
               </p>
+              {selectedDayLabel ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Active day:{" "}
+                  <span className="font-medium text-foreground">{selectedDayLabel}</span>
+                </p>
+              ) : null}
             </div>
-            {selectedDayInWindow ? (
+            {hasExplicitDaySelection ? (
               <Button asChild size="sm" variant="outline">
                 <Link href={clearDayHref}>Clear</Link>
               </Button>
@@ -458,7 +485,7 @@ export default async function InstallsDashboardPage({
                 >
                   <span className="font-medium">{event.component}</span>
                   <span className="text-muted-foreground tabular-nums">
-                    {formatTimeLabel(event.timestamp)} UTC
+                    {formatTimeLabel(event.timestamp)} {DASHBOARD_TIME_ZONE_LABEL}
                   </span>
                 </div>
               ))}

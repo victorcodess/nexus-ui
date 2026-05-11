@@ -650,11 +650,14 @@ export async function getInstallTimeline(
   if (!redis) return [];
 
   const timelineDayKey = key(TIMELINE_KEY_PREFIX, day);
-  const raw = await redis.lrange<string>(timelineDayKey, -maxItems, -1);
+  const raw = await redis.lrange<unknown>(timelineDayKey, -maxItems, -1);
   return (raw ?? [])
     .map((item) => {
       try {
-        const parsed = JSON.parse(item) as InstallTimelineEvent;
+        const parsed =
+          typeof item === "string"
+            ? (JSON.parse(item) as InstallTimelineEvent)
+            : (item as InstallTimelineEvent);
         if (
           typeof parsed?.component !== "string" ||
           typeof parsed?.timestamp !== "number"
