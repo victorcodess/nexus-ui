@@ -6,7 +6,7 @@ import ImageDemo from "@/components/nexus-ui/examples/message/imagedemo";
 import TooltipDemo from "@/components/nexus-ui/examples/tooltip-demo";
 
 export default function DemoPage() {
-  // return <MessageDemo />;
-  return <TooltipDemo />;
+  return <ReasoningDemo />;
+  // return <TooltipDemo />;
   // return <TextShimmerDemo />;
 }

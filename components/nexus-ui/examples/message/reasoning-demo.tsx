@@ -8,8 +8,9 @@ import {
   isTextUIPart,
   type UIMessage,
 } from "ai";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Message,
   MessageAction,
@@ -20,6 +21,15 @@ import {
   MessageMarkdown,
   MessageStack,
 } from "@/components/nexus-ui/message";
+import {
+  FeedbackBar,
+  FeedbackBarAction,
+  FeedbackBarActions,
+  FeedbackBarClose,
+  FeedbackBarContent,
+  FeedbackBarLabel,
+  FeedbackBarPrompt,
+} from "@/components/nexus-ui/feedback-bar";
 import {
   Thread,
   ThreadContent,
@@ -57,8 +67,10 @@ import { ClaudeIcon2 } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
 import {
   ArrowUp02Icon,
+  Cancel01Icon,
   Copy01Icon,
   Edit04Icon,
+  InformationCircleIcon,
   PlusSignIcon,
   RepeatIcon,
   SquareIcon,
@@ -69,7 +81,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 const imgUser = "/assets/user-avatar.avif";
 const imgAssistant = "/assets/nexus-avatar.png";
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.5";
+const DEFAULT_MODEL = "openai/gpt-4o";
 
 /**
  * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/chat`.
@@ -180,6 +192,10 @@ type MessagesProps = {
   copyMessage: (text: string) => void;
   busy: boolean;
   regenerate: ReturnType<typeof useChat>["regenerate"];
+  feedbackTargetMessageId: string | null;
+  feedbackVote: "helpful" | "not-helpful" | null;
+  onFeedbackVote: (vote: "helpful" | "not-helpful") => void;
+  onFeedbackClose: () => void;
 };
 
 function Messages({
@@ -188,6 +204,10 @@ function Messages({
   copyMessage,
   busy,
   regenerate,
+  feedbackTargetMessageId,
+  feedbackVote,
+  onFeedbackVote,
+  onFeedbackClose,
 }: MessagesProps) {
   return (
     <>
@@ -218,7 +238,10 @@ function Messages({
               </MessageContent>
               <MessageActions className="opacity-0 transition-opacity group-hover/message:opacity-100">
                 <MessageActionGroup>
-                  <MessageAction asChild>
+                  <MessageAction
+                    asChild
+                    tooltip={{ content: "Edit", shortcut: "E" }}
+                  >
                     <Button
                       type="button"
                       variant="ghost"
@@ -233,7 +256,7 @@ function Messages({
                       />
                     </Button>
                   </MessageAction>
-                  <MessageAction asChild>
+                  <MessageAction asChild tooltip="Copy">
                     <Button
                       type="button"
                       variant="ghost"
@@ -280,7 +303,7 @@ function Messages({
                 {showReasoning ? (
                   <Reasoning
                     isStreaming={assistantIsPending || reasoningIsStreaming}
-                    className="ml-2 mb-1"
+                    className="mb-1 ml-2"
                   >
                     <ReasoningTrigger />
                     <ReasoningContent>{reasoningText}</ReasoningContent>
@@ -301,7 +324,7 @@ function Messages({
                 text.length > 0 ? (
                   <MessageActions>
                     <MessageActionGroup>
-                      <MessageAction asChild>
+                      <MessageAction asChild tooltip="Copy response">
                         <Button
                           type="button"
                           variant="ghost"
@@ -317,7 +340,7 @@ function Messages({
                           />
                         </Button>
                       </MessageAction>
-                      <MessageAction asChild>
+                      <MessageAction asChild tooltip="Like">
                         <Button
                           type="button"
                           variant="ghost"
@@ -332,7 +355,7 @@ function Messages({
                           />
                         </Button>
                       </MessageAction>
-                      <MessageAction asChild>
+                      <MessageAction asChild tooltip="Dislike">
                         <Button
                           type="button"
                           variant="ghost"
@@ -347,7 +370,7 @@ function Messages({
                           />
                         </Button>
                       </MessageAction>
-                      <MessageAction asChild>
+                      <MessageAction asChild tooltip="Regenerate">
                         <Button
                           type="button"
                           variant="ghost"
@@ -364,7 +387,7 @@ function Messages({
                           />
                         </Button>
                       </MessageAction>
-                      <MessageAction className="ml-1">
+                      <MessageAction className="ml-1" tooltip="View sources">
                         {sourceUrls.length > 0 ? (
                           <Citation
                             citations={sourceUrls.map((s) => ({
@@ -384,30 +407,128 @@ function Messages({
           );
         }
 
+        const rowKey = messageRowListKey(m, i, displayRows);
+        const showFeedbackBar =
+          from === "assistant" && m.id === feedbackTargetMessageId;
+
         return (
-          <motion.div
-            key={messageRowListKey(m, i, displayRows)}
-            className="w-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: 0.3,
-              ease: [0.25, 0.1, 0.25, 1],
-              delay: from === "assistant" ? 0.14 : 0,
-            }}
-          >
-            {from === "user" ? (
-              <Message from="user">
-                {mainColumn}
-                <MessageAvatar src={imgUser} alt="" fallback="U" />
-              </Message>
-            ) : (
-              <Message from="assistant">
-                <MessageAvatar src={imgAssistant} alt="" fallback="A" />
-                {mainColumn}
-              </Message>
-            )}
-          </motion.div>
+          <React.Fragment key={rowKey}>
+            <motion.div
+              className="w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                duration: 0.3,
+                ease: [0.25, 0.1, 0.25, 1],
+                delay: from === "assistant" ? 0.14 : 0,
+              }}
+            >
+              {from === "user" ? (
+                <Message from="user">
+                  {mainColumn}
+                  <MessageAvatar src={imgUser} alt="" fallback="U" />
+                </Message>
+              ) : (
+                <Message from="assistant">
+                  <MessageAvatar src={imgAssistant} alt="" fallback="A" />
+                  {mainColumn}
+                </Message>
+              )}
+            </motion.div>
+            <AnimatePresence>
+              {showFeedbackBar ? (
+                <motion.div
+                  className="mt-4 flex w-full justify-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                >
+                  <FeedbackBar>
+                    <FeedbackBarContent>
+                      <FeedbackBarPrompt>
+                        <HugeiconsIcon
+                          icon={InformationCircleIcon}
+                          strokeWidth={2.0}
+                          className="size-4 shrink-0"
+                        />
+                        <FeedbackBarLabel>
+                          Is this conversation helpful so far?
+                        </FeedbackBarLabel>
+                      </FeedbackBarPrompt>
+                      <FeedbackBarActions>
+                        <FeedbackBarAction asChild tooltip="Helpful">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className={cn(
+                              "cursor-pointer rounded-full bg-transparent transition-all hover:bg-border! active:scale-97",
+                              // feedbackVote === "helpful" &&
+                              //   "bg-border text-foreground",
+                            )}
+                            aria-label="Helpful"
+                            aria-pressed={feedbackVote === "helpful"}
+                            onClick={() => onFeedbackVote("helpful")}
+                          >
+                            <HugeiconsIcon
+                              icon={ThumbsUpIcon}
+                              strokeWidth={2.0}
+                              className={cn(
+                                "size-4 shrink-0 transition-all",
+                                feedbackVote === "helpful" && "fill-current",
+                              )}
+                            />
+                          </Button>
+                        </FeedbackBarAction>
+                        <FeedbackBarAction asChild tooltip="Not helpful">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className={cn(
+                              "cursor-pointer rounded-full bg-transparent transition-all hover:bg-border! active:scale-97",
+                              // feedbackVote === "not-helpful" &&
+                              //   "bg-border text-foreground",
+                            )}
+                            aria-label="Not helpful"
+                            aria-pressed={feedbackVote === "not-helpful"}
+                            onClick={() => onFeedbackVote("not-helpful")}
+                          >
+                            <HugeiconsIcon
+                              icon={ThumbsDownIcon}
+                              strokeWidth={2.0}
+                              className={cn(
+                                "size-4 shrink-0 transition-all",
+                                feedbackVote === "not-helpful" &&
+                                  "fill-current",
+                              )}
+                            />
+                          </Button>
+                        </FeedbackBarAction>
+                      </FeedbackBarActions>
+                    </FeedbackBarContent>
+                    <FeedbackBarClose tooltip="Close">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer rounded-full bg-transparent transition-all duration-200 hover:bg-border! active:scale-97"
+                        aria-label="Close feedback"
+                        onClick={onFeedbackClose}
+                      >
+                        <HugeiconsIcon
+                          icon={Cancel01Icon}
+                          strokeWidth={2.0}
+                          className="size-4 shrink-0"
+                        />
+                      </Button>
+                    </FeedbackBarClose>
+                  </FeedbackBar>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </React.Fragment>
         );
       })}
     </>
@@ -436,6 +557,11 @@ export default function ReasoningDemo() {
     useChat({ transport });
 
   const [input, setInput] = React.useState("");
+  const [feedbackVote, setFeedbackVote] = React.useState<
+    "helpful" | "not-helpful" | null
+  >(null);
+  const [feedbackDismissed, setFeedbackDismissed] = React.useState(false);
+  const [feedbackVisible, setFeedbackVisible] = React.useState(false);
 
   const busy = status === "streaming" || status === "submitted";
 
@@ -463,6 +589,37 @@ export default function ReasoningDemo() {
     return visibleMessages;
   }, [visibleMessages, showPendingAssistantRow]);
 
+  const feedbackTargetMessageId = React.useMemo(() => {
+    const assistantMessages = visibleMessages.filter(
+      (m) => m.role === "assistant",
+    );
+    return assistantMessages[1]?.id ?? null;
+  }, [visibleMessages]);
+
+  React.useEffect(() => {
+    setFeedbackVote(null);
+    setFeedbackDismissed(false);
+    setFeedbackVisible(false);
+  }, [feedbackTargetMessageId]);
+
+  React.useEffect(() => {
+    if (
+      !feedbackTargetMessageId ||
+      feedbackDismissed ||
+      feedbackVisible ||
+      busy
+    ) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setFeedbackVisible(true);
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [feedbackTargetMessageId, feedbackDismissed, feedbackVisible, busy]);
+
+  const showFeedbackBar =
+    feedbackTargetMessageId !== null && !feedbackDismissed && feedbackVisible;
+
   const handleSubmit = React.useCallback(
     async (value: string) => {
       const trimmed = value.trim();
@@ -483,6 +640,14 @@ export default function ReasoningDemo() {
             copyMessage={copyMessage}
             busy={busy}
             regenerate={regenerate}
+            feedbackTargetMessageId={
+              showFeedbackBar ? feedbackTargetMessageId : null
+            }
+            feedbackVote={feedbackVote}
+            onFeedbackVote={(vote) =>
+              setFeedbackVote((prev) => (prev === vote ? null : vote))
+            }
+            onFeedbackClose={() => setFeedbackDismissed(true)}
           />
         </ThreadContent>
         <ThreadScrollToBottom className="bottom-0 z-50" />
