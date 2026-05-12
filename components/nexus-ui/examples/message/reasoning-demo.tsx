@@ -209,6 +209,54 @@ function Messages({
   onFeedbackVote,
   onFeedbackClose,
 }: MessagesProps) {
+  const previousUserMessageRef = React.useRef<HTMLDivElement | null>(null);
+  const [previousUserMessageHeight, setPreviousUserMessageHeight] =
+    React.useState(0);
+
+  const previousUserMessageIndex = React.useMemo(() => {
+    const lastIndex = displayRows.length - 1;
+    if (lastIndex < 0 || displayRows[lastIndex]?.role !== "assistant") {
+      return -1;
+    }
+
+    for (let index = lastIndex - 1; index >= 0; index -= 1) {
+      if (displayRows[index]?.role === "user") {
+        return index;
+      }
+    }
+
+    return -1;
+  }, [displayRows]);
+
+  const attachPreviousUserMessageRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      previousUserMessageRef.current = node;
+      setPreviousUserMessageHeight(node?.clientHeight ?? 0);
+    },
+    [],
+  );
+
+  React.useLayoutEffect(() => {
+    if (previousUserMessageIndex < 0) {
+      setPreviousUserMessageHeight(0);
+      return;
+    }
+
+    const element = previousUserMessageRef.current;
+    if (!element) {
+      return;
+    }
+
+    const measureHeight = () => {
+      setPreviousUserMessageHeight(element.clientHeight);
+    };
+
+    const resizeObserver = new ResizeObserver(measureHeight);
+    resizeObserver.observe(element);
+
+    return () => resizeObserver.disconnect();
+  }, [previousUserMessageIndex]);
+
   return (
     <>
       {displayRows.map((m, i) => {
@@ -410,6 +458,20 @@ function Messages({
         const rowKey = messageRowListKey(m, i, displayRows);
         const showFeedbackBar =
           from === "assistant" && m.id === feedbackTargetMessageId;
+        const hasEarlierAssistant = displayRows
+          .slice(0, i)
+          .some((row) => row.role === "assistant");
+        const useAssistantMinHeight =
+          from === "assistant" && isLast && hasEarlierAssistant;
+        const assistantMinHeightStyle = useAssistantMinHeight
+          ? ({
+              "--reasoning-prev-user-height": `${previousUserMessageHeight}px`,
+            } as React.CSSProperties)
+          : undefined;
+
+        console.log("previousUserMessageHeight", previousUserMessageHeight);
+        console.log("useAssistantMinHeight", useAssistantMinHeight);
+        console.log("assistantMinHeightStyle", assistantMinHeightStyle);
 
         return (
           <React.Fragment key={rowKey}>
@@ -424,12 +486,27 @@ function Messages({
               }}
             >
               {from === "user" ? (
-                <Message from="user">
+                <Message
+                  from="user"
+                  ref={
+                    i === previousUserMessageIndex
+                      ? attachPreviousUserMessageRef
+                      : undefined
+                  }
+                >
                   {mainColumn}
                   <MessageAvatar src={imgUser} alt="" fallback="U" />
                 </Message>
               ) : (
-                <Message from="assistant">
+                <Message
+                  from="assistant"
+                  className={cn(
+                    "",
+                    useAssistantMinHeight &&
+                      "min-h-[calc(var(--reasoning-thread-height)-var(--reasoning-prev-user-height)-var(--reasoning-thread-content-gap)-var(--reasoning-thread-content-bottom-padding)-var(--reasoning-min-height-misc))]",
+                  )}
+                  style={assistantMinHeightStyle}
+                >
                   <MessageAvatar src={imgAssistant} alt="" fallback="A" />
                   {mainColumn}
                 </Message>
@@ -438,7 +515,7 @@ function Messages({
             <AnimatePresence>
               {showFeedbackBar ? (
                 <motion.div
-                  className="mt-4 flex w-full justify-center"
+                  className="mt-4 fl ex w-full justify-center hidden"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -631,9 +708,21 @@ export default function ReasoningDemo() {
   );
 
   return (
-    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-20">
-      <Thread className="h-[75vh]">
-        <ThreadContent className="mx-auto max-w-2xl pb-40">
+    <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-17.25">
+      <Thread
+        className="h-(--reasoning-thread-height)"
+        style={
+          {
+            "--reasoning-thread-height": "75vh",
+            "--reasoning-thread-content-gap": "24px",
+            "--reasoning-thread-content-bottom-padding": "160px",
+            "--reasoning-min-height-misc": "2px",
+          } as React.CSSProperties
+        }
+      >
+        <ThreadContent
+          className="mx-auto max-w-2xl gap-(--reasoning-thread-content-gap) pb-(--reasoning-thread-content-bottom-padding)"
+        >
           <Messages
             displayRows={displayRows}
             status={status}
@@ -653,7 +742,7 @@ export default function ReasoningDemo() {
         <ThreadScrollToBottom className="bottom-0 z-50" />
       </Thread>
 
-      <div className="fixed right-0 bottom-0 left-0 z-10 flex w-full items-center justify-center border-t border-accent bg-background/70 px-6 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95">
+      <div className="fixed right-0 bottom-0 left-0 z-10 flex w-full items-center justify-center border-t border-accent bg-background/70 px-6 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95 opacity- hid den">
         <div className="mx-auto w-full max-w-xl space-y-2">
           {error ? (
             <div
