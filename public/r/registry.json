@@ -268,6 +268,25 @@
           "target": "~/components/nexus-ui/text-shimmer.tsx"
         }
       ]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "Theme-aware Sonner toaster wrapper with status icons.",
+      "dependencies": [
+        "@hugeicons/core-free-icons",
+        "@hugeicons/react",
+        "next-themes",
+        "sonner"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/toast/toast.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/toast.tsx"
+        }
+      ]
     }
   ]
 }
