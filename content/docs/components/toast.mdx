@@ -1,0 +1,148 @@
+---
+title: Toast
+description: Theme-aware Sonner toaster wrapper with status icons
+---
+
+import ToastDefault from "@/components/nexus-ui/examples/toast/default";
+
+Composable toast notifications powered by Sonner with Nexus styling defaults, theme sync, and Hugeicons status icons.
+
+<DemoWithCode src="components/nexus-ui/examples/toast/default.tsx">
+  <ToastDefault />
+</DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/toast
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/toast
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/toast
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/toast
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npm install @hugeicons/core-free-icons @hugeicons/react next-themes sonner
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="registry/new-york/toast/toast.tsx" title="components/nexus-ui/toast.tsx" />
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import { toast } from "sonner";
+import { Toast } from "@/components/nexus-ui/toast";
+```
+
+```tsx keepBackground
+<Toast />
+```
+
+```tsx keepBackground
+toast.success("Saved");
+toast.info("New update available");
+toast.warning("Connection is unstable");
+toast.error("Request failed");
+toast.loading("Syncing...");
+```
+
+## API Reference
+
+### Toast
+
+Wrapper around Sonner's `Toaster` with theme sync and Nexus default icons/styles. Accepts all `ToasterProps`.
+
+<TypeTable
+  type={{
+    position: {
+      type: '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"',
+      default: '"bottom-right"',
+      description: "Placement of the toast stack in the viewport.",
+    },
+    theme: {
+      type: '"light" | "dark" | "system"',
+      default: '"system"',
+      description: "Color theme used by the toaster.",
+    },
+    richColors: {
+      type: "boolean",
+      default: "false",
+      description: "Use accent-rich status colors for toast variants.",
+    },
+    duration: {
+      type: "number",
+      default: "4000",
+      description: "Default auto-dismiss duration in milliseconds.",
+    },
+    closeButton: {
+      type: "boolean",
+      default: "false",
+      description: "Shows a close button on each toast.",
+    },
+    visibleToasts: {
+      type: "number",
+      default: "3",
+      description: "Maximum number of toasts visible at once.",
+    },
+    expand: {
+      type: "boolean",
+      default: "false",
+      description: "Expands stacked toasts to show more content.",
+    },
+    offset: {
+      type: "string | number",
+      description: "Viewport offset for toast stack positioning.",
+    },
+  }}
+/>
