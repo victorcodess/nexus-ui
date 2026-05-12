@@ -55,14 +55,17 @@ type MessageProps = React.HTMLAttributes<HTMLDivElement> & {
   from: MessageFrom;
 };
 
-function Message({
-  className,
-  from,
-  children,
-  "aria-label": ariaLabelProp,
-  "aria-labelledby": ariaLabelledBy,
-  ...props
-}: MessageProps) {
+const Message = React.forwardRef<HTMLDivElement, MessageProps>(function Message(
+  {
+    className,
+    from,
+    children,
+    "aria-label": ariaLabelProp,
+    "aria-labelledby": ariaLabelledBy,
+    ...props
+  },
+  ref,
+) {
   const ariaLabel =
     ariaLabelProp ??
     (ariaLabelledBy == null
@@ -74,6 +77,7 @@ function Message({
   return (
     <MessageContext.Provider value={{ from }}>
       <div
+        ref={ref}
         data-slot="message"
         role="article"
         aria-label={ariaLabel}
@@ -89,7 +93,7 @@ function Message({
       </div>
     </MessageContext.Provider>
   );
-}
+});
 
 type MessageStackProps = React.HTMLAttributes<HTMLDivElement>;
 
