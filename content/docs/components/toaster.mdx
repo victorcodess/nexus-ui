@@ -1,14 +1,14 @@
 ---
-title: Toast
+title: Toaster
 description: Theme-aware Sonner toaster wrapper with status icons
 ---
 
-import ToastDefault from "@/components/nexus-ui/examples/toast/default";
+import ToasterDefault from "@/components/nexus-ui/examples/toaster/default";
 
-Composable toast notifications powered by Sonner with Nexus styling defaults, theme sync, and Hugeicons status icons.
+Toast notifications powered by Sonner.
 
-<DemoWithCode src="components/nexus-ui/examples/toast/default.tsx">
-  <ToastDefault />
+<DemoWithCode src="components/nexus-ui/examples/toaster/default.tsx">
+  <ToasterDefault />
 </DemoWithCode>
 
 ## Installation
@@ -18,22 +18,22 @@ Composable toast notifications powered by Sonner with Nexus styling defaults, th
 <Tabs items={["npm", "pnpm", "yarn", "bun"]}>
 <Tab value="npm">
 ```bash
-npx shadcn@latest add @nexus-ui/toast
+npx shadcn@latest add @nexus-ui/toaster
 ```
 </Tab>
 <Tab value="pnpm">
 ```bash
-pnpm dlx shadcn@latest add @nexus-ui/toast
+pnpm dlx shadcn@latest add @nexus-ui/toaster
 ```
 </Tab>
 <Tab value="yarn">
 ```bash
-yarn dlx shadcn@latest add @nexus-ui/toast
+yarn dlx shadcn@latest add @nexus-ui/toaster
 ```
 </Tab>
 <Tab value="bun">
 ```bash
-bunx shadcn@latest add @nexus-ui/toast
+bunx shadcn@latest add @nexus-ui/toaster
 ```
 </Tab>
 </Tabs>
@@ -69,7 +69,7 @@ bun add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
 <Step>
 <h3>Copy and paste the following code into your project.</h3>
 
-<ComponentSource src="registry/new-york/toast/toast.tsx" title="components/nexus-ui/toast.tsx" />
+<ComponentSource src="registry/new-york/toaster/toaster.tsx" title="components/nexus-ui/toaster.tsx" />
 </Step>
 <Step>
 <h3>Update import paths to match your project setup.</h3>
@@ -82,11 +82,11 @@ bun add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
 
 ```tsx keepBackground
 import { toast } from "sonner";
-import { Toast } from "@/components/nexus-ui/toast";
+import { Toaster } from "@/components/nexus-ui/toaster";
 ```
 
 ```tsx keepBackground
-<Toast />
+<Toaster />
 ```
 
 ```tsx keepBackground
@@ -99,7 +99,7 @@ toast.loading("Syncing...");
 
 ## API Reference
 
-### Toast
+### Toaster
 
 Wrapper around Sonner's `Toaster` with theme sync and Nexus default icons/styles. Accepts all `ToasterProps`.
 

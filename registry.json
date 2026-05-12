@@ -270,9 +270,9 @@
       ]
     },
     {
-      "name": "toast",
+      "name": "toaster",
       "type": "registry:ui",
-      "title": "Toast",
+      "title": "Toaster",
       "description": "Theme-aware Sonner toaster wrapper with status icons.",
       "dependencies": [
         "@hugeicons/core-free-icons",
@@ -282,9 +282,9 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/toast/toast.tsx",
+          "path": "registry/new-york/toaster/toaster.tsx",
           "type": "registry:file",
-          "target": "~/components/nexus-ui/toast.tsx"
+          "target": "~/components/nexus-ui/toaster.tsx"
         }
       ]
     }

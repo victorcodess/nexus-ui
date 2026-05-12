@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toaster",
+  "title": "Toaster",
+  "description": "Theme-aware Sonner toaster wrapper with status icons.",
+  "dependencies": [
+    "@hugeicons/core-free-icons",
+    "@hugeicons/react",
+    "next-themes",
+    "sonner"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/toaster/toaster.tsx",
+      "content": "\"use client\"\n\nimport {\n  Alert02Icon,\n  CheckmarkCircle01Icon,\n  InformationCircleIcon,\n  Loading03Icon,\n  OctagonXIcon,\n} from \"@hugeicons/core-free-icons\"\nimport { HugeiconsIcon } from \"@hugeicons/react\"\nimport { useTheme } from \"next-themes\"\nimport { Toaster as Sonner, type ToasterProps } from \"sonner\"\n\nconst Toaster = ({ ...props }: ToasterProps) => {\n  const { theme = \"system\" } = useTheme()\n\n  return (\n    <Sonner\n      theme={theme as ToasterProps[\"theme\"]}\n      className=\"toaster group\"\n      icons={{\n        success: (\n          <HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} className=\"size-4\" />\n        ),\n        info: <HugeiconsIcon icon={InformationCircleIcon} strokeWidth={2} className=\"size-4\" />,\n        warning: <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className=\"size-4\" />,\n        error: <HugeiconsIcon icon={OctagonXIcon} strokeWidth={2} className=\"size-4\" />,\n        loading: <HugeiconsIcon icon={Loading03Icon} strokeWidth={2} className=\"size-4 animate-spin\" />,\n      }}\n      style={\n        {\n          \"--normal-bg\": \"var(--popover)\",\n          \"--normal-text\": \"var(--popover-foreground)\",\n          \"--normal-border\": \"var(--border)\",\n          \"--border-radius\": \"var(--radius)\",\n        } as React.CSSProperties\n      }\n      {...props}\n    />\n  )\n}\n\nexport { Toaster }\n",
+      "type": "registry:file",
+      "target": "~/components/nexus-ui/toaster.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}
