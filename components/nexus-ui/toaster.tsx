@@ -153,7 +153,7 @@ function ToastCard({
   return (
     <div
       className={cn(
-        "relative flex w-full items-start justify-between gap-2 rounded-[12px] px-4 py-3 transition-colors xl:w-120 shadow-[0_8px_30px_rgb(0,0,0,0.02)]",
+        "relative flex w-full items-start justify-between gap-2 rounded-[12px] px-4 py-3 transition-colors xl:w-120 shadow-[0_8px_10px_rgb(0,0,0,0.05)]",
         "border border-(--toast-color)/5 bg-(--toast-bg) text-(--toast-color)",
         "dark:bg-(--toast-bg)",
         "[--toast-bg:var(--popover)] [--toast-color:var(--popover-foreground)]",
@@ -171,7 +171,7 @@ function ToastCard({
         </div>
       ) : null}
 
-      <div className="flex w-full flex-col gap-0.75">
+      <div className="flex w-full flex-col gap-0.25">
         <span className="text-sm leading-6 font-medium text-(--toast-color)">
           {title}
         </span>

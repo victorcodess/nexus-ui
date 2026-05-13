@@ -4,6 +4,8 @@ import { toast, Toaster } from "@/components/nexus-ui/toaster";
 import { Button } from "@/components/ui/button";
 
 const ToasterVariantsRow = () => {
+  const toasterId = "toaster-example-variants";
+
   return (
     <div className="flex min-h-24 w-full flex-wrap items-center justify-center gap-2">
       <Button
@@ -13,6 +15,7 @@ const ToasterVariantsRow = () => {
         onClick={() =>
           toast.success("Deploy completed.", {
             description: "Your chat assistant changes are now live in production.",
+            toasterId,
           })
         }
       >
@@ -25,6 +28,7 @@ const ToasterVariantsRow = () => {
         onClick={() =>
           toast.info("Model switched.", {
             description: "Responses will now use `gpt-5.5-medium` for this thread.",
+            toasterId,
           })
         }
       >
@@ -37,6 +41,7 @@ const ToasterVariantsRow = () => {
         onClick={() =>
           toast.warning("Context window almost full.", {
             description: "Older messages may be truncated in the next response.",
+            toasterId,
           })
         }
       >
@@ -49,6 +54,7 @@ const ToasterVariantsRow = () => {
         onClick={() =>
           toast.error("Tool call failed.", {
             description: "The web search tool timed out. Try again in a moment.",
+            toasterId,
           })
         }
       >
@@ -61,12 +67,13 @@ const ToasterVariantsRow = () => {
         onClick={() =>
           toast.loading("Generating answer...", {
             description: "The assistant is analyzing files and drafting a response.",
+            toasterId,
           })
         }
       >
         Loading
       </Button>
-      <Toaster />
+      <Toaster id={toasterId} />
     </div>
   );
 };

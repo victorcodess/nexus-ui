@@ -4,6 +4,8 @@ import { toast, Toaster } from "@/components/nexus-ui/toaster";
 import { Button } from "@/components/ui/button";
 
 const ToasterPosition = () => {
+  const toasterId = "toaster-example-position";
+
   return (
     <div className="flex min-h-24 w-full flex-wrap items-center justify-center gap-2">
       <Button
@@ -14,6 +16,7 @@ const ToasterPosition = () => {
           toast.default("Sync started.", {
             description: "Top-left toast for global workspace sync updates.",
             position: "top-left",
+            toasterId,
           })
         }
       >
@@ -28,6 +31,7 @@ const ToasterPosition = () => {
             description:
               "Top-center toast for high-priority permission prompts.",
             position: "top-center",
+            toasterId,
           })
         }
       >
@@ -42,6 +46,7 @@ const ToasterPosition = () => {
             description:
               "Top-right toast for product announcements and releases.",
             position: "top-right",
+            toasterId,
           })
         }
       >
@@ -55,6 +60,7 @@ const ToasterPosition = () => {
           toast.default("File indexed.", {
             description: "Bottom-left toast for background indexing events.",
             position: "bottom-left",
+            toasterId,
           })
         }
       >
@@ -69,6 +75,7 @@ const ToasterPosition = () => {
             description:
               "Bottom-center toast for editor autosave confirmations.",
             position: "bottom-center",
+            toasterId,
           })
         }
       >
@@ -82,12 +89,13 @@ const ToasterPosition = () => {
           toast.default("Prompt copied.", {
             description: "Bottom-right toast for quick local action feedback.",
             position: "bottom-right",
+            toasterId,
           })
         }
       >
         Bottom Right
       </Button>
-      <Toaster />
+      <Toaster id={toasterId} />
     </div>
   );
 };
