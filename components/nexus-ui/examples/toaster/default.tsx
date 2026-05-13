@@ -11,9 +11,9 @@ const ToasterDefault = () => {
         size="default"
         type="button"
         onClick={() =>
-          toast.success("Toast sent successfully", {
+          toast.default("Nexus UI is a component library built on top of shadcn/ui.", {
             duration: Infinity,
-            description: "Your request failed. Try again in a few seconds.",
+            description: "Rather than retrofitting general-purpose components, every primitive is crafted around the patterns AI products demand.",
             action: {
               label: "Retry",
             },

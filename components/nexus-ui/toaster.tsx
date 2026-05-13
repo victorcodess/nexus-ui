@@ -18,8 +18,15 @@ import {
   type ToasterProps,
 } from "sonner";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-type ToastVariant = "default" | "success" | "info" | "warning" | "error" | "loading";
+type ToastVariant =
+  | "default"
+  | "success"
+  | "info"
+  | "warning"
+  | "error"
+  | "loading";
 
 type ToastAction = {
   label: React.ReactNode;
@@ -34,11 +41,33 @@ type ToastContent = {
 } & Omit<ExternalToast, "id" | "icon" | "classNames" | "unstyled" | "action">;
 
 const variantIconMap: Partial<Record<ToastVariant, React.ReactNode>> = {
-  success: <HugeiconsIcon icon={CheckmarkCircle01Icon} strokeWidth={2} className="size-5" />,
-  info: <HugeiconsIcon icon={InformationCircleIcon} strokeWidth={2} className="size-5" />,
-  warning: <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className="size-5" />,
-  error: <HugeiconsIcon icon={OctagonXIcon} strokeWidth={2} className="size-5" />,
-  loading: <HugeiconsIcon icon={Loading03Icon} strokeWidth={2} className="size-5 animate-spin" />,
+  success: (
+    <HugeiconsIcon
+      icon={CheckmarkCircle01Icon}
+      strokeWidth={2}
+      className="size-4.5"
+    />
+  ),
+  info: (
+    <HugeiconsIcon
+      icon={InformationCircleIcon}
+      strokeWidth={2}
+      className="size-4.5"
+    />
+  ),
+  warning: (
+    <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className="size-4.5" />
+  ),
+  error: (
+    <HugeiconsIcon icon={OctagonXIcon} strokeWidth={2} className="size-4.5" />
+  ),
+  loading: (
+    <HugeiconsIcon
+      icon={Loading03Icon}
+      strokeWidth={2}
+      className="size-4.5 animate-spin"
+    />
+  ),
 };
 
 const toast = {
@@ -96,32 +125,42 @@ function ToastCard({
   return (
     <div
       className={cn(
-        "relative flex w-full items-start gap-3 rounded-[12px] border px-4 py-3.5 pr-10 shadow-sm transition-colors",
-        "border-(--toast-border) bg-(--toast-bg) text-(--toast-color)",
-        "dark:border-(--toast-color)/35 dark:bg-(--toast-color)/10",
-        "[--toast-bg:var(--popover)] [--toast-color:var(--popover-foreground)] [--toast-border:var(--border)]",
-        "data-[variant=default]:[--toast-bg:var(--popover)] data-[variant=default]:[--toast-color:var(--popover-foreground)] data-[variant=default]:[--toast-border:var(--border)]",
-        "data-[variant=success]:[--toast-bg:#F0FDF4] data-[variant=success]:[--toast-color:#16A34A] data-[variant=success]:[--toast-border:#BBF7D0]",
-        "data-[variant=info]:[--toast-bg:#EFF6FF] data-[variant=info]:[--toast-color:#2563EB] data-[variant=info]:[--toast-border:#BFDBFE]",
-        "data-[variant=warning]:[--toast-bg:#FEFCE8] data-[variant=warning]:[--toast-color:#CA8A04] data-[variant=warning]:[--toast-border:#FEF08A]",
-        "data-[variant=error]:[--toast-bg:#FEF2F2] data-[variant=error]:[--toast-color:#DC2626] data-[variant=error]:[--toast-border:#FECACA]",
+        "relative flex w-full xl:w-121 items-start justify-between gap-2 rounded-[12px] px-4 py-3 transition-colors",
+        "bg-(--toast-bg) text-(--toast-color) border border-(--toast-color)/5",
+        "dark:bg-(--toast-bg)",
+        "[--toast-bg:var(--popover)] [--toast-color:var(--popover-foreground)]",
+        "data-[variant=default]:[--toast-bg:var(--popover)] data-[variant=default]:[--toast-color:var(--popover-foreground)]",
+        "data-[variant=success]:[--toast-bg:#F0FDF4] data-[variant=success]:[--toast-color:#16A34A] data-[variant=success]:dark:[--toast-bg:#17221C] data-[variant=success]:dark:[--toast-color:#15803D]",
+        "data-[variant=info]:[--toast-bg:#EFF6FF] data-[variant=info]:[--toast-color:#2563EB] data-[variant=info]:dark:[--toast-bg:#181D28] data-[variant=info]:dark:[--toast-color:#1D4ED8]",
+        "data-[variant=warning]:[--toast-bg:#FEFCE8] data-[variant=warning]:[--toast-color:#CA8A04] data-[variant=warning]:dark:[--toast-bg:#252015] data-[variant=warning]:dark:[--toast-color:#CA8A04]",
+        "data-[variant=error]:[--toast-bg:#FEF2F2] data-[variant=error]:[--toast-color:#DC2626] data-[variant=error]:dark:[--toast-bg:#271818] data-[variant=error]:dark:[--toast-color:#B91C1C]",
       )}
       data-variant={variant}
     >
-      {icon ? <div className="mt-0.5 shrink-0 text-(--toast-color)">{icon}</div> : null}
+      {icon ? (
+        <div className="flex size-6 shrink-0 items-center justify-center text-(--toast-color)">
+          {icon}
+        </div>
+      ) : null}
 
-      <div className="min-w-0 flex-1">
-        <div className="text-sm leading-5 font-medium text-(--toast-color)">{title}</div>
+      <div className="flex min-w-0 flex-col gap-0.75">
+        <span className="text-sm leading-6 font-medium text-(--toast-color)">
+          {title}
+        </span>
         {description ? (
-          <div className="mt-1 text-[13px] leading-5 text-(--toast-color)">{description}</div>
+          <div className="mt-0 text-sm leading-5.5 font-[350] text-(--toast-color)">
+            {description}
+          </div>
         ) : null}
 
         {action ? (
-          <button
+          <Button
             type="button"
+            variant="default"
+            size="sm"
             className={cn(
-              "mt-3 inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-medium transition-colors",
-              "border-(--toast-color)/35 text-(--toast-color) hover:bg-(--toast-color)/12",
+              "mt-2 inline-flex w-fit cursor-pointer items-center justify-center rounded-full text-[13px] font-[450] transition-colors",
+              "text-(--toast-bg) bg-(--toast-color) hover:bg-(--toast-color)/90 hover:text-(--toast-bg)",
             )}
             onClick={() => {
               action.onClick?.();
@@ -129,21 +168,23 @@ function ToastCard({
             }}
           >
             {action.label}
-          </button>
+          </Button>
         ) : null}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-sm"
         aria-label="Close notification"
         className={cn(
-          "absolute top-2 right-2 inline-flex size-6 items-center justify-center rounded-md text-(--toast-color) transition-colors",
-          "hover:bg-(--toast-color)/12 focus-visible:ring-2 focus-visible:ring-(--toast-color)/35",
+          "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--toast-color) transition-colors",
+          "hover:bg-(--toast-color)/12 hover:text-(--toast-color) focus-visible:ring-2 focus-visible:ring-(--toast-color)/35 dark:hover:bg-(--toast-color)/10 dark:hover:text-(--toast-color)",
         )}
         onClick={() => sonnerToast.dismiss(id)}
       >
         <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-4" />
-      </button>
+      </Button>
     </div>
   );
 }
