@@ -81,6 +81,7 @@ const toast = {
           description={description}
           variant={variant}
           action={action}
+          closeButton={content.closeButton}
         />
       ),
       sonnerOptions,
@@ -118,6 +119,7 @@ function ToastCard({
   title,
   description,
   action,
+  closeButton = true,
   variant = "default",
 }: ToastContent & { id: string | number }) {
   const icon = variantIconMap[variant];
@@ -172,19 +174,21 @@ function ToastCard({
         ) : null}
       </div>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
-        aria-label="Close notification"
-        className={cn(
-          "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--toast-color) transition-colors",
-          "hover:bg-(--toast-color)/12 hover:text-(--toast-color) focus-visible:ring-2 focus-visible:ring-(--toast-color)/35 dark:hover:bg-(--toast-color)/10 dark:hover:text-(--toast-color)",
-        )}
-        onClick={() => sonnerToast.dismiss(id)}
-      >
-        <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-4" />
-      </Button>
+      {closeButton !== false ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Close notification"
+          className={cn(
+            "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--toast-color) transition-colors",
+            "hover:bg-(--toast-color)/12 hover:text-(--toast-color) focus-visible:ring-2 focus-visible:ring-(--toast-color)/35 dark:hover:bg-(--toast-color)/10 dark:hover:text-(--toast-color)",
+          )}
+          onClick={() => sonnerToast.dismiss(id)}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} className="size-4" />
+        </Button>
+      ) : null}
     </div>
   );
 }

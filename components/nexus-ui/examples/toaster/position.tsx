@@ -25,7 +25,8 @@ const ToasterPosition = () => {
         type="button"
         onClick={() =>
           toast.default("Agent requested approval.", {
-            description: "Top-center toast for high-priority permission prompts.",
+            description:
+              "Top-center toast for high-priority permission prompts.",
             position: "top-center",
           })
         }
@@ -38,7 +39,8 @@ const ToasterPosition = () => {
         type="button"
         onClick={() =>
           toast.default("Update available.", {
-            description: "Top-right toast for product announcements and releases.",
+            description:
+              "Top-right toast for product announcements and releases.",
             position: "top-right",
           })
         }
@@ -64,7 +66,8 @@ const ToasterPosition = () => {
         type="button"
         onClick={() =>
           toast.default("Draft saved.", {
-            description: "Bottom-center toast for editor autosave confirmations.",
+            description:
+              "Bottom-center toast for editor autosave confirmations.",
             position: "bottom-center",
           })
         }
