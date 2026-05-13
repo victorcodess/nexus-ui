@@ -81,8 +81,7 @@ bun add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
 ## Usage
 
 ```tsx keepBackground
-import { toast } from "sonner";
-import { Toaster } from "@/components/nexus-ui/toaster";
+import { toast, Toaster } from "@/components/nexus-ui/toaster";
 ```
 
 ```tsx keepBackground
@@ -90,6 +89,7 @@ import { Toaster } from "@/components/nexus-ui/toaster";
 ```
 
 ```tsx keepBackground
+toast.default("Draft saved");
 toast.success("Saved");
 toast.info("New update available");
 toast.warning("Connection is unstable");
@@ -97,52 +97,139 @@ toast.error("Request failed");
 toast.loading("Syncing...");
 ```
 
+```tsx keepBackground
+toast.success("Profile updated", {
+  description: "Your account details have been saved.",
+  action: {
+    label: "Undo",
+    onClick: () => console.log("Undo clicked"),
+  },
+});
+```
+
 ## API Reference
 
-### Toaster
+### toast
 
-Wrapper around Sonner's `Toaster` with theme sync and Nexus default icons/styles. Accepts all `ToasterProps`.
+Custom headless toast helper built on `sonnerToast.custom`. It renders your Nexus toast card UI while forwarding supported Sonner toast options for behavior and lifecycle.
 
 <TypeTable
   type={{
-    position: {
-      type: '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"',
-      default: '"bottom-right"',
-      description: "Placement of the toast stack in the viewport.",
+    title: {
+      type: "React.ReactNode",
+      description: "Primary toast title text/content.",
     },
-    theme: {
-      type: '"light" | "dark" | "system"',
-      default: '"system"',
-      description: "Color theme used by the toaster.",
+    description: {
+      type: "React.ReactNode",
+      description: "Optional secondary body content.",
     },
-    richColors: {
-      type: "boolean",
-      default: "false",
-      description: "Use accent-rich status colors for toast variants.",
+    variant: {
+      type: '"default" | "success" | "info" | "warning" | "error" | "loading"',
+      default: '"default"',
+      description: "Controls variant color tokens and leading icon. `default` uses neutral theme colors and no icon.",
+    },
+    action: {
+      type: "{ label: React.ReactNode; onClick?: () => void }",
+      description:
+        "Optional custom action button rendered inside the toast card.",
     },
     duration: {
       type: "number",
       default: "4000",
-      description: "Default auto-dismiss duration in milliseconds.",
+      description:
+        "Auto-dismiss duration in milliseconds. Use `Infinity` to keep toast open.",
+    },
+    id: {
+      type: "string | number",
+      description: "Custom toast id for updates/deduping.",
+    },
+    position: {
+      type: '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"',
+      description: "Override destination stack position for this toast.",
+    },
+    toasterId: {
+      type: "string",
+      description: "Route toast to a specific mounted toaster.",
+    },
+    dismissible: {
+      type: "boolean",
+      default: "true",
+      description: "Whether the toast can be dismissed by interaction.",
+    },
+    onDismiss: {
+      type: "() => void",
+      description: "Called when toast is dismissed.",
+    },
+    onAutoClose: {
+      type: "() => void",
+      description: "Called when toast closes from timeout.",
+    },
+    invert: {
+      type: "boolean",
+      default: "false",
+      description: "Use Sonner inverted styling mode where applicable.",
     },
     closeButton: {
       type: "boolean",
       default: "false",
-      description: "Shows a close button on each toast.",
+      description: "Show/hide Sonner close affordance for this toast instance.",
     },
-    visibleToasts: {
-      type: "number",
-      default: "3",
-      description: "Maximum number of toasts visible at once.",
+    testId: {
+      type: "string",
+      description: "Testing identifier attached to toast node.",
+    },
+  }}
+/>
+
+### Toaster
+
+Container component that mounts Sonner. This wrapper sets `theme` from `next-themes` by default, enables class hook `toaster group`, and defaults `toastOptions` to `{ unstyled: true }` (overrideable via props).
+
+<TypeTable
+  type={{
+    theme: {
+      type: '"light" | "dark" | "system"',
+      default: '"system"',
+      description:
+        "Theme synced from `next-themes`; can be overridden via prop.",
+    },
+    position: {
+      type: '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"',
+      default: '"bottom-right"',
+      description: "Global toast placement.",
     },
     expand: {
       type: "boolean",
       default: "false",
-      description: "Expands stacked toasts to show more content.",
+      description: "Expand stacked toasts on hover, or always when true.",
+    },
+    visibleToasts: {
+      type: "number",
+      default: "3",
+      description: "Maximum visible toasts in stack.",
+    },
+    closeButton: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Show default Sonner close controls globally (custom toast UI already renders its own close button).",
     },
     offset: {
       type: "string | number",
-      description: "Viewport offset for toast stack positioning.",
+      description: "Desktop viewport offset for toast stack.",
+    },
+    mobileOffset: {
+      type: "string | number",
+      description: "Mobile viewport offset for toast stack.",
+    },
+    toastOptions: {
+      type: "object",
+      default: "{ unstyled: true }",
+      description: "Default options applied to all toasts from this toaster.",
+    },
+    id: {
+      type: "string",
+      description: "Toaster id for multi-toaster setups.",
     },
   }}
 />
