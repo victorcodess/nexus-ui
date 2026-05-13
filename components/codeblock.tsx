@@ -69,6 +69,7 @@ export interface CodeBlockProps extends ComponentProps<"figure"> {
    * @defaultValue false
    */
   noCollapse?: boolean;
+  noLineNumbers?: boolean;
 
   viewportProps?: HTMLAttributes<HTMLElement>;
 
@@ -139,6 +140,7 @@ export function CodeBlock({
   allowCopy = true,
   keepBackground = false,
   noCollapse = false,
+  noLineNumbers = false,
   icon,
   viewportProps = {},
   children,
@@ -154,6 +156,7 @@ export function CodeBlock({
 
   const collapsedHeight = 16 * 24 + 28; // 16 lines × 24px line-height + 28px padding
   const showCollapse = !noCollapse && overflows && expanded;
+  const hideLineNumbers = noLineNumbers || props["data-line-numbers"] === false;
 
   const codeLang = useMemo(() => findCodeLanguageInTree(children), [children]);
   const isJsonBlock =
@@ -231,6 +234,7 @@ export function CodeBlock({
           ? "-mx-px -mb-px bg-fd-secondary last:rounded-b-xl"
           : "my-4 rounded-xl dark:bg-background",
         keepBackground ? "" : "border border-gray-200 dark:border-white/10",
+        hideLineNumbers && "nd-no-line-numbers",
         "shiki not-prose relative overflow-hidden text-[13px] font-[450]",
         props.className,
         title && "bg-gray-100",
@@ -273,9 +277,9 @@ export function CodeBlock({
               "--padding-right": !title
                 ? "calc(var(--spacing) * 8)"
                 : undefined,
-              counterSet: props["data-line-numbers"]
-                ? `line ${Number(props["data-line-numbers-start"] ?? 1) - 1}`
-                : undefined,
+              counterSet: hideLineNumbers
+                ? undefined
+                : `line ${Number(props["data-line-numbers-start"] ?? 1) - 1}`,
               ...viewportProps.style,
             } as object
           }

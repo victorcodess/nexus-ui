@@ -269,6 +269,11 @@ code .line {
   padding-left: 0px !important;
 }
 
+.nd-no-line-numbers code .line::before {
+  content: none;
+  display: none;
+}
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

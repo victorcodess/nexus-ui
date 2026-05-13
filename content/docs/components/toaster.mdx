@@ -15,96 +15,73 @@ Toast notifications powered by Sonner.
 
 <Tabs items={["CLI", "Manual"]} framed={false}>
 <Tab value="CLI">
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-<Tab value="npm">
+<Steps>
+<Step>Run the following command:</Step>
+
 ```bash
 npx shadcn@latest add @nexus-ui/toaster
 ```
-</Tab>
-<Tab value="pnpm">
-```bash
-pnpm dlx shadcn@latest add @nexus-ui/toaster
+
+<Step>Add the `Toaster` component</Step>
+
+```tsx title="app/layout.tsx"
+import { Toaster } from "@/components/nexus-ui/toaster"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head />
+      <body>
+        <main>{children}</main>
+        <Toaster />
+      </body>
+    </html>
+  )
+}
 ```
-</Tab>
-<Tab value="yarn">
-```bash
-yarn dlx shadcn@latest add @nexus-ui/toaster
-```
-</Tab>
-<Tab value="bun">
-```bash
-bunx shadcn@latest add @nexus-ui/toaster
-```
-</Tab>
-</Tabs>
+</Steps>
 </Tab>
 <Tab value="Manual">
 <Steps>
-<Step>
-<h3>Install the following dependencies:</h3>
+<Step>Install the following dependencies:</Step>
 
-<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
-<Tab value="npm">
 ```bash
-npm install @hugeicons/core-free-icons @hugeicons/react next-themes sonner
+npx shadcn@latest add button && npm install @hugeicons/core-free-icons @hugeicons/react next-themes sonner
 ```
-</Tab>
-<Tab value="pnpm">
-```bash
-pnpm add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
-```
-</Tab>
-<Tab value="yarn">
-```bash
-yarn add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
-```
-</Tab>
-<Tab value="bun">
-```bash
-bun add @hugeicons/core-free-icons @hugeicons/react next-themes sonner
-```
-</Tab>
-</Tabs>
-</Step>
-<Step>
-<h3>Copy and paste the following code into your project.</h3>
+
+<Step>Copy and paste the following code into your project.</Step>
 
 <ComponentSource src="registry/new-york/toaster/toaster.tsx" title="components/nexus-ui/toaster.tsx" />
-</Step>
-<Step>
-<h3>Update import paths to match your project setup.</h3>
-</Step>
+
+<Step>Add the `Toaster` component</Step>
+
+```tsx title="app/layout.tsx"
+import { Toaster } from "@/components/nexus-ui/toaster"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head />
+      <body>
+        <Toaster />
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
 </Steps>
 </Tab>
 </Tabs>
 
 ## Usage
 
-```tsx keepBackground
-import { toast, Toaster } from "@/components/nexus-ui/toaster";
+```tsx keepBackground noLineNumbers
+import { toast } from "@/components/nexus-ui/toaster";
 ```
 
-```tsx keepBackground
-<Toaster />
-```
-
-```tsx keepBackground
-toast.default("Draft saved");
-toast.success("Saved");
-toast.info("New update available");
-toast.warning("Connection is unstable");
-toast.error("Request failed");
-toast.loading("Syncing...");
-```
-
-```tsx keepBackground
-toast.success("Profile updated", {
-  description: "Your account details have been saved.",
-  action: {
-    label: "Undo",
-    onClick: () => console.log("Undo clicked"),
-  },
-});
+```tsx keepBackground noLineNumbers
+toast.default("Event has been created.");
 ```
 
 ## API Reference

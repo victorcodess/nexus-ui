@@ -30,10 +30,14 @@ export default defineConfig({
           "tab",
           "keepBackground",
           "noCollapse",
+          "noLineNumbers",
         ]);
         const data: Record<string, unknown> = parsed.attributes;
         if ("keepBackground" in data) data.keepBackground = true;
         if ("noCollapse" in data) data.noCollapse = true;
+        if ("noLineNumbers" in data || /\bnoLineNumbers\b/.test(meta)) {
+          data.noLineNumbers = true;
+        }
         return data;
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
