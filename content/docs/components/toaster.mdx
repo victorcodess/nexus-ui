@@ -4,6 +4,10 @@ description: Theme-aware Sonner toaster wrapper with status icons
 ---
 
 import ToasterDefault from "@/components/nexus-ui/examples/toaster/default";
+import ToasterWithDescription from "@/components/nexus-ui/examples/toaster/with-description";
+import ToasterWithDescriptionAction from "@/components/nexus-ui/examples/toaster/with-description-action";
+import ToasterVariantsRow from "@/components/nexus-ui/examples/toaster/variants-row";
+import ToasterPosition from "@/components/nexus-ui/examples/toaster/position";
 
 Toast notifications powered by Sonner.
 
@@ -39,6 +43,7 @@ export default function RootLayout({ children }) {
   )
 }
 ```
+
 </Steps>
 </Tab>
 <Tab value="Manual">
@@ -51,7 +56,10 @@ npx shadcn@latest add button && npm install @hugeicons/core-free-icons @hugeicon
 
 <Step>Copy and paste the following code into your project.</Step>
 
-<ComponentSource src="registry/new-york/toaster/toaster.tsx" title="components/nexus-ui/toaster.tsx" />
+<ComponentSource
+  src="registry/new-york/toaster/toaster.tsx"
+  title="components/nexus-ui/toaster.tsx"
+/>
 
 <Step>Add the `Toaster` component</Step>
 
@@ -70,6 +78,7 @@ export default function RootLayout({ children }) {
   )
 }
 ```
+
 </Steps>
 </Tab>
 </Tabs>
@@ -84,11 +93,45 @@ import { toast } from "@/components/nexus-ui/toaster";
 toast.default("Event has been created.");
 ```
 
+## Examples
+
+### With Description
+
+Add supporting copy with the `description` option.
+
+<DemoWithCode src="components/nexus-ui/examples/toaster/with-description.tsx">
+  <ToasterWithDescription />
+</DemoWithCode>
+
+### With Action
+
+Add an inline CTA using the `action` option.
+
+<DemoWithCode src="components/nexus-ui/examples/toaster/with-description-action.tsx">
+  <ToasterWithDescriptionAction />
+</DemoWithCode>
+
+### Variants
+
+Change the variant on each toast call to control the feedback type and visual style.
+
+<DemoWithCode src="components/nexus-ui/examples/toaster/variants-row.tsx">
+  <ToasterVariantsRow />
+</DemoWithCode>
+
+### Position
+
+Show toasts in different corners and center positions using per-toast `position`.
+
+<DemoWithCode src="components/nexus-ui/examples/toaster/position.tsx">
+  <ToasterPosition />
+</DemoWithCode>
+
 ## API Reference
 
 ### toast
 
-Custom headless toast helper built on `sonnerToast.custom`. It renders your Nexus toast card UI while forwarding supported Sonner toast options for behavior and lifecycle.
+Custom headless toast helper built on `sonnerToast.custom`. It renders the `Toast` UI while forwarding supported Sonner toast options for behavior and lifecycle.
 
 <TypeTable
   type={{
@@ -103,7 +146,8 @@ Custom headless toast helper built on `sonnerToast.custom`. It renders your Nexu
     variant: {
       type: '"default" | "success" | "info" | "warning" | "error" | "loading"',
       default: '"default"',
-      description: "Controls variant color tokens and leading icon. `default` uses neutral theme colors and no icon.",
+      description:
+        "Controls variant color tokens and leading icon. `default` uses neutral theme colors and no icon.",
     },
     action: {
       type: "{ label: React.ReactNode; onClick?: () => void }",
@@ -160,7 +204,7 @@ Custom headless toast helper built on `sonnerToast.custom`. It renders your Nexu
 
 ### Toaster
 
-Container component that mounts Sonner. This wrapper sets `theme` from `next-themes` by default, enables class hook `toaster group`, and defaults `toastOptions` to `{ unstyled: true }` (overrideable via props).
+Custom wrapper that mounts Sonner and syncs `theme` from `next-themes`, with `toastOptions={{ unstyled: true }}` by default.
 
 <TypeTable
   type={{

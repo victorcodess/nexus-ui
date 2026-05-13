@@ -143,7 +143,7 @@ function ToastCard({
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-col gap-0.75">
+      <div className="flex w-full flex-col gap-0.75">
         <span className="text-sm leading-6 font-medium text-(--toast-color)">
           {title}
         </span>
