@@ -5,7 +5,7 @@ description: Theme-aware Sonner toaster wrapper with status icons
 
 import ToasterDefault from "@/components/nexus-ui/examples/toaster/default";
 import ToasterWithDescription from "@/components/nexus-ui/examples/toaster/with-description";
-import ToasterWithDescriptionAction from "@/components/nexus-ui/examples/toaster/with-description-action";
+import ToasterWithAction from "@/components/nexus-ui/examples/toaster/with-action";
 import ToasterVariantsRow from "@/components/nexus-ui/examples/toaster/variants-row";
 import ToasterPosition from "@/components/nexus-ui/examples/toaster/position";
 
@@ -107,8 +107,8 @@ Add supporting copy with the `description` option.
 
 Add an inline CTA using the `action` option.
 
-<DemoWithCode src="components/nexus-ui/examples/toaster/with-description-action.tsx">
-  <ToasterWithDescriptionAction />
+<DemoWithCode src="components/nexus-ui/examples/toaster/with-action.tsx">
+  <ToasterWithAction />
 </DemoWithCode>
 
 ### Variants
@@ -149,10 +149,18 @@ Custom headless toast helper built on `sonnerToast.custom`. It renders the `Toas
       description:
         "Controls variant color tokens and leading icon. `default` uses neutral theme colors and no icon.",
     },
+    icon: {
+      type: "React.ReactNode | null",
+      description: "Overrides the leading icon for this toast. Use `null` to hide it.",
+    },
     action: {
       type: "{ label: React.ReactNode; onClick?: () => void }",
       description:
         "Optional custom action button rendered inside the toast card.",
+    },
+    cancel: {
+      type: "{ label: React.ReactNode; onClick?: () => void }",
+      description: "Optional secondary cancel button rendered inside the toast card.",
     },
     duration: {
       type: "number",

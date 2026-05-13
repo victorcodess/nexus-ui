@@ -37,8 +37,13 @@ type ToastContent = {
   title: React.ReactNode;
   description?: React.ReactNode;
   variant?: ToastVariant;
+  icon?: React.ReactNode | null;
   action?: ToastAction;
-} & Omit<ExternalToast, "id" | "icon" | "classNames" | "unstyled" | "action">;
+  cancel?: ToastAction;
+} & Omit<
+  ExternalToast,
+  "id" | "icon" | "classNames" | "unstyled" | "action" | "cancel"
+>;
 
 const variantIconMap: Partial<Record<ToastVariant, React.ReactNode>> = {
   success: (
@@ -72,7 +77,17 @@ const variantIconMap: Partial<Record<ToastVariant, React.ReactNode>> = {
 
 const toast = {
   custom: (content: ToastContent) => {
-    const { title, description, variant, action, ...sonnerOptions } = content;
+    const {
+      title,
+      description,
+      variant,
+      icon,
+      action,
+      cancel,
+      dismissible,
+      closeButton,
+      ...sonnerOptions
+    } = content;
     return sonnerToast.custom(
       (id) => (
         <ToastCard
@@ -80,11 +95,18 @@ const toast = {
           title={title}
           description={description}
           variant={variant}
+          icon={icon}
           action={action}
-          closeButton={content.closeButton}
+          cancel={cancel}
+          dismissible={dismissible}
+          closeButton={closeButton}
         />
       ),
-      sonnerOptions,
+      {
+        ...sonnerOptions,
+        dismissible,
+        closeButton,
+      },
     );
   },
   default: (
@@ -118,11 +140,15 @@ function ToastCard({
   id,
   title,
   description,
+  icon,
   action,
+  cancel,
+  dismissible = true,
   closeButton = true,
   variant = "default",
 }: ToastContent & { id: string | number }) {
-  const icon = variantIconMap[variant];
+  const resolvedIcon = icon === null ? null : (icon ?? variantIconMap[variant]);
+  const canDismiss = dismissible !== false;
 
   return (
     <div
@@ -139,9 +165,9 @@ function ToastCard({
       )}
       data-variant={variant}
     >
-      {icon ? (
+      {resolvedIcon ? (
         <div className="flex size-6 shrink-0 items-center justify-center text-(--toast-color)">
-          {icon}
+          {resolvedIcon}
         </div>
       ) : null}
 
@@ -166,15 +192,33 @@ function ToastCard({
             )}
             onClick={() => {
               action.onClick?.();
-              sonnerToast.dismiss(id);
+              if (canDismiss) sonnerToast.dismiss(id);
             }}
           >
             {action.label}
           </Button>
         ) : null}
+
+        {cancel ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "mt-2 inline-flex w-fit cursor-pointer items-center justify-center rounded-full text-[13px] font-[450] transition-colors",
+              "border border-(--toast-color)/35 text-(--toast-color) hover:bg-(--toast-color)/12",
+            )}
+            onClick={() => {
+              cancel.onClick?.();
+              if (canDismiss) sonnerToast.dismiss(id);
+            }}
+          >
+            {cancel.label}
+          </Button>
+        ) : null}
       </div>
 
-      {closeButton !== false ? (
+      {canDismiss && closeButton !== false ? (
         <Button
           type="button"
           variant="ghost"
