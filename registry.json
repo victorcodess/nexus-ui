@@ -273,7 +273,7 @@
       "name": "toaster",
       "type": "registry:ui",
       "title": "Toaster",
-      "description": "Theme-aware Sonner toaster wrapper with status icons.",
+      "description": "Sonner toasts with variants and action/cancel controls.",
       "dependencies": [
         "@hugeicons/core-free-icons",
         "@hugeicons/react",

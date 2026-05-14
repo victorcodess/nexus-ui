@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -40,6 +40,7 @@ npx shadcn@latest add @nexus-ui/reasoning
 npx shadcn@latest add @nexus-ui/text-shimmer
 npx shadcn@latest add @nexus-ui/image
 npx shadcn@latest add @nexus-ui/feedback-bar
+npx shadcn@latest add @nexus-ui/toaster
 ```
 
 Or install directly via URL (no registry config needed):
@@ -72,6 +73,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Text Shimmer | `text-shimmer` | Animated shimmer text for loading and in-progress UI |
 | Image | `image` | URLs, base64, or `Uint8Array` image payloads with preview, loader, lightbox (Radix Dialog), and action slots |
 | Feedback Bar | `feedback-bar` | Inline feedback prompt with label, action slots, optional Radix tooltips (+ shortcuts), and bordered close region |
+| Toaster | `toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
 
 ## Component APIs
 
@@ -714,6 +716,42 @@ import {
 </FeedbackBar>
 ```
 
+### Toaster
+
+Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls. Uses **`next-themes`** for light/dark/system. Export **`Toaster`** (mount once in the root layout) and a **`toast`** object with ergonomic helpers plus **`toast.dismiss`**.
+
+**Import:**
+
+```tsx
+import { Toaster, toast } from "@/components/nexus-ui/toaster";
+```
+
+**Parts / API:**
+
+| Export | Purpose |
+|--------|---------|
+| `Toaster` | Renders `<Sonner />` with `toastOptions={{ unstyled: true }}` and theme from `useTheme()`; spread extra `ToasterProps`. |
+| `toast.custom` | Build fully custom payloads (`title`, optional `description`, `variant`, `icon`, `action`, `cancel`, Sonner timing/options). |
+| `toast.default` / `success` / `info` / `warning` / `error` / `loading` | Shorthand `(title, options?)` delegating to `toast.custom`. |
+| `toast.dismiss` | Forward to Sonner dismiss API. |
+
+**Root props:** On `Toaster`, standard Sonner props (`position`, `duration`, `expand`, etc.) plus `className` merge behavior from Sonner.
+
+**Props & hooks:** Requires **`ThemeProvider`** from `next-themes` above the layout that renders `Toaster` so `useTheme()` resolves. Toast bodies use shadcn **`Button`** for action/cancel/close.
+
+**Usage notes:** Place `<Toaster />` beside app chrome (e.g. `layout.tsx`). Prefer `toast.success("Copied")` for quick feedback; use `toast.custom` when you need cancel buttons or custom icons (`icon: null` to suppress defaults).
+
+**Example:**
+
+```tsx
+// layout.tsx
+<Toaster position="bottom-right" />
+
+// anywhere client-side
+toast.success("Saved");
+toast.error("Something went wrong", { description: "Try again.", duration: 5000 });
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -811,7 +849,8 @@ components/
 │   ├── reasoning.tsx
 │   ├── text-shimmer.tsx
 │   ├── image.tsx
-│   └── feedback-bar.tsx
+│   ├── feedback-bar.tsx
+│   └── toaster.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -835,11 +874,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Text Shimmer:** `@/lib/utils` only (`cn`)
 - **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 - **Feedback Bar:** `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
+- **Toaster:** `sonner`, `next-themes`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `@/lib/utils`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt
