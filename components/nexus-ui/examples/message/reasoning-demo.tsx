@@ -51,6 +51,7 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
+import { toast, Toaster } from "@/components/nexus-ui/toaster";
 import { Citation, CitationSourcesBadge } from "@/components/nexus-ui/citation";
 import {
   Reasoning,
@@ -82,6 +83,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 const imgUser = "/assets/user-avatar.avif";
 const imgAssistant = "/assets/nexus-avatar.png";
 const DEFAULT_MODEL = "openai/gpt-4o";
+const TOASTER_ID = "reasoning-demo-toaster";
 
 /**
  * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/chat`.
@@ -192,6 +194,11 @@ type MessagesProps = {
   copyMessage: (text: string) => void;
   busy: boolean;
   regenerate: ReturnType<typeof useChat>["regenerate"];
+  messageReactions: Record<string, "helpful" | "not-helpful">;
+  onMessageReactionToggle: (
+    messageId: string,
+    vote: "helpful" | "not-helpful",
+  ) => void;
   feedbackTargetMessageId: string | null;
   feedbackVote: "helpful" | "not-helpful" | null;
   onFeedbackVote: (vote: "helpful" | "not-helpful") => void;
@@ -204,6 +211,8 @@ function Messages({
   copyMessage,
   busy,
   regenerate,
+  messageReactions,
+  onMessageReactionToggle,
   feedbackTargetMessageId,
   feedbackVote,
   onFeedbackVote,
@@ -261,6 +270,7 @@ function Messages({
     <>
       {displayRows.map((m, i) => {
         const from = m.role === "user" ? "user" : "assistant";
+        const messageReaction = messageReactions[m.id] ?? null;
         const text = textFromMessage(m);
         const reasoningText = reasoningTextFromMessage(m);
         const reasoningIsStreaming = isReasoningStreaming(m);
@@ -395,11 +405,29 @@ function Messages({
                           size="icon-sm"
                           className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                           aria-label="Good response"
+                          onClick={(event) => {
+                            event.currentTarget.blur();
+                            onMessageReactionToggle(m.id, "helpful");
+                            toast.default("Marked response as helpful.", {
+                              description:
+                                "Thanks for the feedback on this answer.",
+                              toasterId: TOASTER_ID,
+                              position: "bottom-center",
+                              action: {
+                                label: "Undo",
+                                onClick: () =>
+                                  onMessageReactionToggle(m.id, "helpful"),
+                              },
+                            });
+                          }}
                         >
                           <HugeiconsIcon
                             icon={ThumbsUpIcon}
                             strokeWidth={2.0}
-                            className="size-4"
+                            className={cn(
+                              "size-4",
+                              messageReaction === "helpful" && "fill-current",
+                            )}
                           />
                         </Button>
                       </MessageAction>
@@ -410,11 +438,30 @@ function Messages({
                           size="icon-sm"
                           className="cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97"
                           aria-label="Bad response"
+                          onClick={(event) => {
+                            event.currentTarget.blur();
+                            onMessageReactionToggle(m.id, "not-helpful");
+                            toast.default("Marked response as not helpful.", {
+                              description:
+                                "Your feedback helps improve future responses.",
+                              toasterId: TOASTER_ID,
+                              position: "bottom-center",
+                              action: {
+                                label: "Undo",
+                                onClick: () =>
+                                  onMessageReactionToggle(m.id, "not-helpful"),
+                              },
+                            });
+                          }}
                         >
                           <HugeiconsIcon
                             icon={ThumbsDownIcon}
                             strokeWidth={2.0}
-                            className="size-4"
+                            className={cn(
+                              "size-4",
+                              messageReaction === "not-helpful" &&
+                                "fill-current",
+                            )}
                           />
                         </Button>
                       </MessageAction>
@@ -613,8 +660,20 @@ function Messages({
 }
 
 export default function ReasoningDemo() {
-  const copyMessage = React.useCallback((text: string) => {
-    void navigator.clipboard?.writeText(text);
+  const copyMessage = React.useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.default("Message copied to clipboard.", {
+        toasterId: TOASTER_ID,
+        position: "bottom-right",
+      });
+    } catch {
+      toast.error("Copy failed.", {
+        description: "Could not write to clipboard. Try again.",
+        toasterId: TOASTER_ID,
+        position: "top-center",
+      });
+    }
   }, []);
 
   const [model, setModel] = React.useState<string>(DEFAULT_MODEL);
@@ -637,8 +696,13 @@ export default function ReasoningDemo() {
   const [feedbackVote, setFeedbackVote] = React.useState<
     "helpful" | "not-helpful" | null
   >(null);
+  const [messageReactions, setMessageReactions] = React.useState<
+    Record<string, "helpful" | "not-helpful">
+  >({});
   const [feedbackDismissed, setFeedbackDismissed] = React.useState(false);
   const [feedbackVisible, setFeedbackVisible] = React.useState(false);
+  const modelToastRef = React.useRef(model);
+  const lastErrorToastMessageRef = React.useRef<string | null>(null);
 
   const busy = status === "streaming" || status === "submitted";
 
@@ -697,6 +761,40 @@ export default function ReasoningDemo() {
   const showFeedbackBar =
     feedbackTargetMessageId !== null && !feedbackDismissed && feedbackVisible;
 
+  React.useEffect(() => {
+    if (modelToastRef.current === model) {
+      return;
+    }
+
+    const selectedModel = models.find((item) => item.value === model);
+    toast.info("Model switched.", {
+      description: `Now using ${selectedModel?.title ?? model}.`,
+      toasterId: TOASTER_ID,
+      position: "bottom-left",
+    });
+    modelToastRef.current = model;
+  }, [model]);
+
+  React.useEffect(() => {
+    const currentErrorMessage = error?.message ?? null;
+
+    if (!currentErrorMessage) {
+      lastErrorToastMessageRef.current = null;
+      return;
+    }
+
+    if (lastErrorToastMessageRef.current === currentErrorMessage) {
+      return;
+    }
+
+    toast.error("Request failed.", {
+      description: currentErrorMessage,
+      toasterId: TOASTER_ID,
+      position: "top-center",
+    });
+    lastErrorToastMessageRef.current = currentErrorMessage;
+  }, [error]);
+
   const handleSubmit = React.useCallback(
     async (value: string) => {
       const trimmed = value.trim();
@@ -707,8 +805,17 @@ export default function ReasoningDemo() {
     [busy, sendMessage],
   );
 
+  const showSimulatedErrorToast = React.useCallback(() => {
+    toast.error("Attachment upload failed.", {
+      description: "File exceeded the 20MB limit.",
+      toasterId: TOASTER_ID,
+      position: "top-right",
+    });
+  }, []);
+
   return (
     <div className="relative flex h-screen items-start px-0 pt-5 lg:px-0 lg:pt-17.25">
+      <Toaster id={TOASTER_ID} />
       <Thread
         className="h-(--reasoning-thread-height)"
         style={
@@ -729,6 +836,18 @@ export default function ReasoningDemo() {
             copyMessage={copyMessage}
             busy={busy}
             regenerate={regenerate}
+            messageReactions={messageReactions}
+            onMessageReactionToggle={(messageId, vote) =>
+              setMessageReactions((prev) => {
+                if (prev[messageId] === vote) {
+                  const next = { ...prev };
+                  delete next[messageId];
+                  return next;
+                }
+
+                return { ...prev, [messageId]: vote };
+              })
+            }
             feedbackTargetMessageId={
               showFeedbackBar ? feedbackTargetMessageId : null
             }
@@ -779,8 +898,9 @@ export default function ReasoningDemo() {
                     variant="ghost"
                     size="icon-sm"
                     className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
-                    aria-label="More actions"
+                    aria-label="Simulate tool error toast"
                     disabled={busy}
+                    onClick={showSimulatedErrorToast}
                   >
                     <HugeiconsIcon
                       icon={PlusSignIcon}

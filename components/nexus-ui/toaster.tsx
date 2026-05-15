@@ -153,7 +153,7 @@ function ToastCard({
   return (
     <div
       className={cn(
-        "relative flex w-full items-start justify-between gap-2 rounded-[12px] px-4 py-3 transition-colors xl:w-120 shadow-[0_8px_10px_rgb(0,0,0,0.02)]",
+        "relative flex w-full items-start justify-between gap-2 rounded-[12px] px-4 py-3 transition-colors lg:w-90 xl:w-120 shadow-[0_8px_10px_rgb(0,0,0,0.02)]",
         "border border-(--toast-color)/5 bg-(--toast-bg) text-(--toast-color)",
         "dark:bg-(--toast-bg)",
         "[--toast-bg:var(--popover)] [--toast-color:var(--popover-foreground)]",
@@ -230,7 +230,7 @@ function ToastCard({
           size="icon-sm"
           aria-label="Close notification"
           className={cn(
-            "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--toast-color) transition-colors",
+            "inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-(--toast-color)/70 transition-colors",
             "hover:bg-(--toast-color)/10 hover:text-(--toast-color) focus-visible:ring-2 focus-visible:ring-(--toast-color)/35 dark:hover:bg-(--toast-color)/10 dark:hover:text-(--toast-color)",
           )}
           onClick={() => sonnerToast.dismiss(id)}
