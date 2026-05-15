@@ -21,6 +21,7 @@ const SESSION_REQUIRED_PREFIX = "installs:session:required";
 const SESSION_FILES_PREFIX = "installs:session:files";
 const SESSION_CONFIRMED_PREFIX = "installs:session:confirmed";
 const TIMELINE_KEY_PREFIX = "installs:timeline";
+const RAW_TIMELINE_KEY_PREFIX = "installs:timeline:raw";
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 5;
 
 type SummaryDay = {
@@ -60,6 +61,8 @@ export type InstallTimelineEvent = {
   timestamp: number;
 };
 
+export type InstallTimelineMetric = "confirmed" | "raw";
+
 export type InstallSummary = {
   enabled: boolean;
   storage: "upstash" | "memory" | "disabled";
@@ -92,6 +95,7 @@ type InMemoryInstallStore = {
   dedupe: Map<string, number>;
   sessions: Map<string, InMemoryInstallSession>;
   timelineByDay: Map<string, InstallTimelineEvent[]>;
+  rawTimelineByDay: Map<string, InstallTimelineEvent[]>;
 };
 
 declare global {
@@ -166,6 +170,7 @@ function getInMemoryStore(): InMemoryInstallStore | null {
       dedupe: new Map(),
       sessions: new Map(),
       timelineByDay: new Map(),
+      rawTimelineByDay: new Map(),
     };
   }
 
@@ -178,6 +183,9 @@ function getInMemoryStore(): InMemoryInstallStore | null {
   }
   if (!globalThis.__nexusInMemoryInstallStore.timelineByDay) {
     globalThis.__nexusInMemoryInstallStore.timelineByDay = new Map();
+  }
+  if (!globalThis.__nexusInMemoryInstallStore.rawTimelineByDay) {
+    globalThis.__nexusInMemoryInstallStore.rawTimelineByDay = new Map();
   }
 
   return globalThis.__nexusInMemoryInstallStore;
@@ -244,16 +252,16 @@ function bumpCount(map: Map<string, number>, item: string, amount = 1): void {
 }
 
 function appendTimelineEventInMemory(
-  store: InMemoryInstallStore,
+  eventsByDay: Map<string, InstallTimelineEvent[]>,
   day: string,
   event: InstallTimelineEvent,
 ): void {
-  const events = store.timelineByDay.get(day) ?? [];
+  const events = eventsByDay.get(day) ?? [];
   events.push(event);
   if (events.length > 5000) {
     events.shift();
   }
-  store.timelineByDay.set(day, events);
+  eventsByDay.set(day, events);
 }
 
 export async function recordInstall(
@@ -281,6 +289,10 @@ export async function recordInstall(
     inMemoryStore.rawTotalInstalls += 1;
     bumpCount(inMemoryStore.rawComponents, componentName);
     bumpCount(inMemoryStore.rawDailyInstalls, day);
+    appendTimelineEventInMemory(inMemoryStore.rawTimelineByDay, day, {
+      component: componentName,
+      timestamp: nowMs,
+    });
 
     if (isBrowserNavigation) return;
 
@@ -300,7 +312,7 @@ export async function recordInstall(
       inMemoryStore.confirmedTotalInstalls += 1;
       bumpCount(inMemoryStore.confirmedComponents, componentName);
       bumpCount(inMemoryStore.confirmedDailyInstalls, day);
-      appendTimelineEventInMemory(inMemoryStore, day, {
+      appendTimelineEventInMemory(inMemoryStore.timelineByDay, day, {
         component: componentName,
         timestamp: nowMs,
       });
@@ -319,6 +331,7 @@ export async function recordInstall(
   const redisDedupeKey = key(DEDUPE_KEY_PREFIX, dedupeKey);
   const rawDayInstallKey = key(RAW_DAILY_KEY_PREFIX, day);
   const rawComponentInstallKey = key(RAW_COMPONENT_KEY_PREFIX, componentName);
+  const rawTimelineDayKey = key(RAW_TIMELINE_KEY_PREFIX, day);
   const sessionRequiredKey = key(SESSION_REQUIRED_PREFIX, sessionKey);
   const sessionFilesKey = key(SESSION_FILES_PREFIX, sessionKey);
 
@@ -338,6 +351,14 @@ export async function recordInstall(
     rawPipeline.incr(rawDayInstallKey);
     rawPipeline.sadd(COMPONENT_INDEX_KEY, componentName);
     rawPipeline.expire(rawDayInstallKey, DAILY_TTL_SECONDS);
+    rawPipeline.rpush(
+      rawTimelineDayKey,
+      JSON.stringify({
+        component: componentName,
+        timestamp: nowMs,
+      } satisfies InstallTimelineEvent),
+    );
+    rawPipeline.expire(rawTimelineDayKey, DAILY_TTL_SECONDS);
     await rawPipeline.exec();
 
     if (isBrowserNavigation) return;
@@ -418,7 +439,7 @@ export async function recordInstallFileFetch(
     inMemoryStore.confirmedTotalInstalls += 1;
     bumpCount(inMemoryStore.confirmedComponents, componentName);
     bumpCount(inMemoryStore.confirmedDailyInstalls, day);
-    appendTimelineEventInMemory(inMemoryStore, day, {
+    appendTimelineEventInMemory(inMemoryStore.timelineByDay, day, {
       component: componentName,
       timestamp: nowMs,
     });
@@ -641,6 +662,7 @@ export async function getInstallSummary(days = 14): Promise<InstallSummary> {
 
 export async function getInstallTimeline(
   day: string,
+  metric: InstallTimelineMetric = "confirmed",
   limit = 250,
 ): Promise<InstallTimelineEvent[]> {
   const maxItems = Math.max(1, Math.min(1000, Math.round(limit)));
@@ -648,12 +670,17 @@ export async function getInstallTimeline(
   const inMemoryStore = redis ? null : getInMemoryStore();
 
   if (inMemoryStore) {
-    const events = inMemoryStore.timelineByDay.get(day) ?? [];
+    const eventsByDay =
+      metric === "raw" ? inMemoryStore.rawTimelineByDay : inMemoryStore.timelineByDay;
+    const events = eventsByDay.get(day) ?? [];
     return [...events].slice(-maxItems).reverse();
   }
   if (!redis) return [];
 
-  const timelineDayKey = key(TIMELINE_KEY_PREFIX, day);
+  const timelineDayKey = key(
+    metric === "raw" ? RAW_TIMELINE_KEY_PREFIX : TIMELINE_KEY_PREFIX,
+    day,
+  );
   const raw = await redis.lrange<unknown>(timelineDayKey, -maxItems, -1);
   return (raw ?? [])
     .map((item) => {

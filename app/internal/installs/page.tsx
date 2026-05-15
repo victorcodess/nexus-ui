@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   getInstallDashboardKey,
   getInstallSummary,
+  type InstallTimelineMetric,
   getInstallTimeline,
 } from "@/lib/install-tracking";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ type DashboardSearchParams = {
   days?: string;
   key?: string;
   date?: string;
+  timeline?: string;
 };
 
 function toDays(raw: string | undefined): number {
@@ -91,6 +93,10 @@ function isIsoDate(value: string | undefined): value is string {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function toTimelineMetric(raw: string | undefined): InstallTimelineMetric {
+  return raw === "raw" ? "raw" : "confirmed";
+}
+
 export default async function InstallsDashboardPage({
   searchParams,
 }: {
@@ -101,6 +107,7 @@ export default async function InstallsDashboardPage({
   if (expectedKey && params.key !== expectedKey) notFound();
 
   const days = toDays(params.days);
+  const timelineMetric = toTimelineMetric(params.timeline);
   const summary = await getInstallSummary(days);
   const components = [...summary.componentMetrics].sort(
     (a, b) => b.confirmedInstalls - a.confirmedInstalls,
@@ -153,6 +160,7 @@ export default async function InstallsDashboardPage({
     const search = new URLSearchParams();
     search.set("days", String(range));
     if (params.key) search.set("key", params.key);
+    search.set("timeline", timelineMetric);
     return `/internal/installs?${search.toString()}`;
   };
   const refreshHref = makeRangeHref(days);
@@ -166,19 +174,30 @@ export default async function InstallsDashboardPage({
     selectedDate && selectedDayInWindow === selectedDate,
   );
   const selectedTimeline = selectedDayInWindow
-    ? await getInstallTimeline(selectedDayInWindow, 300)
+    ? await getInstallTimeline(selectedDayInWindow, timelineMetric, 300)
     : [];
   const makeDayHref = (day: string): string => {
     const search = new URLSearchParams();
     search.set("days", String(days));
     if (params.key) search.set("key", params.key);
     search.set("date", day);
+    search.set("timeline", timelineMetric);
+    return `/internal/installs?${search.toString()}`;
+  };
+  const makeTimelineHref = (metric: InstallTimelineMetric): string => {
+    const search = new URLSearchParams();
+    search.set("days", String(days));
+    if (params.key) search.set("key", params.key);
+    if (selectedDayInWindow) search.set("date", selectedDayInWindow);
+    search.set("timeline", metric);
     return `/internal/installs?${search.toString()}`;
   };
   const clearDayHref = makeRangeHref(days);
   const selectedDayLabel = selectedDayInWindow
     ? formatDateLabel(selectedDayInWindow)
     : null;
+  const timelineMetricLabel =
+    timelineMetric === "raw" ? "Raw installs" : "Confirmed installs";
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-8">
@@ -452,7 +471,7 @@ export default async function InstallsDashboardPage({
             <div>
               <h2 className="text-base font-semibold">Selected day timeline</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Confirmed installs by {DASHBOARD_TIME_ZONE_LABEL} timestamp.
+                {timelineMetricLabel} by {DASHBOARD_TIME_ZONE_LABEL} timestamp.
               </p>
               {selectedDayLabel ? (
                 <p className="mt-2 text-xs text-muted-foreground">
@@ -460,6 +479,22 @@ export default async function InstallsDashboardPage({
                   <span className="font-medium text-foreground">{selectedDayLabel}</span>
                 </p>
               ) : null}
+              <div className="mt-3 flex items-center gap-2">
+                <Button
+                  asChild
+                  size="sm"
+                  variant={timelineMetric === "confirmed" ? "default" : "outline"}
+                >
+                  <Link href={makeTimelineHref("confirmed")}>Confirmed</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  variant={timelineMetric === "raw" ? "default" : "outline"}
+                >
+                  <Link href={makeTimelineHref("raw")}>Raw</Link>
+                </Button>
+              </div>
             </div>
             {hasExplicitDaySelection ? (
               <Button asChild size="sm" variant="outline">
@@ -474,7 +509,8 @@ export default async function InstallsDashboardPage({
             </p>
           ) : selectedTimeline.length === 0 ? (
             <p className="mt-6 text-sm text-muted-foreground">
-              No confirmed install events stored for {formatDateLabel(selectedDayInWindow)}.
+              No {timelineMetric} install events stored for{" "}
+              {formatDateLabel(selectedDayInWindow)}.
             </p>
           ) : (
             <div className="mt-6 space-y-2">
