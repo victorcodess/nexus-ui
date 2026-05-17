@@ -186,7 +186,7 @@ function PromptInputAction({
 }: PromptInputActionProps) {
   const Comp = asChild ? Slot : "div";
   const { content, side, shortcut } =
-    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
+    typeof tooltip === "string" ? { content: tooltip } : (tooltip ?? {});
 
   if (!content) {
     return <Comp {...props} />;
