@@ -41,7 +41,7 @@ export function SidebarContent({
 
   return (
     <Base.SidebarContent>
-      {({ collapsed, hovered, ref: asideRef, ...rest }) => (
+      {({ collapsed, hovered, setRef: asideRef, ...rest }) => (
         <>
           <div
             data-sidebar-placeholder=""

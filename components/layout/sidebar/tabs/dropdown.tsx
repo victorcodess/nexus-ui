@@ -23,7 +23,7 @@ export function SidebarTabsDropdown({
   options: SidebarTabWithProps[];
 } & ComponentProps<"button">) {
   const [open, setOpen] = useState(false);
-  const { closeOnRedirect } = useSidebar();
+  const { closeOnRedirect: closeOnRedirectRef } = useSidebar();
   const pathname = usePathname();
 
   const selected = useMemo(() => {
@@ -31,7 +31,7 @@ export function SidebarTabsDropdown({
   }, [options, pathname]);
 
   const onClick = () => {
-    closeOnRedirect.current = false;
+    closeOnRedirectRef.current = false;
     setOpen(false);
   };
 

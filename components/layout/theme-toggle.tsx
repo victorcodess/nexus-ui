@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import { AirplayLineIcon, Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { AnimatePresence, motion } from "motion/react";
 import { useTheme } from "next-themes";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -33,13 +33,7 @@ const full = [
 
 export function SmallThemeToggle({ className }: { className?: string }) {
   const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isDark = mounted ? resolvedTheme === "dark" : false;
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button
@@ -120,11 +114,6 @@ export function ThemeToggle({
   mode?: "light-dark" | "light-dark-system";
 }) {
   const { setTheme, theme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const container = cn(
     "inline-flex items-center rounded-full border p-1 *:rounded-full",
@@ -132,7 +121,7 @@ export function ThemeToggle({
   );
 
   if (mode === "light-dark") {
-    const value = mounted ? resolvedTheme : null;
+    const value = resolvedTheme;
 
     return (
       <button
@@ -157,7 +146,7 @@ export function ThemeToggle({
     );
   }
 
-  const value = mounted ? theme : null;
+  const value = theme;
 
   return (
     <div className={container} data-theme-toggle="" {...props}>

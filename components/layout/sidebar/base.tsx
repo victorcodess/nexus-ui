@@ -5,9 +5,11 @@ import {
   type ComponentProps,
   createContext,
   type PointerEvent,
+  type RefCallback,
   type ReactNode,
   type RefObject,
   use,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -139,7 +141,7 @@ export function SidebarContent({
 }: {
   mode?: Mode | true;
   children: (state: {
-    ref: RefObject<HTMLElement | null>;
+    setRef: RefCallback<HTMLElement>;
     collapsed: boolean;
     hovered: boolean;
     onPointerEnter: (event: PointerEvent) => void;
@@ -148,8 +150,17 @@ export function SidebarContent({
 }) {
   const { collapsed, mode } = useSidebar();
   const [hover, setHover] = useState(false);
-  const ref = useRef<HTMLElement>(null);
-  const timerRef = useRef(0);
+  const [closeTimer, setCloseTimer] = useState<number | null>(null);
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const ref = useCallback<RefCallback<HTMLElement>>((node) => {
+    setElement(node);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer !== null) window.clearTimeout(closeTimer);
+    };
+  }, [closeTimer]);
 
   useOnChange(collapsed, () => {
     if (collapsed) setHover(false);
@@ -158,7 +169,6 @@ export function SidebarContent({
   if (allowedMode !== true && allowedMode !== mode) return;
 
   function shouldIgnoreHover(e: PointerEvent): boolean {
-    const element = ref.current;
     if (!element) return true;
 
     return (
@@ -169,25 +179,30 @@ export function SidebarContent({
   }
 
   return children({
-    ref,
+    setRef: ref,
     collapsed,
     hovered: hover,
     onPointerEnter(e) {
       if (shouldIgnoreHover(e)) return;
-      window.clearTimeout(timerRef.current);
+      if (closeTimer !== null) {
+        window.clearTimeout(closeTimer);
+        setCloseTimer(null);
+      }
       setHover(true);
     },
     onPointerLeave(e) {
       if (shouldIgnoreHover(e)) return;
-      window.clearTimeout(timerRef.current);
-
-      timerRef.current = window.setTimeout(
+      if (closeTimer !== null) {
+        window.clearTimeout(closeTimer);
+      }
+      const timer = window.setTimeout(
         () => setHover(false),
         // if mouse is leaving the viewport, add a close delay
         Math.min(e.clientX, document.body.clientWidth - e.clientX) > 100
           ? 0
           : 500,
       );
+      setCloseTimer(timer);
     },
   });
 }

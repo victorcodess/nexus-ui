@@ -7,9 +7,10 @@ import { SmallThemeToggle } from "./layout/theme-toggle";
 import { LargeSearchToggle, SearchToggle } from "./layout/search-toggle";
 import type { NavItem } from "@/lib/source";
 import { buttonVariants } from "./ui/button";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PanelRightIcon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import { useOnChange } from "fumadocs-core/utils/use-on-change";
 
 interface NavbarProps {
   navItems?: NavItem[];
@@ -21,11 +22,8 @@ export function Navbar({ navItems = [] }: NavbarProps) {
   const isComponents = pathname?.startsWith("/docs/components");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
-
-  useEffect(() => {
-    closeSidebar();
-  }, [pathname, closeSidebar]);
+  const closeSidebar = () => setSidebarOpen(false);
+  useOnChange(pathname, closeSidebar);
 
   useEffect(() => {
     if (sidebarOpen) {
