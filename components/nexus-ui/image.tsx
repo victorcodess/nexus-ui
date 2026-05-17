@@ -48,6 +48,16 @@ function toDataUrl(base64: string, mediaType: string) {
   return `data:${mediaType};base64,${trimmed}`;
 }
 
+function uint8ArrayToBase64(bytes: Uint8Array) {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
 type ImageContextValue = {
   src?: string;
   alt: string;
@@ -90,7 +100,8 @@ function Image({
   children,
   ...props
 }: ImageProps) {
-  const [blobSrc, setBlobSrc] = React.useState<string>();
+  const hasUint8BlobSource =
+    !base64 && uint8Array != null && uint8Array.length > 0;
   const { resolvedMediaType, resolvedSrc } = React.useMemo(() => {
     const nextResolvedMediaType = base64
       ? resolveBase64MediaType(base64, mediaType ?? "image/png")
@@ -98,36 +109,17 @@ function Image({
 
     const nextResolvedSrc = base64
       ? toDataUrl(base64, nextResolvedMediaType)
-      : (blobSrc ?? src);
+      : hasUint8BlobSource
+        ? toDataUrl(uint8ArrayToBase64(uint8Array), nextResolvedMediaType)
+        : src;
 
     return {
       resolvedMediaType: nextResolvedMediaType,
       resolvedSrc: nextResolvedSrc,
     };
-  }, [base64, mediaType, blobSrc, src]);
-
-  React.useEffect(() => {
-    if (base64 || uint8Array == null || uint8Array.length === 0) {
-      setBlobSrc(undefined);
-      return;
-    }
-
-    const blob = new Blob([Uint8Array.from(uint8Array).buffer], {
-      type: mediaType ?? "image/png",
-    });
-    const objectUrl = URL.createObjectURL(blob);
-    setBlobSrc(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [base64, uint8Array, mediaType]);
+  }, [base64, mediaType, src, hasUint8BlobSource, uint8Array]);
 
   const [hasError, setHasError] = React.useState(false);
-
-  React.useEffect(() => {
-    setHasError(false);
-  }, [resolvedSrc]);
 
   const contextValue = React.useMemo<ImageContextValue>(
     () => ({

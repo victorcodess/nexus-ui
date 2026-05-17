@@ -305,7 +305,11 @@ function MobileSidebar({
               aria-label="Close Menu"
               onClick={onClose}
             >
-              <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2.0} className="size-5" />
+              <HugeiconsIcon
+                icon={Cancel01Icon}
+                strokeWidth={2.0}
+                className="size-5"
+              />
             </button>
           </div>
         </div>

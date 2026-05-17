@@ -184,40 +184,34 @@ function Citation({
   const [carouselApi, setCarouselApi] = React.useState<CarouselApi | null>(
     null,
   );
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
-  const [canScrollNext, setCanScrollNext] = React.useState(false);
-  const [carouselCurrent, setCarouselCurrent] = React.useState(1);
-  const [carouselCount, setCarouselCount] = React.useState(0);
+  const [, setCarouselVersion] = React.useState(0);
 
   const len = resolved.length;
+  const clampedActiveIndex =
+    len === 0 ? 0 : Math.min(Math.max(0, activeIndex), len - 1);
+  const contextActiveIndex = carouselApi
+    ? carouselApi.selectedScrollSnap()
+    : clampedActiveIndex;
+  const canScrollPrev = carouselApi?.canScrollPrev() ?? false;
+  const canScrollNext = carouselApi?.canScrollNext() ?? false;
+  const carouselCount = carouselApi?.scrollSnapList().length ?? 0;
+  const carouselCurrent = carouselApi ? carouselApi.selectedScrollSnap() + 1 : 1;
 
-  React.useEffect(() => {
-    setActiveIndex((i) => (len === 0 ? 0 : Math.min(Math.max(0, i), len - 1)));
-  }, [len]);
-
-  React.useEffect(() => {
-    if (!carouselApi) {
-      setCanScrollPrev(false);
-      setCanScrollNext(false);
-      setCarouselCount(0);
-      setCarouselCurrent(1);
-      return;
-    }
-    const sync = () => {
-      setActiveIndex(carouselApi.selectedScrollSnap());
-      setCanScrollPrev(carouselApi.canScrollPrev());
-      setCanScrollNext(carouselApi.canScrollNext());
-      setCarouselCount(carouselApi.scrollSnapList().length);
-      setCarouselCurrent(carouselApi.selectedScrollSnap() + 1);
-    };
-    sync();
-    carouselApi.on("select", sync);
-    carouselApi.on("reInit", sync);
-    return () => {
-      carouselApi.off("select", sync);
-      carouselApi.off("reInit", sync);
-    };
+  const onCarouselChange = React.useCallback(() => {
+    if (!carouselApi) return;
+    setActiveIndex(carouselApi.selectedScrollSnap());
+    setCarouselVersion((v) => v + 1);
   }, [carouselApi]);
+
+  React.useEffect(() => {
+    if (!carouselApi) return;
+    carouselApi.on("select", onCarouselChange);
+    carouselApi.on("reInit", onCarouselChange);
+    return () => {
+      carouselApi.off("select", onCarouselChange);
+      carouselApi.off("reInit", onCarouselChange);
+    };
+  }, [carouselApi, onCarouselChange]);
 
   const setCarouselApiCb = React.useCallback((api: CarouselApi | undefined) => {
     setCarouselApi(api ?? null);
@@ -234,7 +228,7 @@ function Citation({
   const value = React.useMemo<CitationRootContextValue>(
     () => ({
       citations: resolved,
-      activeIndex,
+      activeIndex: contextActiveIndex,
       setActiveIndex,
       carouselApi,
       setCarouselApi: setCarouselApiCb,
@@ -247,7 +241,7 @@ function Citation({
     }),
     [
       resolved,
-      activeIndex,
+      contextActiveIndex,
       carouselApi,
       setCarouselApiCb,
       scrollPrev,
@@ -370,7 +364,7 @@ function CitationContent({
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "flex w-66 flex-col overflow-hidden rounded-[12px] border-border p-0 shadow-[0_-4px_12px_4px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] dark:border-accent",
+        "flex w-66 flex-col overflow-hidden rounded-[12px] border-border p-0 shadow-modal dark:border-accent",
         className,
       )}
       {...props}
@@ -441,7 +435,7 @@ function useCarouselViewportHeight(
     const ro = new ResizeObserver(sync);
     ro.observe(slide);
     return () => (ro.disconnect(), clear());
-  }, [carouselApi, activeIndex]);
+  }, [wrapRef, carouselApi, activeIndex]);
 }
 
 type CitationCarouselContentProps = React.ComponentProps<
