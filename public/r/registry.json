@@ -280,9 +280,6 @@
         "next-themes",
         "sonner"
       ],
-      "registryDependencies": [
-        "button"
-      ],
       "files": [
         {
           "path": "registry/new-york/toaster/toaster.tsx",
