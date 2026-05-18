@@ -8,7 +8,6 @@ import { cn } from "../lib/cn";
 import {
   type ComponentProps,
   type ReactNode,
-  useEffect,
   useState,
 } from "react";
 import {
@@ -105,14 +104,11 @@ function Item({
   name: string;
   item: TypeNode;
 }) {
-  const [open, setOpen] = useState(false);
   const id = parentId ? `${parentId}-${name}` : undefined;
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (!id || !hash) return;
-    if (`#${id}` === hash) setOpen(true);
-  }, [id]);
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined" || !id) return false;
+    return window.location.hash === `#${id}`;
+  });
 
   return (
     <Collapsible

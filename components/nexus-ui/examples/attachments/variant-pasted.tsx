@@ -15,11 +15,9 @@ const SAMPLE_TEXT = [
 ].join(" ");
 
 function AttachmentsVariantPasted() {
-  const blobUrlRef = React.useRef<string | null>(null);
   const [items, setItems] = React.useState<AttachmentMeta[]>(() => {
     const blob = new Blob([SAMPLE_TEXT], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    blobUrlRef.current = url;
     return [
       {
         type: "file",
@@ -31,24 +29,31 @@ function AttachmentsVariantPasted() {
       },
     ];
   });
+  const itemsRef = React.useRef(items);
+
+  React.useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   React.useEffect(
     () => () => {
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-        blobUrlRef.current = null;
+      for (const item of itemsRef.current) {
+        if (item.url?.startsWith("blob:")) {
+          URL.revokeObjectURL(item.url);
+        }
       }
     },
     [],
   );
 
   const remove = React.useCallback(() => {
-    if (blobUrlRef.current) {
-      URL.revokeObjectURL(blobUrlRef.current);
-      blobUrlRef.current = null;
+    for (const item of items) {
+      if (item.url?.startsWith("blob:")) {
+        URL.revokeObjectURL(item.url);
+      }
     }
     setItems([]);
-  }, []);
+  }, [items]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">

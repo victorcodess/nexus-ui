@@ -13,6 +13,7 @@ import {
   Upload01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useOnChange } from "@/lib/use-on-change";
 
 import { cn } from "@/lib/utils";
 
@@ -312,11 +313,12 @@ function Attachments({
   }, [attachments]);
 
   React.useEffect(() => {
+    const managedBlobUrls = managedBlobUrlsRef.current;
     return () => {
-      for (const url of managedBlobUrlsRef.current) {
+      for (const url of managedBlobUrls) {
         URL.revokeObjectURL(url);
       }
-      managedBlobUrlsRef.current.clear();
+      managedBlobUrls.clear();
     };
   }, []);
 
@@ -418,11 +420,14 @@ function Attachments({
     [disabled, appendFilesFromList, onFileInputChange],
   );
 
+  const dragAndDropEnabled = !disabled && windowDrop;
+
+  useOnChange(dragAndDropEnabled, (enabled) => {
+    if (!enabled) setIsDraggingFile(false);
+  });
+
   React.useEffect(() => {
-    if (disabled || !windowDrop) {
-      setIsDraggingFile(false);
-      return;
-    }
+    if (!dragAndDropEnabled) return;
 
     const hasFiles = (e: DragEvent) =>
       Boolean(
@@ -466,7 +471,7 @@ function Attachments({
       document.removeEventListener("dragover", onDragOver);
       document.removeEventListener("drop", onDrop);
     };
-  }, [disabled, windowDrop, appendFilesFromList]);
+  }, [dragAndDropEnabled, appendFilesFromList]);
 
   const value = React.useMemo<AttachmentsContextValue>(
     () => ({
@@ -545,13 +550,8 @@ export function AttachmentsDropOverlay({
   const { isDraggingFile, disabled, maxSize } = useAttachmentsContext(
     "AttachmentsDropOverlay",
   );
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const open = mounted && !disabled && isDraggingFile;
+  const canUseDOM = typeof document !== "undefined";
+  const open = canUseDOM && !disabled && isDraggingFile;
 
   React.useEffect(() => {
     if (!open || variant !== "fullscreen") return;
@@ -582,10 +582,7 @@ export function AttachmentsDropOverlay({
     >
       {children ?? (
         <div className="flex flex-col items-center gap-3">
-          <HugeiconsIcon
-            icon={Upload01Icon}
-            className="size-5 text-primary"
-          />
+          <HugeiconsIcon icon={Upload01Icon} className="size-5 text-primary" />
 
           <div className="flex flex-col items-center gap-1">
             <p className="text-sm font-[350] text-primary">
@@ -674,7 +671,7 @@ function AttachmentList({ className, role, ...props }: AttachmentListProps) {
       data-slot="attachment-list"
       role={role ?? "list"}
       className={cn(
-        "flex w-full max-w-full min-w-0 flex-wrap items-end justify-center gap-2.5 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-color:var(--scrollbar-thumb)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-track]:bg-transparent",
+        "flex w-full max-w-full min-w-0 scrollbar-thin [scrollbar-color:var(--scrollbar-thumb)_transparent] flex-wrap items-end justify-center gap-2.5 overflow-x-auto overscroll-x-contain pb-0.5 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-track]:bg-transparent",
         className,
       )}
       {...props}
@@ -836,10 +833,8 @@ const attachmentPreviewVariants = cva(
       variant: {
         compact:
           "absolute inset-0 size-full rounded-[inherit] border-0 bg-transparent",
-        inline:
-          "size-6 rounded-[4px] border border-input",
-        detailed:
-          "size-11 rounded-[6px] border border-input",
+        inline: "size-6 rounded-[4px] border border-input",
+        detailed: "size-11 rounded-[6px] border border-input",
         pasted:
           "min-h-0 w-full flex-1 shrink self-stretch items-start justify-start border-0 bg-transparent p-0",
       },
@@ -1038,10 +1033,6 @@ function AttachmentRemove({
   const ariaLabel =
     ariaLabelProp ?? `Remove ${attachment.name ?? "attachment"}`;
 
-  if (readOnly) {
-    return null;
-  }
-
   const handleClick = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e);
@@ -1049,6 +1040,10 @@ function AttachmentRemove({
     },
     [onClick, onRemove],
   );
+
+  if (readOnly) {
+    return null;
+  }
 
   if (asChild) {
     return (

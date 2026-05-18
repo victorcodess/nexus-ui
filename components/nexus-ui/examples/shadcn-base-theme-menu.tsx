@@ -98,14 +98,9 @@ export function useShadcnBaseThemeOnDocument(
 export function ShadcnBaseThemeMenu() {
   const [base, setBase] = React.useState<ShadcnBaseThemeId>("neutral");
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const colorScheme =
-    !mounted || resolvedTheme == null
+    resolvedTheme == null
       ? null
       : resolvedTheme === "light"
         ? "light"
@@ -147,7 +142,7 @@ export function ShadcnBaseThemeMenu() {
           )}
           aria-label="Light mode"
           aria-pressed={isLight}
-          disabled={!mounted}
+          disabled={colorScheme == null}
           onClick={() => setTheme("light")}
         >
           <HugeiconsIcon icon={Sun03Icon} strokeWidth={2} className="size-4" />
@@ -163,7 +158,7 @@ export function ShadcnBaseThemeMenu() {
           )}
           aria-label="Dark mode"
           aria-pressed={isDark}
-          disabled={!mounted}
+          disabled={colorScheme == null}
           onClick={() => setTheme("dark")}
         >
           <HugeiconsIcon icon={Moon02Icon} strokeWidth={2} className="size-4" />
@@ -222,7 +217,7 @@ export function ShadcnBaseThemeMenu() {
           className={iconBtn}
           aria-label="Random shadcn base palette in light mode"
           title="Random palette · light"
-          disabled={!mounted}
+          disabled={colorScheme == null}
           onClick={randomizeLight}
         >
           <HugeiconsIcon
@@ -238,7 +233,7 @@ export function ShadcnBaseThemeMenu() {
           className={iconBtn}
           aria-label="Random shadcn base palette in dark mode"
           title="Random palette · dark"
-          disabled={!mounted}
+          disabled={colorScheme == null}
           onClick={randomizeDark}
         >
           <HugeiconsIcon

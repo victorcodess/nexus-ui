@@ -26,6 +26,7 @@ import {
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
 import { Button } from "@/components/ui/button";
+import { useOnChange } from "@/lib/use-on-change";
 
 function attachmentKey(a: AttachmentMeta) {
   return `${a.name ?? ""}-${a.size ?? ""}-${a.mimeType ?? ""}-${a.source ?? ""}-${a.url ?? ""}`;
@@ -98,14 +99,16 @@ function AttachmentsWithPromptInput() {
   }, []);
 
   const attachmentsRef = React.useRef(attachments);
-  attachmentsRef.current = attachments;
+  React.useEffect(() => {
+    attachmentsRef.current = attachments;
+  }, [attachments]);
 
   const intervalsRef = React.useRef<Map<string, number>>(new Map());
   const timeoutsRef = React.useRef<Map<string, number>>(new Map());
   const prevAttachmentKeysRef = React.useRef<Set<string>>(new Set());
 
-  React.useEffect(() => {
-    const current = new Set(attachments.map(attachmentKey));
+  useOnChange(attachments, (current) => {
+    const currentKeys = new Set(current.map(attachmentKey));
 
     const clearKeyTimers = (key: string) => {
       const intId = intervalsRef.current.get(key);
@@ -124,14 +127,14 @@ function AttachmentsWithPromptInput() {
       ...intervalsRef.current.keys(),
       ...timeoutsRef.current.keys(),
     ]) {
-      if (!current.has(key)) clearKeyTimers(key);
+      if (!currentKeys.has(key)) clearKeyTimers(key);
     }
 
     setProgressByKey((p) => {
       const next = { ...p };
       let changed = false;
       for (const k of Object.keys(next)) {
-        if (!current.has(k)) {
+        if (!currentKeys.has(k)) {
           delete next[k];
           changed = true;
         }
@@ -139,12 +142,12 @@ function AttachmentsWithPromptInput() {
       return changed ? next : p;
     });
 
-    const newKeys = [...current].filter(
+    const newKeys = [...currentKeys].filter(
       (k) => !prevAttachmentKeysRef.current.has(k),
     );
 
     for (const key of newKeys) {
-      const added = attachments.find((a) => attachmentKey(a) === key);
+      const added = current.find((a) => attachmentKey(a) === key);
       if (added?.source === "paste") continue;
 
       clearKeyTimers(key);
@@ -183,8 +186,8 @@ function AttachmentsWithPromptInput() {
       intervalsRef.current.set(key, intId);
     }
 
-    prevAttachmentKeysRef.current = current;
-  }, [attachments]);
+    prevAttachmentKeysRef.current = currentKeys;
+  });
 
   React.useEffect(
     () => () => {

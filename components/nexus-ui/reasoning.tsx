@@ -10,6 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useOnChange } from "@/lib/use-on-change";
 import { cn } from "@/lib/utils";
 
 type ReasoningContextValue = {
@@ -49,36 +50,23 @@ function Reasoning({
   ...props
 }: ReasoningProps) {
   const isControlled = openProp !== undefined;
-  const hasMountedRef = React.useRef(false);
   const [internalOpen, setInternalOpen] = React.useState(
     defaultOpen || isStreaming,
   );
   const open = isControlled ? openProp : internalOpen;
   const [durationLabel, setDurationLabel] = React.useState<string | null>(null);
   const [hasStreamed, setHasStreamed] = React.useState(isStreaming);
-  const startedAtRef = React.useRef<number | null>(
-    isStreaming ? Date.now() : null,
-  );
-  const prevStreamingRef = React.useRef(isStreaming);
+  const startedAtRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      if (isStreaming) {
-        setHasStreamed(true);
-        startedAtRef.current = Date.now();
-        setDurationLabel(null);
-        if (!isControlled) {
-          setInternalOpen(true);
-        }
-        onOpenChange?.(true);
-      }
-      prevStreamingRef.current = isStreaming;
-      return;
+    if (isStreaming) {
+      startedAtRef.current = Date.now();
+      onOpenChange?.(true);
     }
+  }, [isStreaming, onOpenChange]);
 
-    const wasStreaming = prevStreamingRef.current;
-    if (!wasStreaming && isStreaming) {
+  useOnChange(isStreaming, (current, previous) => {
+    if (!previous && current) {
       setHasStreamed(true);
       startedAtRef.current = Date.now();
       setDurationLabel(null);
@@ -88,7 +76,7 @@ function Reasoning({
       onOpenChange?.(true);
     }
 
-    if (wasStreaming && !isStreaming) {
+    if (previous && !current) {
       const startedAt = startedAtRef.current;
       const elapsedSeconds =
         startedAt != null
@@ -103,9 +91,7 @@ function Reasoning({
       }
       onOpenChange?.(false);
     }
-
-    prevStreamingRef.current = isStreaming;
-  }, [isControlled, isStreaming, onOpenChange]);
+  });
 
   const label = React.useMemo(() => {
     if (!hasStreamed || isStreaming) return "Thinking...";

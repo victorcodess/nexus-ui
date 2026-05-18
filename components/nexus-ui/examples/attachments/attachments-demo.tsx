@@ -56,6 +56,7 @@ import ChatgptIcon from "@/components/svgs/chatgpt";
 import { ClaudeIcon2 } from "@/components/svgs/claude";
 import GeminiIcon from "@/components/svgs/gemini";
 import { cn } from "@/lib/utils";
+import { useOnChange } from "@/lib/use-on-change";
 import ModelSelectorWithSearch from "../model-selector/with-search";
 
 function attachmentKey(a: AttachmentMeta) {
@@ -322,9 +323,9 @@ function AttachmentsDemo() {
     });
   }, []);
 
-  React.useLayoutEffect(() => {
-    if (attachments.length > 0) {
-      lastNonEmptyAttachmentsRef.current = attachments;
+  useOnChange(attachments, (current) => {
+    if (current.length > 0) {
+      lastNonEmptyAttachmentsRef.current = current;
       setStripCollapseSnapshot(null);
       setAttachmentStripOpen(true);
       return;
@@ -334,7 +335,7 @@ function AttachmentsDemo() {
       setStripCollapseSnapshot([...lastNonEmptyAttachmentsRef.current]);
     }
     setAttachmentStripOpen(false);
-  }, [attachments]);
+  });
 
   const handleAttachmentStripTransitionEnd = React.useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
@@ -356,7 +357,9 @@ function AttachmentsDemo() {
   );
 
   const attachmentsRef = React.useRef(attachments);
-  attachmentsRef.current = attachments;
+  React.useEffect(() => {
+    attachmentsRef.current = attachments;
+  }, [attachments]);
 
   const intervalsRef = React.useRef<Map<string, number>>(new Map());
   const timeoutsRef = React.useRef<Map<string, number>>(new Map());
@@ -380,8 +383,8 @@ function AttachmentsDemo() {
     setActiveCategory(null);
   }, []);
 
-  React.useEffect(() => {
-    const current = new Set(attachments.map(attachmentKey));
+  useOnChange(attachments, (current) => {
+    const currentKeys = new Set(current.map(attachmentKey));
 
     const clearKeyTimers = (key: string) => {
       const intId = intervalsRef.current.get(key);
@@ -400,14 +403,14 @@ function AttachmentsDemo() {
       ...intervalsRef.current.keys(),
       ...timeoutsRef.current.keys(),
     ]) {
-      if (!current.has(key)) clearKeyTimers(key);
+      if (!currentKeys.has(key)) clearKeyTimers(key);
     }
 
     setProgressByKey((p) => {
       const next = { ...p };
       let changed = false;
       for (const k of Object.keys(next)) {
-        if (!current.has(k)) {
+        if (!currentKeys.has(k)) {
           delete next[k];
           changed = true;
         }
@@ -415,12 +418,12 @@ function AttachmentsDemo() {
       return changed ? next : p;
     });
 
-    const newKeys = [...current].filter(
+    const newKeys = [...currentKeys].filter(
       (k) => !prevAttachmentKeysRef.current.has(k),
     );
 
     for (const key of newKeys) {
-      const added = attachments.find((a) => attachmentKey(a) === key);
+      const added = current.find((a) => attachmentKey(a) === key);
       if (added?.source === "paste") continue;
 
       clearKeyTimers(key);
@@ -459,8 +462,8 @@ function AttachmentsDemo() {
       intervalsRef.current.set(key, intId);
     }
 
-    prevAttachmentKeysRef.current = current;
-  }, [attachments]);
+    prevAttachmentKeysRef.current = currentKeys;
+  });
 
   React.useEffect(
     () => () => {
@@ -520,7 +523,6 @@ function AttachmentsDemo() {
 
   React.useLayoutEffect(() => {
     if (attachmentStripItems.length === 0) {
-      setAttachmentStripContentHeight(0);
       return;
     }
     const el = attachmentStripMeasureRef.current;

@@ -16,7 +16,7 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 
 type PromptInputContextValue = {
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  setTextareaNode: (node: HTMLTextAreaElement | null) => void;
   onSubmit?: (value: string) => void;
 };
 
@@ -62,7 +62,12 @@ function PromptInput({
   );
 
   const contextValue = React.useMemo<PromptInputContextValue>(
-    () => ({ textareaRef, onSubmit }),
+    () => ({
+      setTextareaNode: (node) => {
+        textareaRef.current = node;
+      },
+      onSubmit,
+    }),
     [onSubmit],
   );
 
@@ -94,11 +99,14 @@ const PromptInputTextarea = React.forwardRef<
   ref,
 ) {
   const context = React.useContext(PromptInputContext);
-  const textareaRef = context?.textareaRef;
+  const setTextareaNode = context?.setTextareaNode;
   const onSubmit = context?.onSubmit;
-  const mergedRef = textareaRef
-    ? mergeRefs<HTMLTextAreaElement>(textareaRef, ref)
-    : ref;
+  const handleTextareaRef = React.useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      mergeRefs<HTMLTextAreaElement>(setTextareaNode, ref)(node);
+    },
+    [setTextareaNode, ref],
+  );
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -115,7 +123,7 @@ const PromptInputTextarea = React.forwardRef<
     <ScrollArea className="max-h-40">
       <ScrollViewport>
         <Textarea
-          ref={mergedRef}
+          ref={handleTextareaRef}
           aria-label="Message input"
           placeholder="How can I help you today?"
           className={cn(
@@ -178,7 +186,7 @@ function PromptInputAction({
 }: PromptInputActionProps) {
   const Comp = asChild ? Slot : "div";
   const { content, side, shortcut } =
-    typeof tooltip === "string" ? { content: tooltip } : tooltip ?? {};
+    typeof tooltip === "string" ? { content: tooltip } : (tooltip ?? {});
 
   if (!content) {
     return <Comp {...props} />;

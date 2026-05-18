@@ -11,6 +11,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useOnChange } from "@/lib/use-on-change";
 import {
   Message,
   MessageAction,
@@ -245,11 +246,14 @@ function Messages({
     [],
   );
 
-  React.useLayoutEffect(() => {
-    if (previousUserMessageIndex < 0) {
+  useOnChange(previousUserMessageIndex, (current) => {
+    if (current < 0) {
       setPreviousUserMessageHeight(0);
-      return;
     }
+  });
+
+  React.useLayoutEffect(() => {
+    if (previousUserMessageIndex < 0) return;
 
     const element = previousUserMessageRef.current;
     if (!element) {
@@ -677,16 +681,14 @@ export default function ReasoningDemo() {
   }, []);
 
   const [model, setModel] = React.useState<string>(DEFAULT_MODEL);
-  const modelRef = React.useRef(model);
-  modelRef.current = model;
 
   const transport = React.useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: () => ({ model: modelRef.current }),
+        body: () => ({ model }),
       }),
-    [],
+    [model],
   );
 
   const { messages, sendMessage, status, stop, regenerate, error, clearError } =
@@ -737,11 +739,11 @@ export default function ReasoningDemo() {
     return assistantMessages[1]?.id ?? null;
   }, [visibleMessages]);
 
-  React.useEffect(() => {
+  useOnChange(feedbackTargetMessageId, () => {
     setFeedbackVote(null);
     setFeedbackDismissed(false);
     setFeedbackVisible(false);
-  }, [feedbackTargetMessageId]);
+  });
 
   React.useEffect(() => {
     if (

@@ -383,16 +383,14 @@ export default function MessageDemo() {
   }, []);
 
   const [model, setModel] = React.useState<string>(models[0].value);
-  const modelRef = React.useRef(model);
-  modelRef.current = model;
 
   const transport = React.useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: () => ({ model: modelRef.current }),
+        body: () => ({ model }),
       }),
-    [],
+    [model],
   );
 
   const { messages, sendMessage, status, stop, regenerate, error, clearError } =

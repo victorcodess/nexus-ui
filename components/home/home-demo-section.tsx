@@ -46,12 +46,14 @@ export function HomeDemoSection() {
   const [checked, setChecked] = React.useState(false);
 
   const activeTargetRef = React.useRef(activeModel);
-  activeTargetRef.current = activeModel;
-
   const displayKeyRef = React.useRef(displayKey);
-  displayKeyRef.current = displayKey;
 
   const codeOverlayRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    activeTargetRef.current = activeModel;
+    displayKeyRef.current = displayKey;
+  }, [activeModel, displayKey]);
 
   React.useEffect(() => {
     const el = codeOverlayRef.current;

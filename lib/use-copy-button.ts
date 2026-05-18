@@ -17,7 +17,10 @@ export function useCopyButton(
   const [checked, setChecked] = useState(false);
   const callbackRef = useRef(onCopy);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  callbackRef.current = onCopy;
+
+  useEffect(() => {
+    callbackRef.current = onCopy;
+  }, [onCopy]);
 
   const onClick = useCallback<MouseEventHandler>(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
