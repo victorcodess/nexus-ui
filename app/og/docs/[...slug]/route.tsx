@@ -58,6 +58,7 @@ export async function GET(
         paddingTop: 120,
       }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={svgRightWideDataUrl}
         alt=""
