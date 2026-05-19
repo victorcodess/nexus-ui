@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  DEFAULT_SUMMARY_DAYS,
   getInstallDashboardKey,
   getInstallSummary,
   type InstallTimelineMetric,
   getInstallTimeline,
+  toInstallSummaryDays,
 } from "@/lib/install-tracking";
 import { Button } from "@/components/ui/button";
 
@@ -28,13 +30,6 @@ type DashboardSearchParams = {
   date?: string;
   timeline?: string;
 };
-
-function toDays(raw: string | undefined): number {
-  const parsed = Number(raw ?? "30");
-  if (!Number.isFinite(parsed)) return 30;
-  const rounded = Math.round(parsed);
-  return Math.max(1, Math.min(90, rounded));
-}
 
 function toPercent(value: number, max: number): string {
   if (max <= 0) return "0%";
@@ -106,7 +101,7 @@ export default async function InstallsDashboardPage({
   const expectedKey = getInstallDashboardKey();
   if (expectedKey && params.key !== expectedKey) notFound();
 
-  const days = toDays(params.days);
+  const days = toInstallSummaryDays(params.days);
   const timelineMetric = toTimelineMetric(params.timeline);
   const summary = await getInstallSummary(days);
   const components = [...summary.componentMetrics].sort(
@@ -225,18 +220,21 @@ export default async function InstallsDashboardPage({
           </div>
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span className="rounded-full border bg-muted px-2 py-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
               Source: {summary.storage}
             </span>
-            <span className="rounded-full border bg-muted px-2 py-1">
-              Window: {days} days
+            <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
+              Window: {days} days (default {DEFAULT_SUMMARY_DAYS})
             </span>
-            <span className="rounded-full border bg-muted px-2 py-1">
+            <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
               Timezone: {DASHBOARD_TIME_ZONE_LABEL}
             </span>
-            <span className="rounded-full border bg-muted px-2 py-1">
+            <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
               Primary metric: confirmed installs
+            </span>
+            <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
+              Day bucketing: UTC (displayed in WAT)
             </span>
           </div>
 
@@ -260,7 +258,7 @@ export default async function InstallsDashboardPage({
         </article>
         <article className="rounded-xl border bg-card p-4 shadow-sm">
           <p className="text-xs font-medium text-muted-foreground uppercase">
-            Installs today ({DASHBOARD_TIME_ZONE_LABEL})
+            Installs today (UTC bucket, shown in WAT)
           </p>
           <p className="mt-2 text-2xl font-semibold">
             {today.confirmedInstalls.toLocaleString()}
