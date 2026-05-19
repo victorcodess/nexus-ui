@@ -8,7 +8,7 @@ const R_DIR = join(REGISTRY_BASE, "public", "r");
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> }
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const pathSegments = (await params).path ?? [];
 
@@ -30,7 +30,9 @@ export async function GET(
       const componentName = pathSegments[0].replace(/\.json$/, "");
       const content = await readFile(join(R_DIR, pathSegments[0]), "utf-8");
       const parsed = JSON.parse(content);
-      const requiredFiles = Array.isArray(parsed.files) ? parsed.files.length : 1;
+      const requiredFiles = Array.isArray(parsed.files)
+        ? parsed.files.length
+        : 1;
       const hasInlineContent =
         Array.isArray(parsed.files) &&
         parsed.files.length > 0 &&
