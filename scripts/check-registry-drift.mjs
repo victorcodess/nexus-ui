@@ -6,6 +6,7 @@ import { join } from "node:path";
 function run(command, args) {
   const result = spawnSync(command, args, {
     stdio: "inherit",
+    shell: process.platform === "win32",
   });
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
@@ -65,6 +66,18 @@ for (const item of registryItems.items ?? []) {
     console.error(`Failed to validate generated ${item.name}.json:`, error);
     process.exit(1);
   }
+}
+
+const driftResult = spawnSync("git", ["diff", "--exit-code", "--", "public/r"], {
+  stdio: "inherit",
+  shell: process.platform === "win32",
+});
+
+if (driftResult.status !== 0) {
+  console.error(
+    "Registry drift detected in public/r. Run `npm run registry:build` and commit the updated files.",
+  );
+  process.exit(driftResult.status ?? 1);
 }
 
 console.log("Registry outputs were generated and validated.");

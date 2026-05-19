@@ -50,7 +50,10 @@ ensureDir(registryStagingDir);
 for (const item of registry.items ?? []) {
   for (const file of item.files ?? []) {
     if (!file?.target || !file?.path) {
-      continue;
+      console.error(
+        `Invalid registry file entry for "${item?.name ?? "unknown"}": each files[] item must include both "target" and "path".`,
+      );
+      process.exit(1);
     }
 
     const sourcePath = resolve(join(root, file.target.replace(/^~\//, "")));
