@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile, access } from "fs/promises";
+import { readFile } from "fs/promises";
 import { join } from "path";
-import { recordInstall, recordInstallFileFetch } from "@/lib/install-tracking";
+import { recordInstall } from "@/lib/install-tracking";
 
 const REGISTRY_BASE = process.cwd();
 const R_DIR = join(REGISTRY_BASE, "public", "r");
-const REGISTRY_SRC = join(REGISTRY_BASE, "registry");
-const REGISTRY_PUBLIC = join(REGISTRY_BASE, "public", "registry");
-
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export async function GET(
   _request: NextRequest,
@@ -59,44 +48,6 @@ export async function GET(
       });
       return NextResponse.json(parsed, {
         headers: { "Cache-Control": "public, max-age=3600, s-maxage=3600" },
-      });
-    }
-
-    // /api/registry/registry/... -> source files (tsx, etc.)
-    if (pathSegments[0] === "registry" && pathSegments.length > 1) {
-      const filePath = pathSegments.slice(1).join("/");
-      if (filePath.includes("..")) {
-        return NextResponse.json({ error: "Invalid path" }, { status: 400 });
-      }
-      // Prefer public/registry (build output), fallback to source registry/
-      const publicPath = join(REGISTRY_PUBLIC, filePath);
-      const srcPath = join(REGISTRY_SRC, filePath);
-
-      const path = (await fileExists(publicPath)) ? publicPath : srcPath;
-      if (!(await fileExists(path))) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-      }
-
-      const content = await readFile(path, "utf-8");
-      const filePathSegments = filePath.split("/").filter(Boolean);
-      // filePath shape is usually: new-york/<component>/<file>.tsx
-      const componentName = filePathSegments[1];
-      if (componentName) {
-        await recordInstallFileFetch(componentName, filePath, _request);
-      }
-      const ext = filePath.split(".").pop();
-      const contentType =
-        ext === "tsx" || ext === "ts"
-          ? "text/typescript"
-          : ext === "css"
-            ? "text/css"
-            : "text/plain";
-
-      return new NextResponse(content, {
-        headers: {
-          "Content-Type": contentType,
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
-        },
       });
     }
 

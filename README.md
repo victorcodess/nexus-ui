@@ -162,6 +162,10 @@ npm install
 npm run dev
 ```
 
+## Contributing
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the contribution guidelines.
+
 ## License
 
 MIT

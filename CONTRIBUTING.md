@@ -13,6 +13,23 @@ npm run dev
 
 The docs site runs at [http://localhost:3000](http://localhost:3000).
 
+## Registry Workflow (Source of Truth)
+
+`components/nexus-ui/*` and `registry.json` are the canonical source. `public/r/*` is generated from them.
+
+When you change a Nexus UI component:
+
+1. Edit component source under `components/nexus-ui`.
+2. Build generated registry outputs:
+   ```bash
+   npm run registry:build
+   ```
+3. Validate generated outputs:
+   ```bash
+   npm run registry:check
+   ```
+4. Commit source changes and regenerated `public/r/*` files (`components/nexus-ui/*`, `registry.json`, `public/r/*`, docs/scripts as needed).
+
 ## Project Structure
 
 ```
@@ -25,8 +42,6 @@ components/
   ui/                 # shadcn/ui primitives
 content/docs/         # Fumadocs MDX pages
   components/         # Component docs
-registry/             # Registry files (synced from components)
-  new-york/
 public/r/             # Built registry JSON for shadcn CLI
 ```
 
@@ -62,8 +77,9 @@ chore: add model-selector to registry
 2. Create a branch (`git checkout -b feat/my-feature`)
 3. Make your changes
 4. Run `npm run build` and `npm run lint` to verify
-5. Commit with a conventional commit message
-6. Push and open a pull request
+5. Run `npm run registry:check` if component files changed
+6. Commit with a conventional commit message
+7. Push and open a pull request
 
 **PR guidelines:** Keep pull requests focused—each PR should address one specific thing. Write a descriptive title and description that clearly explains what changed and why.
 
