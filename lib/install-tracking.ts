@@ -519,7 +519,9 @@ function getRecentDates(days: number): string[] {
   return dates;
 }
 
-export async function getInstallSummary(days = 14): Promise<InstallSummary> {
+export async function getInstallSummary(
+  days = DEFAULT_SUMMARY_DAYS,
+): Promise<InstallSummary> {
   const safeDays = toInstallSummaryDays(days);
   const redis = getRedisClient();
   const inMemoryStore = redis ? null : getInMemoryStore();

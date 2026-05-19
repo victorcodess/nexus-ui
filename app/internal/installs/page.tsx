@@ -225,7 +225,10 @@ export default async function InstallsDashboardPage({
               Source: {summary.storage}
             </span>
             <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
-              Window: {days} days (default {DEFAULT_SUMMARY_DAYS})
+              Window: {days} days
+              {days !== DEFAULT_SUMMARY_DAYS
+                ? ` (default ${DEFAULT_SUMMARY_DAYS})`
+                : ""}
             </span>
             <span className="rounded-full border bg-muted px-2 py-1 shrink-0">
               Timezone: {DASHBOARD_TIME_ZONE_LABEL}
