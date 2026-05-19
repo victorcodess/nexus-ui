@@ -6,7 +6,7 @@ import {
   readFileSync,
   rmSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -53,15 +53,18 @@ for (const item of registry.items ?? []) {
       continue;
     }
 
-    const sourcePath = join(root, file.target.replace(/^~\//, ""));
-    const destinationPath = join(root, file.path);
+    const sourcePath = resolve(join(root, file.target.replace(/^~\//, "")));
+    const destinationPath = resolve(join(root, file.path));
+    if (sourcePath === destinationPath) {
+      continue;
+    }
     ensureDir(dirname(destinationPath));
     cpSync(sourcePath, destinationPath);
   }
 }
 
 try {
-  run("shadcn", ["build"]);
+  run("npx", ["shadcn", "build"]);
   console.log("Registry outputs generated in public/r");
 } finally {
   removeIfExists(registryStagingDir);
