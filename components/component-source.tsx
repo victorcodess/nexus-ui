@@ -4,7 +4,7 @@ import { highlight } from "fumadocs-core/highlight";
 import { ComponentSourceClient } from "./component-source-client";
 
 export interface ComponentSourceProps {
-  /** Path to the component file relative to project root (e.g. "registry/new-york/model-selector/model-selector.tsx") */
+  /** Path to the component file relative to project root (e.g. "components/nexus-ui/model-selector.tsx") */
   src: string;
   /** Optional title for the code block */
   title?: string;

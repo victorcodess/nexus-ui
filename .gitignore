@@ -3,7 +3,6 @@
 
 # generated content
 .source
-/public/registry
 
 # test & build
 /coverage

@@ -12,7 +12,7 @@
       "registryDependencies": ["textarea", "scroll-area", "tooltip", "kbd"],
       "files": [
         {
-          "path": "registry/new-york/prompt-input/prompt-input.tsx",
+          "path": "components/nexus-ui/prompt-input.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/prompt-input.tsx"
         }
@@ -27,7 +27,7 @@
       "registryDependencies": ["button"],
       "files": [
         {
-          "path": "registry/new-york/suggestions/suggestions.tsx",
+          "path": "components/nexus-ui/suggestions.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/suggestions.tsx"
         }
@@ -46,7 +46,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/attachments/attachments.tsx",
+          "path": "components/nexus-ui/attachments.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/attachments.tsx"
         }
@@ -64,7 +64,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/model-selector/model-selector.tsx",
+          "path": "components/nexus-ui/model-selector.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/model-selector.tsx"
         }
@@ -122,12 +122,12 @@
       },
       "files": [
         {
-          "path": "registry/new-york/message/message.tsx",
+          "path": "components/nexus-ui/message.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/message.tsx"
         },
         {
-          "path": "registry/new-york/message/codeblock.tsx",
+          "path": "components/nexus-ui/codeblock.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/codeblock.tsx"
         }
@@ -146,7 +146,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/thread/thread.tsx",
+          "path": "components/nexus-ui/thread.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/thread.tsx"
         }
@@ -169,7 +169,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/citation/citation.tsx",
+          "path": "components/nexus-ui/citation.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/citation.tsx"
         }
@@ -184,7 +184,7 @@
       "registryDependencies": ["tooltip", "kbd"],
       "files": [
         {
-          "path": "registry/new-york/image/image.tsx",
+          "path": "components/nexus-ui/image.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/image.tsx"
         }
@@ -230,7 +230,7 @@
       },
       "files": [
         {
-          "path": "registry/new-york/reasoning/reasoning.tsx",
+          "path": "components/nexus-ui/reasoning.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/reasoning.tsx"
         }
@@ -250,7 +250,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/feedback-bar/feedback-bar.tsx",
+          "path": "components/nexus-ui/feedback-bar.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/feedback-bar.tsx"
         }
@@ -263,7 +263,7 @@
       "description": "Animated shimmer text for loading and streaming states.",
       "files": [
         {
-          "path": "registry/new-york/text-shimmer/text-shimmer.tsx",
+          "path": "components/nexus-ui/text-shimmer.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/text-shimmer.tsx"
         }
@@ -280,9 +280,12 @@
         "next-themes",
         "sonner"
       ],
+      "registryDependencies": [
+        "button"
+      ],
       "files": [
         {
-          "path": "registry/new-york/toaster/toaster.tsx",
+          "path": "components/nexus-ui/toaster.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/toaster.tsx"
         }

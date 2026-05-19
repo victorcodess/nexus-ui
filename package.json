@@ -4,16 +4,17 @@
   "private": true,
   "scripts": {
     "build": "npm run registry:build && next build",
+    "predev": "npm run registry:build",
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint",
+    "registry:build": "node scripts/build-registry.mjs",
+    "registry:check": "node scripts/check-registry-drift.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "registry:build": "shadcn build && node scripts/copy-registry-to-public.mjs",
-    "registry:sync": "node scripts/sync-registry.mjs"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
