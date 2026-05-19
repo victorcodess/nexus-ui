@@ -23,6 +23,7 @@ const SESSION_CONFIRMED_PREFIX = "installs:session:confirmed";
 const TIMELINE_KEY_PREFIX = "installs:timeline";
 const RAW_TIMELINE_KEY_PREFIX = "installs:timeline:raw";
 const DEFAULT_SESSION_TTL_SECONDS = 60 * 5;
+export const DEFAULT_SUMMARY_DAYS = 30;
 
 type SummaryDay = {
   date: string;
@@ -119,6 +120,23 @@ function toNumber(value: unknown): number {
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;
+}
+
+export function toInstallSummaryDays(value: unknown): number {
+  if (typeof value === "string" && value.trim() === "") {
+    return DEFAULT_SUMMARY_DAYS;
+  }
+
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : Number.NaN;
+
+  if (!Number.isFinite(parsed)) return DEFAULT_SUMMARY_DAYS;
+  const rounded = Math.round(parsed);
+  return Math.max(1, Math.min(90, rounded));
 }
 
 function getDedupeWindowSeconds(): number {
@@ -501,7 +519,10 @@ function getRecentDates(days: number): string[] {
   return dates;
 }
 
-export async function getInstallSummary(days = 14): Promise<InstallSummary> {
+export async function getInstallSummary(
+  days = DEFAULT_SUMMARY_DAYS,
+): Promise<InstallSummary> {
+  const safeDays = toInstallSummaryDays(days);
   const redis = getRedisClient();
   const inMemoryStore = redis ? null : getInMemoryStore();
 
@@ -523,7 +544,7 @@ export async function getInstallSummary(days = 14): Promise<InstallSummary> {
   }
 
   if (inMemoryStore) {
-    const dates = getRecentDates(days);
+    const dates = getRecentDates(safeDays);
     const componentNameSet = new Set<string>([
       ...inMemoryStore.rawComponents.keys(),
       ...inMemoryStore.dedupedComponents.keys(),
@@ -597,7 +618,7 @@ export async function getInstallSummary(days = 14): Promise<InstallSummary> {
   ]);
 
   const componentNames = [...(componentNamesRaw ?? [])].sort((a, b) => a.localeCompare(b));
-  const dates = getRecentDates(days);
+  const dates = getRecentDates(safeDays);
 
   const [
     componentTotalsRaw,
