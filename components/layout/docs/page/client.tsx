@@ -241,12 +241,8 @@ export function PageLastUpdate({
   ...props
 }: Omit<ComponentProps<"p">, "children"> & { date: Date }) {
   const { text } = useI18n();
-  const [date, setDate] = useState("");
-
-  useEffect(() => {
-    // to the timezone of client
-    setDate(value.toLocaleDateString());
-  }, [value]);
+  // Render-time derivation avoids an extra state update pass.
+  const date = value.toLocaleDateString();
 
   return (
     <p

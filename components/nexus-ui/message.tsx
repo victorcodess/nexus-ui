@@ -142,63 +142,65 @@ function MessageMarkdown({
   components,
   ...props
 }: MessageMarkdownProps) {
-  const defaultComponents = {
-    code: CodeBlock,
-    inlineCode: ({
-      children,
-      className,
-      ...props
-    }: React.HTMLAttributes<HTMLElement>) => (
-      <code
-        className={cn(
-          "rounded-md border-none bg-muted px-1.5 py-0.5 font-mono text-xs font-[450]",
-          className,
-        )}
-        data-slot="message-markdown-inline-code"
-        {...props}
-      >
-        {children}
-      </code>
-    ),
-    table: (props: React.HTMLAttributes<HTMLTableElement>) => (
-      <div
-        data-slot="message-markdown-table-wrap"
-        className={[
-          "my-6 prose-no-margin overflow-hidden rounded-2xl border border-border bg-muted dark:border-accent dark:bg-background",
-          "[&_tbody_tr:first-child_td:first-child]:rounded-ss-xl",
-          "[&_tbody_tr:first-child_td:last-child]:rounded-se-xl",
-          "[&_tbody_tr:last-child_td:first-child]:rounded-es-xl",
-          "[&_tbody_tr:last-child_td:last-child]:rounded-ee-xl",
-        ].join(" ")}
-      >
-        <table
-          data-slot="message-markdown-table"
-          className="w-full border-separate border-spacing-0 border-none bg-muted text-sm dark:bg-background"
-          {...props}
-        />
-      </div>
-    ),
-    th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => (
-      <th
-        data-slot="message-markdown-th"
-        className="border-none px-5 py-2 text-start text-[13px] font-normal! text-muted-foreground! dark:bg-background"
-        {...props}
-      />
-    ),
-    td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => (
-      <td
-        data-slot="message-markdown-td"
-        className="border-0 border-accent bg-card px-5 py-3 text-[13px] text-primary dark:bg-card [tr:not(:first-child)_&]:border-t"
-        {...props}
-      />
-    ),
-  };
-
   const mergedComponents = React.useMemo(
-    () => ({
-      ...(defaultComponents as object),
-      ...((components ?? {}) as object),
-    }),
+    () => {
+      const defaultComponents = {
+        code: CodeBlock,
+        inlineCode: ({
+          children,
+          className,
+          ...props
+        }: React.HTMLAttributes<HTMLElement>) => (
+          <code
+            className={cn(
+              "rounded-md border-none bg-muted px-1.5 py-0.5 font-mono text-xs font-[450]",
+              className,
+            )}
+            data-slot="message-markdown-inline-code"
+            {...props}
+          >
+            {children}
+          </code>
+        ),
+        table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+          <div
+            data-slot="message-markdown-table-wrap"
+            className={[
+              "my-6 prose-no-margin overflow-hidden rounded-2xl border border-border bg-muted dark:border-accent dark:bg-background",
+              "[&_tbody_tr:first-child_td:first-child]:rounded-ss-xl",
+              "[&_tbody_tr:first-child_td:last-child]:rounded-se-xl",
+              "[&_tbody_tr:last-child_td:first-child]:rounded-es-xl",
+              "[&_tbody_tr:last-child_td:last-child]:rounded-ee-xl",
+            ].join(" ")}
+          >
+            <table
+              data-slot="message-markdown-table"
+              className="w-full border-separate border-spacing-0 border-none bg-muted text-sm dark:bg-background"
+              {...props}
+            />
+          </div>
+        ),
+        th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+          <th
+            data-slot="message-markdown-th"
+            className="border-none px-5 py-2 text-start text-[13px] font-normal! text-muted-foreground! dark:bg-background"
+            {...props}
+          />
+        ),
+        td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+          <td
+            data-slot="message-markdown-td"
+            className="border-0 border-accent bg-card px-5 py-3 text-[13px] text-primary dark:bg-card [tr:not(:first-child)_&]:border-t"
+            {...props}
+          />
+        ),
+      };
+
+      return {
+        ...(defaultComponents as object),
+        ...((components ?? {}) as object),
+      };
+    },
     [components],
   );
 

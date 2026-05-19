@@ -21,7 +21,6 @@ function ReasoningDefault() {
 
   React.useEffect(() => {
     let i = 0;
-    setIsStreaming(true);
 
     const timer = window.setInterval(() => {
       i += 2;
