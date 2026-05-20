@@ -22,6 +22,7 @@ import {
   TIMELINE_KEY_PREFIX,
   TOTAL_INSTALLS_KEY,
   UNIQUE_DAILY_KEY_PREFIX,
+  UNIQUE_COMPONENT_DAILY_KEY_PREFIX,
 } from "@/lib/install-tracking/constants";
 import { getInMemoryStore, getRedisClient } from "@/lib/install-tracking/storage";
 import { key, toISODateUTC, toNumber } from "@/lib/install-tracking/utils";
@@ -182,7 +183,12 @@ export async function recordInstall(
 
   const dayInstallKey = key(DAILY_KEY_PREFIX, day);
   const componentInstallKey = key(COMPONENT_KEY_PREFIX, componentName);
+  const componentDailyKey = key(key(COMPONENT_KEY_PREFIX, componentName), day);
   const uniqueDayKey = key(UNIQUE_DAILY_KEY_PREFIX, day);
+  const uniqueComponentDailyKey = key(
+    key(UNIQUE_COMPONENT_DAILY_KEY_PREFIX, componentName),
+    day,
+  );
 
   try {
     const rawPipeline = redis.multi();
@@ -213,10 +219,14 @@ export async function recordInstall(
     pipeline.incr(TOTAL_INSTALLS_KEY);
     pipeline.incr(componentInstallKey);
     pipeline.incr(dayInstallKey);
+    pipeline.incr(componentDailyKey);
     pipeline.sadd(COMPONENT_INDEX_KEY, componentName);
     pipeline.sadd(uniqueDayKey, installerHash);
+    pipeline.sadd(uniqueComponentDailyKey, installerHash);
     pipeline.expire(dayInstallKey, DAILY_TTL_SECONDS);
+    pipeline.expire(componentDailyKey, DAILY_TTL_SECONDS);
     pipeline.expire(uniqueDayKey, DAILY_TTL_SECONDS);
+    pipeline.expire(uniqueComponentDailyKey, DAILY_TTL_SECONDS);
     if (confirmOnIntent) {
       const confirmedComponentKey = key(CONFIRMED_COMPONENT_KEY_PREFIX, componentName);
       const confirmedDayKey = key(CONFIRMED_DAILY_KEY_PREFIX, day);

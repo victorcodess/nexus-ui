@@ -9,6 +9,7 @@ export const COMPONENT_KEY_PREFIX = "installs:component";
 export const RAW_COMPONENT_KEY_PREFIX = "installs:raw:component";
 export const CONFIRMED_COMPONENT_KEY_PREFIX = "installs:confirmed:component";
 export const UNIQUE_DAILY_KEY_PREFIX = "installs:unique:day";
+export const UNIQUE_COMPONENT_DAILY_KEY_PREFIX = "installs:unique:component";
 export const DAILY_TTL_SECONDS = 60 * 60 * 24 * 366;
 export const DEFAULT_DEDUPE_WINDOW_SECONDS = 60;
 export const DEDUPE_KEY_PREFIX = "installs:dedupe";
