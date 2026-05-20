@@ -2,6 +2,9 @@
   "name": "nexus-ui",
   "version": "0.0.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "npm run registry:build && next build",
     "predev": "npm run registry:build",
@@ -14,7 +17,10 @@
     "registry:build": "node scripts/build-registry.mjs",
     "registry:check": "node scripts/check-registry-drift.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
@@ -63,6 +69,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.7",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",

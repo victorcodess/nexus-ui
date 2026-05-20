@@ -21,18 +21,18 @@ When you change a Nexus UI component:
 
 1. Edit component source under `components/nexus-ui`.
 2. Build generated registry outputs:
-   ```bash
-   npm run registry:build
-   ```
+
+   `npm run registry:build`
+
 3. Validate generated outputs:
-   ```bash
-   npm run registry:check
-   ```
+
+   `npm run registry:check`
+
 4. Commit source changes and regenerated `public/r/*` files (`components/nexus-ui/*`, `registry.json`, `public/r/*`, docs/scripts as needed).
 
 ## Project Structure
 
-```
+```text
 components/
   nexus-ui/           # Source components (canonical)
     model-selector.tsx
@@ -49,7 +49,7 @@ public/r/             # Built registry JSON for shadcn CLI
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 <type>: <description>
 ```
 
@@ -64,12 +64,24 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Examples:**
 
-```
+```text
 feat: add model selector component
 fix: resolve dropdown positioning on scroll
 docs: update model selector API reference
 chore: add model-selector to registry
 ```
+
+## CLI Release Workflow
+
+`packages/nexus-ui-cli` uses Changesets for automated versioning/changelog and npm publishing.
+
+When your PR changes `packages/nexus-ui-cli/*`, add a changeset:
+
+```bash
+npm run changeset
+```
+
+The release workflow on `main` will open/update a "Version Packages" PR. Merging that PR publishes `nexus-ui-cli` to npm and creates release notes.
 
 ## Submitting Changes
 
