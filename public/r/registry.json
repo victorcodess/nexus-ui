@@ -49,6 +49,11 @@
           "path": "components/nexus-ui/attachments.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/attachments.tsx"
+        },
+        {
+          "path": "lib/use-on-change.ts",
+          "type": "registry:file",
+          "target": "~/lib/use-on-change.ts"
         }
       ]
     },
@@ -233,6 +238,11 @@
           "path": "components/nexus-ui/reasoning.tsx",
           "type": "registry:file",
           "target": "~/components/nexus-ui/reasoning.tsx"
+        },
+        {
+          "path": "lib/use-on-change.ts",
+          "type": "registry:file",
+          "target": "~/lib/use-on-change.ts"
         }
       ]
     },
