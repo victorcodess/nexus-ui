@@ -247,6 +247,56 @@
       ]
     },
     {
+      "name": "chain-of-thought",
+      "type": "registry:ui",
+      "title": "Chain of Thought",
+      "description": "Composable multi-step AI thought process with per-step status, labels, and collapsible content.",
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
+      ],
+      "registryDependencies": ["collapsible"],
+      "css": {
+        "@import \"tw-shimmer\"": {},
+        "@layer utilities": {
+          "@keyframes reasoning-expand": {
+            "from": {
+              "height": "0"
+            },
+            "to": {
+              "height": "var(--radix-collapsible-content-height)"
+            }
+          },
+          "@keyframes reasoning-collapse": {
+            "from": {
+              "height": "var(--radix-collapsible-content-height)"
+            },
+            "to": {
+              "height": "0"
+            }
+          },
+          ".animate-collapsible-down": {
+            "animation": "reasoning-expand 0.2s ease-out"
+          },
+          ".animate-collapsible-up": {
+            "animation": "reasoning-collapse 0.2s ease-out"
+          }
+        }
+      },
+      "files": [
+        {
+          "path": "components/nexus-ui/chain-of-thought.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/chain-of-thought.tsx"
+        },
+        {
+          "path": "lib/use-on-change.ts",
+          "type": "registry:file",
+          "target": "~/lib/use-on-change.ts"
+        }
+      ]
+    },
+    {
       "name": "feedback-bar",
       "type": "registry:ui",
       "title": "Feedback Bar",
