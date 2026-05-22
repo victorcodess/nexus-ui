@@ -1,20 +1,23 @@
 import * as React from "react";
 import {
-  AiBrain01Icon,
   AiWebBrowsingIcon,
-  ArrowDown01Icon,
   Globe02Icon,
   CheckmarkCircle01Icon,
   YoutubeIcon,
   IdeaIcon,
+  AiBrain01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  ChainOfThought,
+  ChainOfThoughtComplete,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  ChainOfThoughtStepContent,
+  ChainOfThoughtStepTitle,
+  ChainOfThoughtTrigger,
+} from "@/components/nexus-ui/chain-of-thought";
 
 const SEARCH_PILLS = [
   "trending movies April 2026 box office",
@@ -167,204 +170,182 @@ const YOUTUBE_LINKS = [
 function ChainOfThoughtDefault() {
   return (
     <div className="w-full">
-      <Collapsible>
-        <CollapsibleTrigger className="group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground">
-          <HugeiconsIcon
-            icon={AiBrain01Icon}
-            strokeWidth={1.75}
-            className="size-4"
-          />
-          <span className="text-sm leading-6 group-data-[streaming=true]:shimmer group-data-[streaming=true]:shimmer-repeat-delay-0 group-data-[streaming=true]:shimmer-spread-50 group-data-[streaming=true]:not-dark:shimmer-invert">
-            Chain of Thought
-          </span>
-          <HugeiconsIcon
-            icon={ArrowDown01Icon}
-            strokeWidth={2}
-            className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
-          />
-        </CollapsibleTrigger>
-
-        <CollapsibleContent className="mt-3 space-y-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-          <div className="flex w-full gap-2 text-sm text-muted-foreground">
-            <div className="relative mt-0.25">
-              <HugeiconsIcon
-                icon={YoutubeIcon}
-                strokeWidth={1.75}
-                className="size-4"
-              />
-              <div className="absolute top-4.5 -bottom-2.5 left-1/2 -mx-px w-px bg-border"></div>
-            </div>
-
-            <div className="min-w-0 flex-1 space-y-2 overflow-x-hidden">
-              <Collapsible>
-                <CollapsibleTrigger className="group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground">
-                  <span className="text-sm leading-4.5 group-data-[streaming=true]:shimmer group-data-[streaming=true]:shimmer-repeat-delay-0 group-data-[streaming=true]:shimmer-spread-50 group-data-[streaming=true]:not-dark:shimmer-invert">
-                    Youtube search
-                  </span>
-                  <HugeiconsIcon
-                    icon={ArrowDown01Icon}
-                    strokeWidth={2}
-                    className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
-                  />
-                </CollapsibleTrigger>
-
-                <CollapsibleContent className="mt-2 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                  <div className="mt-1 space-y-2">
-                    <div className="-mx-1 mt-1 no-scrollbar flex gap-1.5 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
-                      {YOUTUBE_SEARCH_QUERIES.map((pill) => (
-                        <span
-                          key={pill}
-                          className="inline-flex h-6.5 shrink-0 items-center gap-1 rounded-full bg-muted px-2 text-xs leading-4.5 whitespace-nowrap text-muted-foreground sm:max-w-[187.8px] sm:whitespace-normal"
-                        >
-                          <HugeiconsIcon
-                            icon={Globe02Icon}
-                            strokeWidth={1.75}
-                            className="size-4 shrink-0 text-muted-foreground/50"
-                          />
-                          <span className="min-w-0 sm:truncate">{pill}</span>
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-1.5 no-scrollbar flex max-h-[180px] w-full max-w-full min-w-0 flex-col gap-2 overflow-x-hidden overflow-y-auto rounded-[12px] border border-border/50 bg-secondary p-3">
-                      {YOUTUBE_LINKS.map((source) => (
-                        <a
-                          key={source.url}
-                          href={source.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="grid w-full max-w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_minmax(0,7.5rem)] items-center gap-2 rounded-md px-1.5 py-1 text-xs leading-4.5 transition-colors hover:bg-border/50 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,9rem)] dark:hover:bg-border/40"
-                        >
-                          <img
-                            alt=""
-                            loading="lazy"
-                            width={16}
-                            height={16}
-                            className="size-4 shrink-0 rounded"
-                            src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=128`}
-                          />
-                          <div className="min-w-0 truncate text-primary">
-                            {source.title}
-                          </div>
-                          <div
-                            className="min-w-0 truncate text-right text-muted-foreground tabular-nums"
-                            title={source.domain}
-                          >
-                            {source.domain}
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </div>
-
-          <div
-            className="flex items-center gap-2 text-sm leading-4.5 text-muted-foreground"
-            style={{ opacity: 1, transform: "none" }}
-          >
-            <div className="relative">
-              <HugeiconsIcon
-                icon={IdeaIcon}
-                strokeWidth={1.75}
-                className="size-4"
-              />
-              <div className="absolute top-4.5 -bottom-2.75 left-1/2 -mx-px w-px bg-border"></div>
-            </div>
-            <span className="">Gathered 8 sources</span>
-          </div>
-
-          <div className="flex w-full animate-in gap-2 text-sm text-muted-foreground">
-            <div className="relative mt-0.25">
-              <HugeiconsIcon
-                icon={AiWebBrowsingIcon}
-                strokeWidth={1.75}
-                className="size-4"
-              />
-              <div className="absolute top-4.5 -bottom-2.5 left-1/2 -mx-px w-px bg-border"></div>
-            </div>
-
-            <div className="min-w-0 flex-1 space-y-2 overflow-x-hidden">
-              <Collapsible>
-                <CollapsibleTrigger className="group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground">
-                  <span className="text-sm leading-4.5 group-data-[streaming=true]:shimmer group-data-[streaming=true]:shimmer-repeat-delay-0 group-data-[streaming=true]:shimmer-spread-50 group-data-[streaming=true]:not-dark:shimmer-invert">
-                    Web search
-                  </span>
-                  <HugeiconsIcon
-                    icon={ArrowDown01Icon}
-                    strokeWidth={2}
-                    className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:group-data-[streaming=false]:opacity-100"
-                  />
-                </CollapsibleTrigger>
-
-                <CollapsibleContent className="mt-2 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                  <div className="mt-1 space-y-2">
-                    <div className="-mx-1 mt-1 no-scrollbar flex gap-1.5 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
-                      {SEARCH_PILLS.map((pill) => (
-                        <span
-                          key={pill}
-                          className="inline-flex h-6.5 shrink-0 items-center gap-1 rounded-full bg-muted px-2 text-xs leading-4.5 whitespace-nowrap text-muted-foreground sm:max-w-[187.8px] sm:whitespace-normal"
-                        >
-                          <HugeiconsIcon
-                            icon={Globe02Icon}
-                            strokeWidth={1.75}
-                            className="size-4 shrink-0 text-muted-foreground/50"
-                          />
-                          <span className="min-w-0 sm:truncate">{pill}</span>
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="mt-1.5 no-scrollbar flex max-h-[180px] w-full max-w-full min-w-0 flex-col gap-2 overflow-x-hidden overflow-y-auto rounded-[12px] border border-border/50 bg-secondary p-3">
-                      {SOURCES.map((source) => (
-                        <a
-                          key={source.url}
-                          href={source.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="grid w-full max-w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_minmax(0,7.5rem)] items-center gap-2 rounded-md px-1.5 py-1 text-xs leading-4.5 transition-colors hover:bg-border/50 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,9rem)] dark:hover:bg-border/40"
-                        >
-                          <img
-                            alt=""
-                            loading="lazy"
-                            width={16}
-                            height={16}
-                            className="size-4 shrink-0 rounded"
-                            src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=128`}
-                          />
-                          <div className="min-w-0 truncate text-primary">
-                            {source.title}
-                          </div>
-                          <div
-                            className="min-w-0 truncate text-right text-muted-foreground tabular-nums"
-                            title={source.domain}
-                          >
-                            {source.domain}
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </div>
-
-          <div
-            className="mt-0 flex animate-in items-center gap-2 text-sm leading-4.5 text-muted-foreground"
-            style={{ opacity: 1, transform: "none" }}
-          >
+      <ChainOfThought autoCloseOnAllComplete={false}>
+        <ChainOfThoughtTrigger
+          icon={
             <HugeiconsIcon
-              icon={CheckmarkCircle01Icon}
+              icon={AiBrain01Icon}
               strokeWidth={1.75}
               className="size-4"
             />
-            <span className="">Task complete</span>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+          }
+        >
+          Chain of Thought
+        </ChainOfThoughtTrigger>
+
+        <ChainOfThoughtContent>
+          <ChainOfThoughtStep
+            status="completed"
+            hasContent
+            autoCloseOnComplete={false}
+          >
+            <ChainOfThoughtStepTitle
+              icon={
+                <HugeiconsIcon
+                  icon={YoutubeIcon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
+              }
+              className=""
+            >
+              Youtube search
+            </ChainOfThoughtStepTitle>
+            <ChainOfThoughtStepContent className="">
+              <div className="mt-1 space-y-2">
+                <div className="-mx-1 mt-1 no-scrollbar flex gap-1.5 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
+                  {YOUTUBE_SEARCH_QUERIES.map((pill) => (
+                    <span
+                      key={pill}
+                      className="inline-flex h-6.5 shrink-0 items-center gap-1 rounded-full bg-muted px-2 text-xs leading-4.5 whitespace-nowrap text-muted-foreground sm:max-w-[187.8px] sm:whitespace-normal"
+                    >
+                      <HugeiconsIcon
+                        icon={Globe02Icon}
+                        strokeWidth={1.75}
+                        className="size-4 shrink-0 text-muted-foreground/50"
+                      />
+                      <span className="min-w-0 sm:truncate">{pill}</span>
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-1.5 no-scrollbar flex max-h-[180px] w-full max-w-full min-w-0 flex-col gap-2 overflow-x-hidden overflow-y-auto rounded-[12px] border border-border/50 bg-secondary p-3">
+                  {YOUTUBE_LINKS.map((source) => (
+                    <a
+                      key={source.url}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="grid w-full max-w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_minmax(0,7.5rem)] items-center gap-2 rounded-md px-1.5 py-1 text-xs leading-4.5 transition-colors hover:bg-border/50 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,9rem)] dark:hover:bg-border/40"
+                    >
+                      <img
+                        alt=""
+                        loading="lazy"
+                        width={16}
+                        height={16}
+                        className="size-4 shrink-0 rounded"
+                        src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=128`}
+                      />
+                      <div className="min-w-0 truncate text-primary">
+                        {source.title}
+                      </div>
+                      <div
+                        className="min-w-0 truncate text-right text-muted-foreground tabular-nums"
+                        title={source.domain}
+                      >
+                        {source.domain}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </ChainOfThoughtStepContent>
+          </ChainOfThoughtStep>
+
+          <ChainOfThoughtStep status="completed">
+            <ChainOfThoughtStepTitle
+              icon={
+                <HugeiconsIcon
+                  icon={IdeaIcon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
+              }
+            >
+              Gathered 8 sources
+            </ChainOfThoughtStepTitle>
+          </ChainOfThoughtStep>
+
+          <ChainOfThoughtStep
+            status="completed"
+            hasContent
+            autoCloseOnComplete={false}
+            className="animate-in"
+          >
+            <ChainOfThoughtStepTitle
+              icon={
+                <HugeiconsIcon
+                  icon={AiWebBrowsingIcon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
+              }
+            >
+              Web search
+            </ChainOfThoughtStepTitle>
+            <ChainOfThoughtStepContent>
+              <div className="mt-1 space-y-2">
+                <div className="-mx-1 mt-1 no-scrollbar flex gap-1.5 overflow-x-auto overscroll-x-contain px-1 pb-0.5 [-webkit-overflow-scrolling:touch] sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
+                  {SEARCH_PILLS.map((pill) => (
+                    <span
+                      key={pill}
+                      className="inline-flex h-6.5 shrink-0 items-center gap-1 rounded-full bg-muted px-2 text-xs leading-4.5 whitespace-nowrap text-muted-foreground sm:max-w-[187.8px] sm:whitespace-normal"
+                    >
+                      <HugeiconsIcon
+                        icon={Globe02Icon}
+                        strokeWidth={1.75}
+                        className="size-4 shrink-0 text-muted-foreground/50"
+                      />
+                      <span className="min-w-0 sm:truncate">{pill}</span>
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-1.5 no-scrollbar flex max-h-[180px] w-full max-w-full min-w-0 flex-col gap-2 overflow-x-hidden overflow-y-auto rounded-[12px] border border-border/50 bg-secondary p-3">
+                  {SOURCES.map((source, index) => (
+                    <a
+                      key={`${source.url}-${index}`}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="grid w-full max-w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_minmax(0,7.5rem)] items-center gap-2 rounded-md px-1.5 py-1 text-xs leading-4.5 transition-colors hover:bg-border/50 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,9rem)] dark:hover:bg-border/40"
+                    >
+                      <img
+                        alt=""
+                        loading="lazy"
+                        width={16}
+                        height={16}
+                        className="size-4 shrink-0 rounded"
+                        src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=128`}
+                      />
+                      <div className="min-w-0 truncate text-primary">
+                        {source.title}
+                      </div>
+                      <div
+                        className="min-w-0 truncate text-right text-muted-foreground tabular-nums"
+                        title={source.domain}
+                      >
+                        {source.domain}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </ChainOfThoughtStepContent>
+          </ChainOfThoughtStep>
+
+          <ChainOfThoughtComplete
+            label="Task complete"
+            icon={
+              <HugeiconsIcon
+                icon={CheckmarkCircle01Icon}
+                strokeWidth={1.75}
+                className="size-4"
+              />
+            }
+          />
+        </ChainOfThoughtContent>
+      </ChainOfThought>
     </div>
   );
 }
