@@ -72,16 +72,14 @@ function ChainOfThought({
     Record<string, ChainOfThoughtStepStatus>
   >({});
 
-  const allStepsComplete = React.useMemo(() => {
+  const { allStepsComplete, hasAnyError } = React.useMemo(() => {
     const statuses = Object.values(stepStatuses);
-    return (
-      statuses.length > 0 && statuses.every((status) => status === "completed")
-    );
+    return {
+      allStepsComplete:
+        statuses.length > 0 && statuses.every((status) => status === "completed"),
+      hasAnyError: statuses.some((status) => status === "error"),
+    };
   }, [stepStatuses]);
-  const hasAnyError = React.useMemo(
-    () => Object.values(stepStatuses).some((status) => status === "error"),
-    [stepStatuses],
-  );
 
   const open = isControlled ? openProp : internalOpen;
 
@@ -155,7 +153,7 @@ function ChainOfThoughtTrigger({
   return (
     <CollapsibleTrigger
       data-slot="chain-of-thought-trigger"
-      data-active={isActive ? "true" : "false"}
+      data-active={String(isActive)}
       className={cn(
         "group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground",
         className,
@@ -166,8 +164,7 @@ function ChainOfThoughtTrigger({
       <span
         className={cn(
           "text-sm leading-6",
-          isActive &&
-            "group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert",
+          "group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert",
         )}
       >
         {children ?? label}
@@ -194,7 +191,8 @@ function ChainOfThoughtContent({
     <CollapsibleContent
       data-slot="chain-of-thought-content"
       className={cn(
-        "mt-3 space-y-3 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
+        "mt-3 space-y-3",
+        "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
         className,
       )}
       {...props}
@@ -230,6 +228,7 @@ function ChainOfThoughtStep({
   const { registerStep } = useChainOfThoughtRootContext("ChainOfThoughtStep");
   const stepId = React.useId();
   const isControlled = openProp !== undefined;
+  const canAutoManageOpen = !isControlled && hasContent;
   const [internalOpen, setInternalOpen] = React.useState(
     () => defaultOpen || (hasContent && (status === "active" || status === "error")),
   );
@@ -251,10 +250,9 @@ function ChainOfThoughtStep({
 
   useOnChange(status, (current, previous) => {
     if (
-      !isControlled &&
-      hasContent &&
-      previous !== "active" &&
-      current === "active"
+      canAutoManageOpen &&
+      (current === "active" || current === "error") &&
+      previous !== current
     ) {
       setInternalOpen(true);
       onOpenChange?.(true);
@@ -262,19 +260,7 @@ function ChainOfThoughtStep({
     }
 
     if (
-      !isControlled &&
-      hasContent &&
-      previous !== "error" &&
-      current === "error"
-    ) {
-      setInternalOpen(true);
-      onOpenChange?.(true);
-      return;
-    }
-
-    if (
-      isControlled ||
-      !hasContent ||
+      !canAutoManageOpen ||
       !autoCloseOnComplete ||
       previous === undefined
     ) {
@@ -326,7 +312,7 @@ type ChainOfThoughtStepTitleProps =
 
 function ChainOfThoughtStepTitle({
   className,
-  label,
+  label: labelProp,
   icon,
   collapsible,
   children,
@@ -338,6 +324,7 @@ function ChainOfThoughtStepTitle({
   const isCollapsible = collapsible ?? hasContent;
   const isActive = status === "active";
   const isError = status === "error";
+  const label = children ?? labelProp;
 
   if (!isCollapsible) {
     const staticProps = props as React.HTMLAttributes<HTMLDivElement>;
@@ -345,7 +332,7 @@ function ChainOfThoughtStepTitle({
     return (
       <div
         data-slot="chain-of-thought-step-title"
-        data-active={isActive ? "true" : "false"}
+        data-active={String(isActive)}
         className={cn(
           "group flex items-center text-sm leading-4.5 text-muted-foreground",
           isError && "text-destructive",
@@ -355,14 +342,8 @@ function ChainOfThoughtStepTitle({
         {...staticProps}
       >
         {icon ? <div className="relative mt-0.25">{icon}</div> : null}
-        <span
-          className={cn(
-            "text-sm leading-4.5",
-            isActive &&
-              "group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert",
-          )}
-        >
-          {children ?? label}
+        <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+          {label}
         </span>
       </div>
     );
@@ -371,7 +352,7 @@ function ChainOfThoughtStepTitle({
   return (
     <CollapsibleTrigger
       data-slot="chain-of-thought-step-title"
-      data-active={isActive ? "true" : "false"}
+      data-active={String(isActive)}
       className={cn(
         "group flex w-full cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground",
         isError && "text-destructive hover:text-destructive/90",
@@ -385,14 +366,8 @@ function ChainOfThoughtStepTitle({
     >
       {icon ? <div className="relative mt-0.25">{icon}</div> : null}
       <div className="flex min-w-0 flex-1 items-center gap-1.25 overflow-hidden">
-        <span
-          className={cn(
-            "text-sm leading-4.5",
-            isActive &&
-              "group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert",
-          )}
-        >
-          {children ?? label}
+        <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+          {label}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
@@ -417,7 +392,8 @@ function ChainOfThoughtStepContent({
     <CollapsibleContent
       data-slot="chain-of-thought-step-content"
       className={cn(
-        "mt-2 overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
+        "mt-2",
+        "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
         className,
       )}
       {...props}
@@ -448,7 +424,7 @@ function ChainOfThoughtComplete({
       )}
       {...props}
     >
-      {icon ?? null}
+      {icon}
       <span>{label}</span>
     </div>
   );
