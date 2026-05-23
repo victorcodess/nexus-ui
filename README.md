@@ -21,7 +21,8 @@
   <a href="https://nexus-ui.dev/docs/components/text-shimmer">Text Shimmer</a> ·
   <a href="https://nexus-ui.dev/docs/components/image">Image</a> ·
   <a href="https://nexus-ui.dev/docs/components/feedback-bar">Feedback Bar</a> ·
-  <a href="https://nexus-ui.dev/docs/components/toaster">Toaster</a>
+  <a href="https://nexus-ui.dev/docs/components/toaster">Toaster</a> ·
+  <a href="https://nexus-ui.dev/docs/components/chain-of-thought">Chain of Thought</a>
 </p>
 
 ---
@@ -52,6 +53,7 @@ Copy-paste components into your project. You own the code.
 | `Image`         | AI image UI for URLs, base64, and bytes with preview, loader, lightbox, and actions |
 | `FeedbackBar`   | Feedback prompt bar with composable info, actions, tooltips, and close section |
 | `Toaster`       | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
+| `ChainOfThought` | Structured multi-step thought timeline with step status and collapsible step UI |
 
 ## Quick Start
 
@@ -80,6 +82,7 @@ npx shadcn@latest add @nexus-ui/text-shimmer
 npx shadcn@latest add @nexus-ui/image
 npx shadcn@latest add @nexus-ui/feedback-bar
 npx shadcn@latest add @nexus-ui/toaster
+npx shadcn@latest add @nexus-ui/chain-of-thought
 ```
 
 **Option 2: Direct URL**
@@ -93,7 +96,7 @@ npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```bash
 npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation reasoning text-shimmer image feedback-bar toaster
+npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation reasoning text-shimmer image feedback-bar toaster chain-of-thought
 ```
 
 To use the `@nexus-ui` scope with a custom registry, add to your `components.json`:

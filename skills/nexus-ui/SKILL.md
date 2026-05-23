@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, chain of thought, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -41,6 +41,7 @@ npx shadcn@latest add @nexus-ui/text-shimmer
 npx shadcn@latest add @nexus-ui/image
 npx shadcn@latest add @nexus-ui/feedback-bar
 npx shadcn@latest add @nexus-ui/toaster
+npx shadcn@latest add @nexus-ui/chain-of-thought
 ```
 
 Or install directly via URL (no registry config needed):
@@ -74,6 +75,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Image | `image` | URLs, base64, or `Uint8Array` image payloads with preview, loader, lightbox (Radix Dialog), and action slots |
 | Feedback Bar | `feedback-bar` | Inline feedback prompt with label, action slots, optional Radix tooltips (+ shortcuts), and bordered close region |
 | Toaster | `toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
+| Chain of Thought | `chain-of-thought` | Multi-step trace UI: step status, nested collapsibles, optional “complete” row; registry adds `tw-shimmer` + collapsible animation CSS and `lib/use-on-change` |
 
 ## Component APIs
 
@@ -752,6 +754,60 @@ toast.success("Saved");
 toast.error("Something went wrong", { description: "Try again.", duration: 5000 });
 ```
 
+### Chain of Thought
+
+Structured timeline for tool / reasoning steps: a **root** collapsible tracks all child step statuses, optional **shimmer** on active labels (via `tw-shimmer`), and **`useOnChange`** drives auto-open/close when steps transition.
+
+**Import:**
+
+```tsx
+import {
+  ChainOfThought,
+  ChainOfThoughtTrigger,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  ChainOfThoughtStepTitle,
+  ChainOfThoughtStepContent,
+  ChainOfThoughtComplete,
+  type ChainOfThoughtStepStatus,
+} from "@/components/nexus-ui/chain-of-thought";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `ChainOfThought` | Root **Collapsible** + context registry for steps; props `autoCloseOnAllComplete` (default `true`) closes when every step is `completed`. |
+| `ChainOfThoughtTrigger` | Header row with optional icon/label and chevron; label shimmers while work is in flight. |
+| `ChainOfThoughtContent` | Body container for **`ChainOfThoughtStep`** list. |
+| `ChainOfThoughtStep` | Per-step **Collapsible**; `status` drives registration + shimmer; `hasContent` + `autoCloseOnComplete` auto-manage expansion. |
+| `ChainOfThoughtStepTitle` | Row with icon + label; becomes **CollapsibleTrigger** when expandable content exists (or force `collapsible`). |
+| `ChainOfThoughtStepContent` | Expandable output region for a step. |
+| `ChainOfThoughtComplete` | Optional footer row (“All steps complete”) after steps. |
+
+**Root props:** See source types: controlled `open` / `defaultOpen` / `onOpenChange` on root and steps; `ChainOfThoughtStepStatus` is `"pending"` \| `"active"` \| `"completed"` \| `"error"`.
+
+**Props & hooks:** Internal contexts only. Install includes `lib/use-on-change.ts` when pulled from the registry.
+
+**Usage notes:** Give each step stable visual content for `hasContent` when you want expand/collapse. Pair with streaming/tool events by updating `status` on each step.
+
+**Example (shape):**
+
+```tsx
+<ChainOfThought>
+  <ChainOfThoughtTrigger>Chain of thought</ChainOfThoughtTrigger>
+  <ChainOfThoughtContent>
+    <ChainOfThoughtStep status="completed">
+      <ChainOfThoughtStepTitle icon={…} label="Search the web" />
+    </ChainOfThoughtStep>
+    <ChainOfThoughtStep status="active" hasContent>
+      <ChainOfThoughtStepTitle icon={…} label="Read results" />
+      <ChainOfThoughtStepContent>…</ChainOfThoughtStepContent>
+    </ChainOfThoughtStep>
+  </ChainOfThoughtContent>
+</ChainOfThought>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -850,7 +906,8 @@ components/
 │   ├── text-shimmer.tsx
 │   ├── image.tsx
 │   ├── feedback-bar.tsx
-│   └── toaster.tsx
+│   ├── toaster.tsx
+│   └── chain-of-thought.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -875,11 +932,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Image:** `@radix-ui/react-dialog`, `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 - **Feedback Bar:** `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 - **Toaster:** `sonner`, `next-themes`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `@/lib/utils`
+- **Chain of Thought:** `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `collapsible`, `tw-shimmer` (registry CSS), `@/lib/use-on-change`, `@/lib/utils`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster) · [chain-of-thought](https://nexus-ui.dev/docs/components/chain-of-thought)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt
