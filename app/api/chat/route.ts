@@ -39,8 +39,7 @@ function isPerplexityModelId(
   model: string | undefined,
 ): model is PerplexityModelId {
   return (
-    model != null &&
-    (PERPLEXITY_MODEL_IDS as readonly string[]).includes(model)
+    model != null && (PERPLEXITY_MODEL_IDS as readonly string[]).includes(model)
   );
 }
 
@@ -102,14 +101,8 @@ const demoTools = {
       "Convert an amount from one currency to another using a mock exchange rate",
     inputSchema: z.object({
       amount: z.number().positive().describe("Amount to convert"),
-      from: z
-        .string()
-        .length(3)
-        .describe("Source currency code, e.g. USD"),
-      to: z
-        .string()
-        .length(3)
-        .describe("Target currency code, e.g. EUR"),
+      from: z.string().length(3).describe("Source currency code, e.g. USD"),
+      to: z.string().length(3).describe("Target currency code, e.g. EUR"),
     }),
     execute: async ({ amount, from, to }) => {
       await new Promise((resolve) => setTimeout(resolve, 650));
@@ -166,10 +159,8 @@ const demoTools = {
 } as const;
 
 export async function POST(req: Request) {
-  const {
-    messages,
-    model,
-  }: { messages: UIMessage[]; model?: string } = await req.json();
+  const { messages, model }: { messages: UIMessage[]; model?: string } =
+    await req.json();
 
   const usePerplexity = isPerplexityModelId(model);
   const useOpenAIProvider = isOpenAIGatewayModelId(model);
@@ -180,7 +171,7 @@ export async function POST(req: Request) {
     ? perplexityModel(model)
     : useOpenAIProvider
       ? openai(openAIModelId ?? "gpt-4o")
-    : (model ?? DEFAULT_GATEWAY_MODEL);
+      : (model ?? DEFAULT_GATEWAY_MODEL);
   const useAnthropicReasoning =
     !usePerplexity && isAnthropicGatewayModelId(model);
   const tools = usePerplexity ? undefined : demoTools;

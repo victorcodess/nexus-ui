@@ -290,16 +290,11 @@ function isWebSearchToolOutput(value: unknown): value is WebSearchToolOutput {
   if (typeof value !== "object" || value === null) return false;
   const maybe = value as Partial<WebSearchToolOutput>;
   const hasQuery =
-    typeof maybe.query === "string" ||
-    typeof maybe.action?.query === "string";
+    typeof maybe.query === "string" || typeof maybe.action?.query === "string";
   const hasResultList =
     Array.isArray(maybe.results) || Array.isArray(maybe.sources);
 
-  return (
-    hasQuery ||
-    hasResultList ||
-    maybe.action?.type === "search"
-  );
+  return hasQuery || hasResultList || maybe.action?.type === "search";
 }
 
 function withFallbackWebSearchSources(
@@ -467,7 +462,9 @@ function WebSearchToolResult({ output }: { output: WebSearchToolOutput }) {
                 className="size-4 shrink-0 rounded"
                 src={`https://www.google.com/s2/favicons?domain=${source.domain}&sz=128`}
               />
-              <div className="min-w-0 truncate text-primary">{source.title}</div>
+              <div className="min-w-0 truncate text-primary">
+                {source.title}
+              </div>
               <div
                 className="min-w-0 truncate text-right text-muted-foreground tabular-nums"
                 title={source.domain}
@@ -994,17 +991,18 @@ function Messages({
         const from = m.role === "user" ? "user" : "assistant";
         const text = textFromMessage(m);
         const sourceUrls = sourceUrlPartsFromMessage(m);
-        const sourceUrlItems = sourceUrls
-          .slice(0, 10)
-          .map((source) => ({
-            title: source.title?.trim() || source.url,
-            url: source.url,
-            snippet: "",
-          })) satisfies WebSearchSourceItem[];
+        const sourceUrlItems = sourceUrls.slice(0, 10).map((source) => ({
+          title: source.title?.trim() || source.url,
+          url: source.url,
+          snippet: "",
+        })) satisfies WebSearchSourceItem[];
         const rawToolSteps =
           toolStepCarryover.carriedToolStepsByIndex.get(i) ??
           toolStepsFromAssistantMessage(m);
-        const toolSteps = applyWebSourceUrlsToSteps(rawToolSteps, sourceUrlItems);
+        const toolSteps = applyWebSourceUrlsToSteps(
+          rawToolSteps,
+          sourceUrlItems,
+        );
         const hasToolSteps = toolSteps.length > 0;
         const isLast = i === displayRows.length - 1;
         const inlineCitationSources = sourceUrls.map((source) => ({
