@@ -9,15 +9,18 @@ export const contentType = "image/png";
 
 async function loadGoogleFont(font: string, weight: number, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`;
-  const css = await (await fetch(url)).text();
-  const resource = css.match(
-    /src: url\((.+)\) format\('(opentype|truetype)'\)/,
-  )?.[1];
-  if (resource) {
+  try {
+    const css = await (await fetch(url)).text();
+    const resource = css.match(
+      /src: url\((.+)\) format\('(opentype|truetype)'\)/,
+    )?.[1];
+    if (!resource) return null;
     const response = await fetch(resource);
-    if (response.ok) return response.arrayBuffer();
+    if (!response.ok) return null;
+    return response.arrayBuffer();
+  } catch {
+    return null;
   }
-  throw new Error("Failed to load font");
 }
 
 export default async function Image() {
@@ -34,6 +37,14 @@ export default async function Image() {
     loadGoogleFont("Inter", 400, text),
     loadGoogleFont("Inter", 500, text),
   ]);
+  const fonts = [
+    fontRegular
+      ? ({ name: "Inter", data: fontRegular, style: "normal", weight: 400 } as const)
+      : null,
+    fontMedium
+      ? ({ name: "Inter", data: fontMedium, style: "normal", weight: 500 } as const)
+      : null,
+  ].filter((font): font is NonNullable<typeof font> => font !== null);
 
   return new ImageResponse(
     <div
@@ -150,10 +161,7 @@ export default async function Image() {
     </div>,
     {
       ...size,
-      fonts: [
-        { name: "Inter", data: fontRegular, style: "normal", weight: 400 },
-        { name: "Inter", data: fontMedium, style: "normal", weight: 500 },
-      ],
+      fonts,
     },
   );
 }

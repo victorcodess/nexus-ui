@@ -10,12 +10,33 @@ export interface ComponentSourceProps {
   title?: string;
 }
 
+function resolveSourcePath(src: string) {
+  const componentRelative = src.startsWith("components/nexus-ui/")
+    ? src.slice("components/nexus-ui/".length)
+    : null;
+  if (componentRelative && !componentRelative.includes("..")) {
+    return join(process.cwd(), "components", "nexus-ui", componentRelative);
+  }
+
+  const libRelative = src.startsWith("lib/") ? src.slice("lib/".length) : null;
+  if (libRelative && !libRelative.includes("..")) {
+    return join(process.cwd(), "lib", libRelative);
+  }
+
+  return null;
+}
+
 /**
  * Renders a code block with the contents of a component file.
  * Use in MDX for Manual installation steps to avoid duplicating source code.
  */
 export async function ComponentSource({ src, title }: ComponentSourceProps) {
-  const code = readFileSync(join(process.cwd(), src), "utf-8");
+  const resolvedPath = resolveSourcePath(src);
+  if (!resolvedPath) {
+    throw new Error(`Unsupported component source path: ${src}`);
+  }
+
+  const code = readFileSync(resolvedPath, "utf-8");
   const highlighted = await highlight(code, { lang: "tsx" });
   return <ComponentSourceClient highlightedCode={highlighted} title={title} />;
 }
