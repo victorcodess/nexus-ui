@@ -23,7 +23,11 @@ function ChainOfThoughtWithoutHeader() {
           <ChainOfThoughtStep status="completed">
             <ChainOfThoughtStepTitle
               icon={
-                <HugeiconsIcon icon={Globe02Icon} strokeWidth={1.75} className="size-4" />
+                <HugeiconsIcon
+                  icon={Globe02Icon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
               }
             >
               Fetched customer chat history from CRM
@@ -32,7 +36,13 @@ function ChainOfThoughtWithoutHeader() {
 
           <ChainOfThoughtStep status="completed">
             <ChainOfThoughtStepTitle
-              icon={<HugeiconsIcon icon={FolderOpenIcon} strokeWidth={1.75} className="size-4" />}
+              icon={
+                <HugeiconsIcon
+                  icon={FolderOpenIcon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
+              }
             >
               Retrieved orders, refunds, and delivery events
             </ChainOfThoughtStepTitle>
@@ -40,7 +50,13 @@ function ChainOfThoughtWithoutHeader() {
 
           <ChainOfThoughtStep status="completed">
             <ChainOfThoughtStepTitle
-              icon={<HugeiconsIcon icon={Analytics01Icon} strokeWidth={1.75} className="size-4" />}
+              icon={
+                <HugeiconsIcon
+                  icon={Analytics01Icon}
+                  strokeWidth={1.75}
+                  className="size-4"
+                />
+              }
             >
               Generated escalation summary and next actions
             </ChainOfThoughtStepTitle>

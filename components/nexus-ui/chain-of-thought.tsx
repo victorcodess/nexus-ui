@@ -76,7 +76,8 @@ function ChainOfThought({
     const statuses = Object.values(stepStatuses);
     return {
       allStepsComplete:
-        statuses.length > 0 && statuses.every((status) => status === "completed"),
+        statuses.length > 0 &&
+        statuses.every((status) => status === "completed"),
       hasAnyError: statuses.some((status) => status === "error"),
     };
   }, [stepStatuses]);
@@ -230,7 +231,9 @@ function ChainOfThoughtStep({
   const isControlled = openProp !== undefined;
   const canAutoManageOpen = !isControlled && hasContent;
   const [internalOpen, setInternalOpen] = React.useState(
-    () => defaultOpen || (hasContent && (status === "active" || status === "error")),
+    () =>
+      defaultOpen ||
+      (hasContent && (status === "active" || status === "error")),
   );
   const open = isControlled ? openProp : internalOpen;
 
@@ -259,11 +262,7 @@ function ChainOfThoughtStep({
       return;
     }
 
-    if (
-      !canAutoManageOpen ||
-      !autoCloseOnComplete ||
-      previous === undefined
-    ) {
+    if (!canAutoManageOpen || !autoCloseOnComplete || previous === undefined) {
       return;
     }
 
@@ -347,7 +346,9 @@ function ChainOfThoughtStepTitle({
         )}
         {...staticProps}
       >
-        {resolvedIcon ? <div className="relative mt-0.25">{resolvedIcon}</div> : null}
+        {resolvedIcon ? (
+          <div className="relative mt-0.25">{resolvedIcon}</div>
+        ) : null}
         <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
         </span>
@@ -370,7 +371,9 @@ function ChainOfThoughtStepTitle({
         "children"
       >)}
     >
-      {resolvedIcon ? <div className="relative mt-0.25">{resolvedIcon}</div> : null}
+      {resolvedIcon ? (
+        <div className="relative mt-0.25">{resolvedIcon}</div>
+      ) : null}
       <div className="flex min-w-0 flex-1 items-center gap-1.25 overflow-hidden">
         <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
