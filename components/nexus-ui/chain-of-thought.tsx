@@ -156,25 +156,22 @@ function ChainOfThoughtTrigger({
       data-slot="chain-of-thought-trigger"
       data-active={String(isActive)}
       className={cn(
-        "group flex cursor-pointer items-center gap-1.25 text-muted-foreground transition-colors hover:text-foreground",
+        "group flex w-full cursor-pointer items-center gap-1.25 overflow-hidden text-muted-foreground transition-colors hover:text-foreground",
         className,
       )}
       {...props}
     >
       {icon}
-      <span
-        className={cn(
-          "text-sm leading-6",
-          "group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert",
-        )}
-      >
-        {children ?? label}
-      </span>
-      <HugeiconsIcon
-        icon={ArrowDown01Icon}
-        strokeWidth={2}
-        className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-100"
-      />
+      <div className="flex min-w-0 flex-1 items-start gap-1.25 overflow-hidden">
+        <span className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+          {children ?? label}
+        </span>
+        <HugeiconsIcon
+          icon={ArrowDown01Icon}
+          strokeWidth={2}
+          className="ml-0.5 size-4 shrink-0 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-100"
+        />
+      </div>
     </CollapsibleTrigger>
   );
 }
@@ -349,7 +346,7 @@ function ChainOfThoughtStepTitle({
         {resolvedIcon ? (
           <div className="relative mt-0.25">{resolvedIcon}</div>
         ) : null}
-        <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+        <span className="truncate text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
         </span>
       </div>
@@ -374,14 +371,14 @@ function ChainOfThoughtStepTitle({
       {resolvedIcon ? (
         <div className="relative mt-0.25">{resolvedIcon}</div>
       ) : null}
-      <div className="flex min-w-0 flex-1 items-center gap-1.25 overflow-hidden">
-        <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+      <div className="flex min-w-0 flex-1 items-start gap-1.25 overflow-hidden">
+        <span className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
         </span>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2}
-          className="ml-0.5 size-4 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-100"
+          className="ml-0.5 size-4 shrink-0 opacity-0 transition-all group-hover:opacity-100 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-100"
         />
       </div>
     </CollapsibleTrigger>
