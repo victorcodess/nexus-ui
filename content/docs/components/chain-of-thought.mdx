@@ -1,14 +1,528 @@
 ---
 title: Chain of Thought
-description: Chain of Thought component for displaying a chain of thought process
-
+description: Structured multi-step AI thought process with status-aware labels and collapsible step content
 ---
 
 import ChainOfThoughtDefault from "@/components/nexus-ui/examples/chain-of-thought/default";
+import ChainOfThoughtBasic from "@/components/nexus-ui/examples/chain-of-thought/basic";
+import ChainOfThoughtWithContent from "@/components/nexus-ui/examples/chain-of-thought/with-content";
+import ChainOfThoughtError from "@/components/nexus-ui/examples/chain-of-thought/error";
+import ChainOfThoughtWithoutHeader from "@/components/nexus-ui/examples/chain-of-thought/without-header";
 
+Structured timeline for assistant/tool execution traces. Use it to display sequential steps (web search, code search, file reads, tool calls) with per-step status, optional expandable output, and an auto-closing root when all steps complete.
 
-Chain of Thought component for displaying a chain of thought process.
-
-<DemoWithCode src="components/nexus-ui/examples/chain-of-thought/default.tsx" previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start">
+<DemoWithCode
+  src="components/nexus-ui/examples/chain-of-thought/default.tsx"
+  previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start"
+>
   <ChainOfThoughtDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/chain-of-thought
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/chain-of-thought
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/chain-of-thought
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/chain-of-thought
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add collapsible && npm install @hugeicons/react @hugeicons/core-free-icons tw-shimmer
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add collapsible && pnpm add @hugeicons/react @hugeicons/core-free-icons tw-shimmer
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add collapsible && yarn add @hugeicons/react @hugeicons/core-free-icons tw-shimmer
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add collapsible && bun add @hugeicons/react @hugeicons/core-free-icons tw-shimmer
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="components/nexus-ui/chain-of-thought.tsx" title="components/nexus-ui/chain-of-thought.tsx" />
+<ComponentSource src="lib/use-on-change.ts" title="lib/use-on-change.ts" />
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  ChainOfThought,
+  ChainOfThoughtTrigger,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  ChainOfThoughtStepTitle,
+  ChainOfThoughtStepContent,
+  ChainOfThoughtComplete,
+} from "@/components/nexus-ui/chain-of-thought";
+```
+
+```tsx keepBackground noCollapse
+<ChainOfThought>
+  <ChainOfThoughtTrigger>
+    Thinking...
+  </ChainOfThoughtTrigger>
+  <ChainOfThoughtContent>
+    <ChainOfThoughtStep status="active" hasContent>
+      <ChainOfThoughtStepTitle icon={<SearchIcon />}>
+        Searching the web...
+      </ChainOfThoughtStepTitle>
+      <ChainOfThoughtStepContent>
+        {/* step output */}
+      </ChainOfThoughtStepContent>
+    </ChainOfThoughtStep>
+
+    <ChainOfThoughtStep status="pending">
+      <ChainOfThoughtStepTitle icon={<CodeIcon />}>
+        Search codebase for API handlers
+      </ChainOfThoughtStepTitle>
+    </ChainOfThoughtStep>
+
+    <ChainOfThoughtComplete label="Task complete" />
+  </ChainOfThoughtContent>
+</ChainOfThought>
+```
+
+Typical status progression per step is `pending -> active -> completed` (or `error`).
+
+## Examples
+
+### Basic
+
+Simple timeline labels that mirror how coding agents report progress in tools like Cursor.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/chain-of-thought/basic.tsx"
+  previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start"
+>
+  <ChainOfThoughtBasic />
+</DemoWithCode>
+
+### With Content
+
+Expandable step content for rich outputs like search queries, links, file matches, and analysis payloads.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/chain-of-thought/with-content.tsx"
+  previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start"
+>
+  <ChainOfThoughtWithContent />
+</DemoWithCode>
+
+### Error
+
+Show a failed step with `status="error"` and include contextual details in step content.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/chain-of-thought/error.tsx"
+  previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start"
+>
+  <ChainOfThoughtError />
+</DemoWithCode>
+
+### Without Header
+
+Render only the step timeline by omitting `ChainOfThoughtTrigger`. Root stays open and `autoCloseOnAllComplete` is disabled.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/chain-of-thought/without-header.tsx"
+  previewClassName="max-h-none! h-auto min-h-[480px] flex flex-col items-start py-40! justify-start"
+>
+  <ChainOfThoughtWithoutHeader />
+</DemoWithCode>
+
+## Vercel AI SDK Integration
+
+`ChainOfThought` works well with `useChat` by mapping assistant tool parts into timeline steps.
+
+Use it with [Vercel AI SDK](https://sdk.vercel.ai) by:
+
+- deriving step status (`pending`/`active`/`completed`/`error`) from tool part state
+- rendering tool results inside `ChainOfThoughtStepContent` when available
+- letting root auto-close after all steps are completed
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react
+```
+
+</Step>
+<Step>
+<h3>Create a chat API route that streams tool and text parts</h3>
+
+You can use any `streamText(...).toUIMessageStreamResponse()` route shape used in your app. See [Prompt Input docs](/docs/components/prompt-input#vercel-ai-sdk-integration) for a minimal route scaffold.
+
+</Step>
+<Step>
+<h3>Map assistant parts to Chain of Thought steps</h3>
+
+```tsx
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type UIMessage } from "ai";
+import {
+  ChainOfThought,
+  ChainOfThoughtTrigger,
+  ChainOfThoughtContent,
+  ChainOfThoughtStep,
+  ChainOfThoughtStepTitle,
+  ChainOfThoughtStepContent,
+  ChainOfThoughtComplete,
+  type ChainOfThoughtStepStatus,
+} from "@/components/nexus-ui/chain-of-thought";
+
+type StepVM = {
+  id: string;
+  label: string;
+  status: ChainOfThoughtStepStatus;
+  hasContent?: boolean;
+  content?: React.ReactNode;
+};
+
+function stepsFromAssistant(message: UIMessage): StepVM[] {
+  return message.parts.flatMap((part, index) => {
+    // AI SDK UI emits tool-specific part types: tool-<toolName>
+    if (part.type === "tool-displayWeather") {
+      switch (part.state) {
+        case "input-available":
+          return [
+            {
+              id: `weather-${index}`,
+              label: "Running weather tool...",
+              status: "active" as const,
+              hasContent: true,
+              content: <div className="text-xs text-muted-foreground">Fetching forecast...</div>,
+            },
+          ];
+        case "output-available":
+          return [
+            {
+              id: `weather-${index}`,
+              label: "Weather tool",
+              status: "completed" as const,
+              hasContent: true,
+              content: <pre>{JSON.stringify(part.output, null, 2)}</pre>,
+            },
+          ];
+        case "output-error":
+          return [
+            {
+              id: `weather-${index}`,
+              label: "Weather tool failed",
+              status: "error" as const,
+              hasContent: true,
+              content: <div className="text-xs text-destructive">{part.errorText}</div>,
+            },
+          ];
+      }
+    }
+
+    if (part.type === "tool-getStockPrice") {
+      switch (part.state) {
+        case "input-available":
+          return [
+            {
+              id: `stock-${index}`,
+              label: "Running stock tool...",
+              status: "active" as const,
+            },
+          ];
+        case "output-available":
+          return [
+            {
+              id: `stock-${index}`,
+              label: "Stock price tool",
+              status: "completed" as const,
+              hasContent: true,
+              content: <pre>{JSON.stringify(part.output, null, 2)}</pre>,
+            },
+          ];
+        case "output-error":
+          return [
+            {
+              id: `stock-${index}`,
+              label: "Stock price tool failed",
+              status: "error" as const,
+              hasContent: true,
+              content: <div className="text-xs text-destructive">{part.errorText}</div>,
+            },
+          ];
+      }
+    }
+
+    return [];
+  });
+}
+
+export default function ChainOfThoughtWithUseChat() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant) return null;
+
+  const steps = stepsFromAssistant(assistant);
+  if (steps.length === 0) return null;
+
+  return (
+    <ChainOfThought autoCloseOnAllComplete>
+      <ChainOfThoughtTrigger>Thinking...</ChainOfThoughtTrigger>
+      <ChainOfThoughtContent>
+        {steps.map((step) => (
+          <ChainOfThoughtStep
+            key={step.id}
+            status={step.status}
+            hasContent={step.hasContent}
+          >
+            <ChainOfThoughtStepTitle collapsible={Boolean(step.hasContent)}>
+              {step.label}
+            </ChainOfThoughtStepTitle>
+            {step.hasContent ? (
+              <ChainOfThoughtStepContent>{step.content}</ChainOfThoughtStepContent>
+            ) : null}
+          </ChainOfThoughtStep>
+        ))}
+        <ChainOfThoughtComplete label="Task complete" />
+      </ChainOfThoughtContent>
+    </ChainOfThought>
+  );
+}
+```
+
+</Step>
+</Steps>
+
+## API Reference
+
+### ChainOfThought
+
+Root container for the thought timeline. Tracks child step statuses to drive trigger activity and optional auto-close behavior. Wraps [Collapsible Root](https://www.radix-ui.com/primitives/docs/components/collapsible#root).
+
+<TypeTable
+  type={{
+    open: {
+      type: "boolean",
+      description: "Controlled open state for the root collapsible container.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      default: "true",
+      description: "Initial open state in uncontrolled mode.",
+    },
+    onOpenChange: {
+      type: "(open: boolean) => void",
+      description:
+        "Called when root open state changes from user interaction or auto-close.",
+    },
+    autoCloseOnAllComplete: {
+      type: "boolean",
+      default: "true",
+      description:
+        "Automatically closes root once all registered steps reach completed.",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes merged with the root wrapper.",
+    },
+  }}
+/>
+
+### ChainOfThoughtTrigger
+
+Top trigger row for the thought timeline. Label shimmer is active while the flow is in progress and no step is in `error`. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger).
+
+<TypeTable
+  type={{
+    icon: {
+      type: "React.ReactNode",
+      description: "Optional icon rendered before the trigger label.",
+    },
+    label: {
+      type: "React.ReactNode",
+      description: "Fallback label when children is not provided.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Optional label content. Overrides label when present.",
+    },
+    className: {
+      type: "string",
+      description: "Additional trigger classes.",
+    },
+  }}
+/>
+
+### ChainOfThoughtContent
+
+Content container for step rows. Wraps [Collapsible Content](https://www.radix-ui.com/primitives/docs/components/collapsible#content).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for spacing and animation wrapper.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "ChainOfThoughtStep rows and optional completion row.",
+    },
+  }}
+/>
+
+### ChainOfThoughtStep
+
+A single timeline step with status-aware open behavior and optional expandable content. Wraps [Collapsible](https://www.radix-ui.com/primitives/docs/components/collapsible).
+
+<TypeTable
+  type={{
+    status: {
+      type: '"pending" | "active" | "completed" | "error"',
+      default: '"pending"',
+      description:
+        "Step lifecycle state. Active/error can auto-open content; completed can auto-close.",
+    },
+    hasContent: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Marks the step as expandable and enables step content behavior.",
+    },
+    open: {
+      type: "boolean",
+      description: "Controlled open state for this step.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      default: "false",
+      description: "Initial open state for uncontrolled step mode.",
+    },
+    onOpenChange: {
+      type: "(open: boolean) => void",
+      description:
+        "Called when step open state changes or status-driven auto-open/close occurs.",
+    },
+    autoCloseOnComplete: {
+      type: "boolean",
+      default: "true",
+      description:
+        "When true, closes step content when status transitions to completed.",
+    },
+  }}
+/>
+
+### ChainOfThoughtStepTitle
+
+Step label row. Can render as static text row or collapsible trigger row. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger).
+
+<TypeTable
+  type={{
+    icon: {
+      type: "React.ReactNode",
+      description: "Optional leading icon for the step row.",
+    },
+    label: {
+      type: "React.ReactNode",
+      description: "Fallback title when children is not provided.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Optional step title content. Overrides label when present.",
+    },
+    collapsible: {
+      type: "boolean",
+      description:
+        "Forces trigger behavior. By default it follows step hasContent.",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes for the title row.",
+    },
+  }}
+/>
+
+### ChainOfThoughtStepContent
+
+Expandable area for tool output/results. Keep result rendering consumer-defined. Wraps [Collapsible Content](https://www.radix-ui.com/primitives/docs/components/collapsible#content).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description:
+        "Additional classes for content panel and animation wrapper.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Any custom step payload (lists, tables, cards, etc.).",
+    },
+  }}
+/>
+
+### ChainOfThoughtComplete
+
+Terminal row for completion state (`Task complete`, `Done`, etc.).
+
+<TypeTable
+  type={{
+    label: {
+      type: "React.ReactNode",
+      description: "Completion label text/content.",
+    },
+    icon: {
+      type: "React.ReactNode",
+      description: "Optional completion icon.",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes for completion row styling.",
+    },
+  }}
+/>

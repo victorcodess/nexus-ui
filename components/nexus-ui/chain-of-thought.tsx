@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { Alert02Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import {
@@ -219,7 +219,7 @@ function ChainOfThoughtStep({
   status = "pending",
   hasContent = false,
   open: openProp,
-  defaultOpen = false,
+  defaultOpen = true,
   onOpenChange,
   autoCloseOnComplete = true,
   children,
@@ -324,6 +324,12 @@ function ChainOfThoughtStepTitle({
   const isCollapsible = collapsible ?? hasContent;
   const isActive = status === "active";
   const isError = status === "error";
+  const resolvedIcon =
+    isError && icon ? (
+      <HugeiconsIcon icon={Alert02Icon} strokeWidth={1.75} className="size-4" />
+    ) : (
+      icon
+    );
   const label = children ?? labelProp;
 
   if (!isCollapsible) {
@@ -336,12 +342,12 @@ function ChainOfThoughtStepTitle({
         className={cn(
           "group flex items-center text-sm leading-4.5 text-muted-foreground",
           isError && "text-destructive",
-          icon ? "gap-2" : "gap-0",
+          resolvedIcon ? "gap-2" : "gap-0",
           className,
         )}
         {...staticProps}
       >
-        {icon ? <div className="relative mt-0.25">{icon}</div> : null}
+        {resolvedIcon ? <div className="relative mt-0.25">{resolvedIcon}</div> : null}
         <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
         </span>
@@ -356,7 +362,7 @@ function ChainOfThoughtStepTitle({
       className={cn(
         "group flex w-full cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground",
         isError && "text-destructive hover:text-destructive/90",
-        "gap-2",
+        resolvedIcon ? "gap-2" : "gap-0",
         className,
       )}
       {...(props as Omit<
@@ -364,7 +370,7 @@ function ChainOfThoughtStepTitle({
         "children"
       >)}
     >
-      {icon ? <div className="relative mt-0.25">{icon}</div> : null}
+      {resolvedIcon ? <div className="relative mt-0.25">{resolvedIcon}</div> : null}
       <div className="flex min-w-0 flex-1 items-center gap-1.25 overflow-hidden">
         <span className="text-sm leading-4.5 group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
