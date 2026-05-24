@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "citation",
   "title": "Citation",
-  "description": "Composable inline citations with hover preview, multi-source carousel, and favicons.",
+  "description": "Inline source references with hover preview and multi-source carousel",
   "dependencies": [
     "radix-ui",
     "@hugeicons/react",

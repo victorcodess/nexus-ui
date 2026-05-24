@@ -41,19 +41,19 @@ Copy-paste components into your project. You own the code.
 
 | Component       | Description                                                                 |
 | --------------- | --------------------------------------------------------------------------- |
-| `PromptInput`   | Composable chat input with auto-resizing textarea and action slots          |
-| `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and items    |
-| `Suggestions`   | Prompt suggestion chips for guiding user input                               |
-| `Attachments`   | File-attachment UI for inputs and messages (compact, inline, detailed, pasted) |
-| `Message`       | Chat message layout with markdown body, optional avatar, actions, and attachments |
-| `Thread`        | Chat thread viewport with stick-to-bottom scrolling and scroll-to-bottom control |
-| `Citation`      | Inline citations with hover preview, favicons, and multi-source carousel    |
-| `Reasoning`     | Collapsible reasoning trace with streaming labels and markdown content        |
-| `TextShimmer`   | Animated shimmer text for loading and in-progress states                    |
-| `Image`         | AI image UI for URLs, base64, and bytes with preview, loader, lightbox, and actions |
-| `FeedbackBar`   | Feedback prompt bar with composable info, actions, tooltips, and close section |
-| `Toaster`       | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
-| `ChainOfThought` | Structured multi-step thought timeline with step status and collapsible step UI |
+| `PromptInput` | Composable chat input with auto-resizing textarea and action slots |
+| `ModelSelector` | Dropdown for selecting AI models with radio groups, sub-menus, and custom items |
+| `Suggestions` | Prompt suggestion chips for guiding user input |
+| `Attachments` | Composable file attachments for chat inputs and messages with preview, variants, and upload wiring |
+| `Message` | Chat message layout with markdown, optional avatar, actions, and attachments |
+| `Thread` | Scrollable chat thread with stick-to-bottom scrolling and jump-to-bottom control |
+| `Citation` | Inline source references with hover preview and multi-source carousel |
+| `Reasoning` | Collapsible model reasoning trace with streaming-aware labels and markdown body |
+| `TextShimmer` | Animated shimmer text for loading, tool runs, and other in-progress UI |
+| `Image` | Image renderer for URLs, base64, and byte payloads with preview, loader, lightbox, and action slots |
+| `FeedbackBar` | Feedback prompt bar for per-message or thread ratings with action and close slots |
+| `Toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
+| `ChainOfThought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
 
 ## Quick Start
 

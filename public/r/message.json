@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "message",
   "title": "Message",
-  "description": "Composable chat message layout with markdown body, actions, and avatar.",
+  "description": "Chat message layout with markdown, optional avatar, actions, and attachments",
   "dependencies": [
     "streamdown",
     "@streamdown/cjk",

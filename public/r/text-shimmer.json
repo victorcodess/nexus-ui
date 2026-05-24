@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "text-shimmer",
   "title": "Text Shimmer",
-  "description": "Animated shimmer text for loading and streaming states.",
+  "description": "Animated shimmer text for loading, tool runs, and other in-progress UI",
   "files": [
     {
       "path": "components/nexus-ui/text-shimmer.tsx",

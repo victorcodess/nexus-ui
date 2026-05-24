@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "prompt-input",
   "title": "Prompt Input",
-  "description": "A composable AI chat input component with auto-resizing textarea and action slots.",
+  "description": "Composable chat input with auto-resizing textarea and action slots",
   "dependencies": [
     "@radix-ui/react-slot"
   ],

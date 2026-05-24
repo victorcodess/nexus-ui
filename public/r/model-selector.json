@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "model-selector",
   "title": "Model Selector",
-  "description": "A dropdown for selecting an AI model with radio groups, sub-menus, and custom items.",
+  "description": "Dropdown for selecting AI models with radio groups, sub-menus, and custom items",
   "dependencies": [
     "radix-ui",
     "@hugeicons/react",

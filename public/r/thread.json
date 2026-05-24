@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "thread",
   "title": "Thread",
-  "description": "Chat thread viewport with stick-to-bottom scrolling and a scroll-to-bottom control.",
+  "description": "Scrollable chat thread with stick-to-bottom scrolling and jump-to-bottom control",
   "dependencies": [
     "@radix-ui/react-slot",
     "@hugeicons/react",

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "feedback-bar",
   "title": "Feedback Bar",
-  "description": "Composable feedback prompt bar with action and close slots.",
+  "description": "Feedback prompt bar for per-message or thread ratings with action and close slots",
   "dependencies": [
     "@radix-ui/react-slot"
   ],

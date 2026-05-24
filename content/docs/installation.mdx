@@ -79,8 +79,6 @@ Nexus UI is in the [shadcn directory](https://ui.shadcn.com/registry). No config
   </Tab>
 </Tabs>
 
-Available components: `prompt-input`, `suggestions`, `model-selector`, `attachments`, `message`, `thread`, `citation`, `reasoning`, `text-shimmer`, `image`, `feedback-bar`, `toaster`, `chain-of-thought`.
-
 ### Option 2: Direct URL
 
 Add components by passing the registry URL directly:
@@ -205,7 +203,6 @@ export function ChatInput() {
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-70 hover:dark:bg-secondary"
             >
               <Paperclip />
             </Button>
@@ -217,7 +214,6 @@ export function ChatInput() {
             <Button
               type="button"
               size="icon-sm"
-              className="cursor-pointer rounded-full active:scale-97 disabled:opacity-70"
             >
               <ArrowUp />
             </Button>

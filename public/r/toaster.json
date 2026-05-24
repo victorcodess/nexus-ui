@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "toaster",
   "title": "Toaster",
-  "description": "Sonner toasts with variants and action/cancel controls.",
+  "description": "Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls",
   "dependencies": [
     "@hugeicons/core-free-icons",
     "@hugeicons/react",

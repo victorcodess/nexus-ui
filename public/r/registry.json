@@ -7,7 +7,7 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
-      "description": "A composable AI chat input component with auto-resizing textarea and action slots.",
+      "description": "Composable chat input with auto-resizing textarea and action slots",
       "dependencies": ["@radix-ui/react-slot"],
       "registryDependencies": ["textarea", "scroll-area", "tooltip", "kbd"],
       "files": [
@@ -22,7 +22,7 @@
       "name": "suggestions",
       "type": "registry:ui",
       "title": "Suggestions",
-      "description": "Composable prompt suggestion chips for guiding user input.",
+      "description": "Prompt suggestion chips for guiding user input",
       "dependencies": ["@radix-ui/react-slot"],
       "registryDependencies": ["button"],
       "files": [
@@ -37,7 +37,7 @@
       "name": "attachments",
       "type": "registry:ui",
       "title": "Attachments",
-      "description": "Composable file-attachment UI for inputs and messages with compact, inline, and detailed variants.",
+      "description": "Composable file attachments for chat inputs and messages with preview, variants, and upload wiring",
       "dependencies": [
         "@radix-ui/react-slot",
         "class-variance-authority",
@@ -61,7 +61,7 @@
       "name": "model-selector",
       "type": "registry:ui",
       "title": "Model Selector",
-      "description": "A dropdown for selecting an AI model with radio groups, sub-menus, and custom items.",
+      "description": "Dropdown for selecting AI models with radio groups, sub-menus, and custom items",
       "dependencies": [
         "radix-ui",
         "@hugeicons/react",
@@ -79,7 +79,7 @@
       "name": "message",
       "type": "registry:ui",
       "title": "Message",
-      "description": "Composable chat message layout with markdown body, actions, and avatar.",
+      "description": "Chat message layout with markdown, optional avatar, actions, and attachments",
       "dependencies": [
         "streamdown",
         "@streamdown/cjk",
@@ -142,7 +142,7 @@
       "name": "thread",
       "type": "registry:ui",
       "title": "Thread",
-      "description": "Chat thread viewport with stick-to-bottom scrolling and a scroll-to-bottom control.",
+      "description": "Scrollable chat thread with stick-to-bottom scrolling and jump-to-bottom control",
       "dependencies": [
         "@radix-ui/react-slot",
         "@hugeicons/react",
@@ -161,7 +161,7 @@
       "name": "citation",
       "type": "registry:ui",
       "title": "Citation",
-      "description": "Composable inline citations with hover preview, multi-source carousel, and favicons.",
+      "description": "Inline source references with hover preview and multi-source carousel",
       "dependencies": [
         "radix-ui",
         "@hugeicons/react",
@@ -184,7 +184,7 @@
       "name": "image",
       "type": "registry:ui",
       "title": "Image",
-      "description": "Composable AI image renderer for base64 and Uint8Array payloads with preview, loader, and action slots.",
+      "description": "Image renderer for URLs, base64, and byte payloads with preview, loader, lightbox, and action slots",
       "dependencies": ["@radix-ui/react-slot", "@radix-ui/react-dialog"],
       "registryDependencies": ["tooltip", "kbd"],
       "files": [
@@ -199,7 +199,7 @@
       "name": "reasoning",
       "type": "registry:ui",
       "title": "Reasoning",
-      "description": "Collapsible AI reasoning block with streaming-aware trigger label and markdown content.",
+      "description": "Collapsible model reasoning trace with streaming-aware labels and markdown body",
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons",
@@ -250,7 +250,7 @@
       "name": "feedback-bar",
       "type": "registry:ui",
       "title": "Feedback Bar",
-      "description": "Composable feedback prompt bar with action and close slots.",
+      "description": "Feedback prompt bar for per-message or thread ratings with action and close slots",
       "dependencies": [
         "@radix-ui/react-slot"
       ],
@@ -270,7 +270,7 @@
       "name": "text-shimmer",
       "type": "registry:ui",
       "title": "Text Shimmer",
-      "description": "Animated shimmer text for loading and streaming states.",
+      "description": "Animated shimmer text for loading, tool runs, and other in-progress UI",
       "files": [
         {
           "path": "components/nexus-ui/text-shimmer.tsx",
@@ -283,7 +283,7 @@
       "name": "toaster",
       "type": "registry:ui",
       "title": "Toaster",
-      "description": "Sonner toasts with variants and action/cancel controls.",
+      "description": "Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls",
       "dependencies": [
         "@hugeicons/core-free-icons",
         "@hugeicons/react",
@@ -305,7 +305,7 @@
       "name": "chain-of-thought",
       "type": "registry:ui",
       "title": "Chain of Thought",
-      "description": "Composable multi-step AI thought process with per-step status, labels, and collapsible content.",
+      "description": "Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish",
       "dependencies": [
         "@hugeicons/react",
         "@hugeicons/core-free-icons"

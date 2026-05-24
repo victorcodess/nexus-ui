@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "suggestions",
   "title": "Suggestions",
-  "description": "Composable prompt suggestion chips for guiding user input.",
+  "description": "Prompt suggestion chips for guiding user input",
   "dependencies": [
     "@radix-ui/react-slot"
   ],

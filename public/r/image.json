@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "image",
   "title": "Image",
-  "description": "Composable AI image renderer for base64 and Uint8Array payloads with preview, loader, and action slots.",
+  "description": "Image renderer for URLs, base64, and byte payloads with preview, loader, lightbox, and action slots",
   "dependencies": [
     "@radix-ui/react-slot",
     "@radix-ui/react-dialog"

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "reasoning",
   "title": "Reasoning",
-  "description": "Collapsible AI reasoning block with streaming-aware trigger label and markdown content.",
+  "description": "Collapsible model reasoning trace with streaming-aware labels and markdown body",
   "dependencies": [
     "@hugeicons/react",
     "@hugeicons/core-free-icons",

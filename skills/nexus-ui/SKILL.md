@@ -64,18 +64,18 @@ Components are installed to `components/nexus-ui/` by default.
 | Component | Registry name | Description |
 |-----------|---------------|-------------|
 | Prompt Input | `prompt-input` | Composable chat input with auto-resizing textarea and action slots |
-| Model Selector | `model-selector` | Dropdown for selecting a model with radio groups, sub-menus, and custom items |
-| Suggestions | `suggestions` | Prompt suggestion chips and optional panel layout |
-| Attachments | `attachments` | File-attachment UI for inputs and messages (variants + drag/drop helpers) |
-| Message | `message` | Chat message shell with Streamdown markdown, avatar, and action slots |
-| Thread | `thread` | Stick-to-bottom thread viewport with scroll-to-bottom control |
-| Citation | `citation` | Inline citations with hover preview, favicons, and multi-source carousel |
-| Reasoning | `reasoning` | Collapsible reasoning trace with streaming-aware trigger label and markdown body |
-| Text Shimmer | `text-shimmer` | Animated shimmer text for loading and in-progress UI |
-| Image | `image` | URLs, base64, or `Uint8Array` image payloads with preview, loader, lightbox (Radix Dialog), and action slots |
-| Feedback Bar | `feedback-bar` | Inline feedback prompt with label, action slots, optional Radix tooltips (+ shortcuts), and bordered close region |
+| Model Selector | `model-selector` | Dropdown for selecting AI models with radio groups, sub-menus, and custom items |
+| Suggestions | `suggestions` | Prompt suggestion chips for guiding user input |
+| Attachments | `attachments` | Composable file attachments for chat inputs and messages with preview, variants, and upload wiring |
+| Message | `message` | Chat message layout with markdown, optional avatar, actions, and attachments |
+| Thread | `thread` | Scrollable chat thread with stick-to-bottom scrolling and jump-to-bottom control |
+| Citation | `citation` | Inline source references with hover preview and multi-source carousel |
+| Reasoning | `reasoning` | Collapsible model reasoning trace with streaming-aware labels and markdown body |
+| Text Shimmer | `text-shimmer` | Animated shimmer text for loading, tool runs, and other in-progress UI |
+| Image | `image` | Image renderer for URLs, base64, and byte payloads with preview, loader, lightbox, and action slots |
+| Feedback Bar | `feedback-bar` | Feedback prompt bar for per-message or thread ratings with action and close slots |
 | Toaster | `toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
-| Chain of Thought | `chain-of-thought` | Multi-step trace UI: step status, nested collapsibles, optional “complete” row; registry adds `tw-shimmer` + collapsible animation CSS and `lib/use-on-change` |
+| Chain of Thought | `chain-of-thought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
 
 ## Component APIs
 

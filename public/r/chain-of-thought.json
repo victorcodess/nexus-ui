@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "chain-of-thought",
   "title": "Chain of Thought",
-  "description": "Composable multi-step AI thought process with per-step status, labels, and collapsible content.",
+  "description": "Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish",
   "dependencies": [
     "@hugeicons/react",
     "@hugeicons/core-free-icons"
