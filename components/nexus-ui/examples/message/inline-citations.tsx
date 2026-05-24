@@ -83,7 +83,6 @@ export function createInlineCitationComponents(
 
       return (
         <>
-          {" "}
           <Citation citations={citations}>
             <CitationTrigger />
             <CitationContent>
