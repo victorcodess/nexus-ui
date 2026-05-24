@@ -1,35 +1,13 @@
-<img width="2400" height="1260" alt="image" src="https://github.com/user-attachments/assets/d70ca019-c9fb-4f37-94b3-a9f238a4c7e7" />
+<img width="2400" height="1260" alt="image" src="https://github.com/user-attachments/assets/cfd3da91-d6d6-4f12-bdc5-53a19c7ce0ee" />
 
-<p align="center">
-  <h1 align="center">Nexus UI</h1>
-</p>
-
+<h1 align="center">Nexus UI</h1>
 <p align="center">
   Beautiful, customizable components for modern AI experiences.
 </p>
 
-<p align="center">
-  <a href="https://nexus-ui.dev">Documentation</a> ·
-  <a href="https://nexus-ui.dev/docs/components/prompt-input">Prompt Input</a> ·
-  <a href="https://nexus-ui.dev/docs/components/model-selector">Model Selector</a> ·
-  <a href="https://nexus-ui.dev/docs/components/suggestions">Suggestions</a> ·
-  <a href="https://nexus-ui.dev/docs/components/attachments">Attachments</a> ·
-  <a href="https://nexus-ui.dev/docs/components/message">Message</a> ·
-  <a href="https://nexus-ui.dev/docs/components/thread">Thread</a> ·
-  <a href="https://nexus-ui.dev/docs/components/citation">Citation</a> ·
-  <a href="https://nexus-ui.dev/docs/components/reasoning">Reasoning</a> ·
-  <a href="https://nexus-ui.dev/docs/components/text-shimmer">Text Shimmer</a> ·
-  <a href="https://nexus-ui.dev/docs/components/image">Image</a> ·
-  <a href="https://nexus-ui.dev/docs/components/feedback-bar">Feedback Bar</a> ·
-  <a href="https://nexus-ui.dev/docs/components/toaster">Toaster</a> ·
-  <a href="https://nexus-ui.dev/docs/components/chain-of-thought">Chain of Thought</a>
-</p>
+## Overview
 
----
-
-## About
-
-Nexus UI is a design-first component library for building AI-powered applications. It provides a set of composable primitives that integrate seamlessly with the [Vercel AI SDK](https://sdk.vercel.ai), [ElevenLabs](https://elevenlabs.io), and other AI services.
+Nexus UI is an open-source component library for building AI-powered interfaces. It provides a set of composable primitives that integrate seamlessly with the [Vercel AI SDK](https://sdk.vercel.ai), [ElevenLabs](https://elevenlabs.io), and other AI services.
 
 Think of it as **shadcn/ui, but purpose-built for AI apps**.
 
@@ -71,18 +49,6 @@ Nexus UI is in the [shadcn registry](https://ui.shadcn.com/registry). No config 
 
 ```bash
 npx shadcn@latest add @nexus-ui/prompt-input
-npx shadcn@latest add @nexus-ui/model-selector
-npx shadcn@latest add @nexus-ui/suggestions
-npx shadcn@latest add @nexus-ui/attachments
-npx shadcn@latest add @nexus-ui/message
-npx shadcn@latest add @nexus-ui/thread
-npx shadcn@latest add @nexus-ui/citation
-npx shadcn@latest add @nexus-ui/reasoning
-npx shadcn@latest add @nexus-ui/text-shimmer
-npx shadcn@latest add @nexus-ui/image
-npx shadcn@latest add @nexus-ui/feedback-bar
-npx shadcn@latest add @nexus-ui/toaster
-npx shadcn@latest add @nexus-ui/chain-of-thought
 ```
 
 **Option 2: Direct URL**
@@ -96,7 +62,7 @@ npx shadcn@latest add https://nexus-ui.dev/r/prompt-input.json
 ```bash
 npx nexus-ui-cli@latest
 # or add specific components
-npx nexus-ui-cli@latest add prompt-input model-selector suggestions attachments message thread citation reasoning text-shimmer image feedback-bar toaster chain-of-thought
+npx nexus-ui-cli@latest add prompt-input
 ```
 
 To use the `@nexus-ui` scope with a custom registry, add to your `components.json`:
@@ -112,51 +78,36 @@ To use the `@nexus-ui` scope with a custom registry, add to your `components.jso
 ## Usage
 
 ```tsx
-import { Button } from "@/components/ui/button";
 import {
   PromptInput,
-  PromptInputActions,
-  PromptInputAction,
-  PromptInputActionGroup,
   PromptInputTextarea,
-} from "@/components/nexus-ui/prompt-input";
-import { ArrowUp02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+  PromptInputActions,
+} from '@/components/nexus-ui/prompt-input'
 
-const ChatInput = () => {
+export function ChatInput() {
   return (
     <PromptInput>
       <PromptInputTextarea />
       <PromptInputActions>
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full border-none bg-transparent text-[13px] leading-6 font-normal text-gray-900 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <HugeiconsIcon icon={PlusSignIcon} strokeWidth={2.0} className="size-4" />
+            <Button>
+              <Paperclip />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
-
         <PromptInputActionGroup>
           <PromptInputAction asChild>
-            <Button className="size-8 cursor-pointer gap-1 rounded-full bg-gray-700 text-[13px] leading-6 font-normal text-white hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700">
-              <HugeiconsIcon icon={ArrowUp02Icon} strokeWidth={2.0} className="size-4" />
+            <Button>
+              <ArrowUp />
             </Button>
           </PromptInputAction>
         </PromptInputActionGroup>
       </PromptInputActions>
     </PromptInput>
-  );
-};
+  )
+}
 ```
-
-## Tech Stack
-
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- Radix UI Primitives
-- Next.js
-- Fumadocs
 
 ## Development
 
