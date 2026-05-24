@@ -200,12 +200,21 @@ function ChainOfThoughtContent({
   );
 }
 
+function hasIconInStepTitle(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some(
+    (child) =>
+      React.isValidElement<{ icon?: React.ReactNode }>(child) &&
+      child.props.icon != null,
+  );
+}
+
 type ChainOfThoughtStepProps = Omit<
   React.ComponentProps<typeof Collapsible>,
   "open" | "defaultOpen" | "onOpenChange"
 > & {
   status?: ChainOfThoughtStepStatus;
   hasContent?: boolean;
+  showConnector?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -216,6 +225,7 @@ function ChainOfThoughtStep({
   className,
   status = "pending",
   hasContent = false,
+  showConnector,
   open: openProp,
   defaultOpen = true,
   onOpenChange,
@@ -225,6 +235,8 @@ function ChainOfThoughtStep({
 }: ChainOfThoughtStepProps) {
   const { registerStep } = useChainOfThoughtRootContext("ChainOfThoughtStep");
   const stepId = React.useId();
+  const showConnectorResolved =
+    showConnector ?? hasIconInStepTitle(children);
   const isControlled = openProp !== undefined;
   const canAutoManageOpen = !isControlled && hasContent;
   const [internalOpen, setInternalOpen] = React.useState(
@@ -273,12 +285,20 @@ function ChainOfThoughtStep({
     <ChainOfThoughtStepContext.Provider value={{ status, hasContent }}>
       <Collapsible
         data-slot="chain-of-thought-step"
-        className={cn("w-full", className)}
+        className={cn("relative w-full fade-in-0", className)}
         open={open}
         onOpenChange={handleOpenChange}
         {...props}
       >
         {children}
+        {showConnectorResolved ? (
+          <div
+            className={cn(
+              "absolute top-4.75 -bottom-2.75 left-2 -mx-px w-px",
+              status === "error" ? "bg-destructive/20" : "bg-border/50",
+            )}
+          ></div>
+        ) : null}
       </Collapsible>
     </ChainOfThoughtStepContext.Provider>
   );
@@ -344,7 +364,9 @@ function ChainOfThoughtStepTitle({
         {...staticProps}
       >
         {resolvedIcon ? (
-          <div className="relative mt-0.25">{resolvedIcon}</div>
+          <div className="relative flex size-4 shrink-0 items-center justify-center">
+            {resolvedIcon}
+          </div>
         ) : null}
         <span className="truncate text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
           {label}
@@ -358,7 +380,7 @@ function ChainOfThoughtStepTitle({
       data-slot="chain-of-thought-step-title"
       data-active={String(isActive)}
       className={cn(
-        "group flex w-full cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground",
+        "group flex w-full cursor-pointer items-center text-sm text-muted-foreground transition-colors hover:text-foreground",
         isError && "text-destructive hover:text-destructive/90",
         resolvedIcon ? "gap-2" : "gap-0",
         className,
@@ -369,7 +391,9 @@ function ChainOfThoughtStepTitle({
       >)}
     >
       {resolvedIcon ? (
-        <div className="relative mt-0.25">{resolvedIcon}</div>
+        <div className="relative flex size-4 shrink-0 items-center justify-center">
+          {resolvedIcon}
+        </div>
       ) : null}
       <div className="flex min-w-0 flex-1 items-start gap-1.25 overflow-hidden">
         <span className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
@@ -398,7 +422,7 @@ function ChainOfThoughtStepContent({
     <CollapsibleContent
       data-slot="chain-of-thought-step-content"
       className={cn(
-        "mt-2",
+        "mt-2 ml-6",
         "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
         className,
       )}
@@ -424,7 +448,7 @@ function ChainOfThoughtComplete({
     <div
       data-slot="chain-of-thought-complete"
       className={cn(
-        "mt-0 flex animate-in items-center gap-2 text-sm leading-4.5 text-muted-foreground",
+        "mt-0 flex items-center gap-2 text-sm leading-4.5 text-muted-foreground fade-in-0",
         !icon && "gap-0",
         className,
       )}

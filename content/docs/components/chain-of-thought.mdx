@@ -132,7 +132,7 @@ Typical status progression per step is `pending -> active -> completed` (or `err
 
 ### Basic
 
-Simple timeline labels that mirror how coding agents report progress in tools like Cursor.
+Simple timeline labels that mirror how coding agents report progress in tools like Cursor. Steps without icons hide connectors by default.
 
 <DemoWithCode
   src="components/nexus-ui/examples/chain-of-thought/basic.tsx"
@@ -435,6 +435,11 @@ A single timeline step with status-aware open behavior and optional expandable c
       description:
         "Marks the step as expandable and enables step content behavior.",
     },
+    showConnector: {
+      type: "boolean",
+      description:
+        "Overrides connector visibility. By default it follows whether step title has an icon.",
+    },
     open: {
       type: "boolean",
       description: "Controlled open state for this step.",
@@ -442,7 +447,8 @@ A single timeline step with status-aware open behavior and optional expandable c
     defaultOpen: {
       type: "boolean",
       default: "false",
-      description: "Initial open state for uncontrolled step mode.",
+      description:
+        "Initial open state for uncontrolled step mode.",
     },
     onOpenChange: {
       type: "(open: boolean) => void",
