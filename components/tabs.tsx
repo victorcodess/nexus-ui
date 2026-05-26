@@ -128,6 +128,9 @@ function TabsItemsFramedList({
   const rowRef = React.useRef<HTMLDivElement>(null);
   const activeTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const [indicator, setIndicator] = React.useState({ left: 0, width: 0 });
+  const [indicatorTransitionEnabled, setIndicatorTransitionEnabled] =
+    React.useState(false);
+  const transitionArmRequestedRef = React.useRef(false);
 
   const updateIndicator = useCallback(() => {
     const row = rowRef.current;
@@ -142,6 +145,15 @@ function TabsItemsFramedList({
     const width = Math.max(0, tabRect.width - TAB_LINE_INSET_PX * 2);
 
     setIndicator({ left, width });
+
+    // Prevent the initial mount/navigation paint from animating
+    // from the default position; arm transitions after first layout.
+    if (width > 0 && !transitionArmRequestedRef.current) {
+      transitionArmRequestedRef.current = true;
+      requestAnimationFrame(() => {
+        setIndicatorTransitionEnabled(true);
+      });
+    }
   }, []);
 
   React.useLayoutEffect(() => {
@@ -218,7 +230,8 @@ function TabsItemsFramedList({
           aria-hidden
           className={cn(
             "pointer-events-none absolute bottom-0 z-1 h-px bg-gray-900 ease-out dark:bg-gray-50",
-            "transition-[left,width] duration-200",
+            indicatorTransitionEnabled &&
+              "transition-[left,width] duration-200",
             indicator.width <= 0 && "opacity-0",
           )}
           style={{
@@ -342,7 +355,7 @@ function TabsItemsPillClipList({
         <div
           aria-hidden
           ref={clipContainerRef}
-          className="pointer-events-none absolute inset-0 z-[1] flex items-center gap-2 bg-gray-100 dark:bg-gray-800"
+          className="pointer-events-none absolute inset-0 z-1 flex items-center gap-2 bg-gray-100 dark:bg-gray-800"
           style={{
             transition: "clip-path 0.2s ease",
             clipPath: "inset(100% 100% 100% 100%)",
