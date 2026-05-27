@@ -62,7 +62,7 @@ function ChainOfThoughtDefault() {
             </ChainOfThoughtStepTitle>
           </ChainOfThoughtStep>
 
-          <ChainOfThoughtStep status="completed" className="animate-in">
+          <ChainOfThoughtStep status="completed">
             <ChainOfThoughtStepTitle
               icon={
                 <HugeiconsIcon
