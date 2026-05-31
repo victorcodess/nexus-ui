@@ -5,6 +5,7 @@ const withMDX = createMDX();
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  transpilePackages: ['@react-symbols/icons'],
   images: {
     remotePatterns: [
       { hostname: 'placehold.co' },
