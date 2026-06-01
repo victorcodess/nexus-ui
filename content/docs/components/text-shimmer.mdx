@@ -179,7 +179,19 @@ Animated text wrapper component. Uses a generated keyframe name per instance to 
       type: "boolean",
       default: "false",
       description:
-        "Uses a darker highlight formula instead of the default brighter one.",
+        "Uses a darker highlight formula in both light and dark themes.",
+    },
+    invertLight: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Uses the same darker highlight formula as `invert`, but only in light theme.",
+    },
+    invertDark: {
+      type: "boolean",
+      default: "false",
+      description:
+        "Uses the same darker highlight formula as `invert`, but only in dark theme.",
     },
     className: {
       type: "string",

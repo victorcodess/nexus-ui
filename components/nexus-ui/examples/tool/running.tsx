@@ -4,6 +4,7 @@ import {
   ToolInput,
   ToolTrigger,
 } from "@/components/nexus-ui/tool";
+import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
 
 function ToolRunning() {
   const input = {
@@ -19,7 +20,7 @@ function ToolRunning() {
       <ToolContent>
         <ToolInput payload={input} />
         <div className="text-sm text-muted-foreground">
-          Fetching billing summary...
+          <TextShimmer invertLight>Fetching billing summary...</TextShimmer>
         </div>
       </ToolContent>
     </Tool>

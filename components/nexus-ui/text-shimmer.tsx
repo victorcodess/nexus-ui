@@ -32,6 +32,16 @@ export type TextShimmerProps = Omit<
    */
   invert?: boolean;
   /**
+   * Invert shimmer contrast in light theme only.
+   * @default false
+   */
+  invertLight?: boolean;
+  /**
+   * Invert shimmer contrast in dark theme only.
+   * @default false
+   */
+  invertDark?: boolean;
+  /**
    * Delay before the next shimmer pass in seconds.
    * @default 0
    */
@@ -48,6 +58,8 @@ export function TextShimmer({
   angle = 0,
   color,
   invert = false,
+  invertLight = false,
+  invertDark = false,
   children,
   ...props
 }: TextShimmerProps) {
@@ -64,28 +76,41 @@ export function TextShimmer({
   const start = 50 - boundedSpread;
   const end = 50 + boundedSpread;
   const edge = "currentColor";
-  const beam = invert
-    ? (color ??
-      "oklch(from currentColor min(calc(l - 0.4), 0.2) c h / calc(alpha + 0.4))")
-    : (color ??
-      "oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.35))");
+  const brightBeam =
+    color ??
+    "oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.35))";
+  const dimBeam =
+    color ??
+    "oklch(from currentColor min(calc(l - 0.4), 0.2) c h / calc(alpha + 0.4))";
+  const lightBeam = invert || invertLight ? dimBeam : brightBeam;
+  const darkBeam = invert || invertDark ? dimBeam : brightBeam;
   const keyframes = `@keyframes ${keyframeName} {
     0% { background-position: 100% 50%; }
     ${movePercent}% { background-position: -60% 50%; }
     100% { background-position: -100% 50%; }
+  }
+  [data-nx-text-shimmer="${keyframeName}"] {
+    --nx-text-shimmer-beam: var(--nx-text-shimmer-beam-light);
+  }
+  .dark [data-nx-text-shimmer="${keyframeName}"],
+  [data-theme="dark"] [data-nx-text-shimmer="${keyframeName}"] {
+    --nx-text-shimmer-beam: var(--nx-text-shimmer-beam-dark);
   }`;
 
   return (
     <>
       <style>{keyframes}</style>
       <Comp
+        data-nx-text-shimmer={keyframeName}
         className={cn("bg-size-[200%_auto] bg-clip-text", className)}
         style={{
-          backgroundImage: `linear-gradient(${90 + angle}deg, ${edge} ${start}%, ${beam} 50%, ${edge} ${end}%)`,
+          "--nx-text-shimmer-beam-light": lightBeam,
+          "--nx-text-shimmer-beam-dark": darkBeam,
+          backgroundImage: `linear-gradient(${90 + angle}deg, ${edge} ${start}%, var(--nx-text-shimmer-beam) 50%, ${edge} ${end}%)`,
           animation: `${keyframeName} ${totalDuration}s linear infinite`,
           WebkitTextFillColor: "transparent",
           ...style,
-        }}
+        } as React.CSSProperties}
         {...props}
       >
         {children}
