@@ -233,7 +233,7 @@ export function CodeBlock({
         inTab
           ? "-mx-px -mb-px bg-fd-secondary last:rounded-b-xl"
           : "my-4 rounded-xl dark:bg-background",
-        keepBackground ? "" : "border border-gray-200 dark:border-white/10",
+        keepBackground ? "" : "border border-gray-200 dark:border-white/10 bg-secondary! dark:bg-background!",
         hideLineNumbers && "nd-no-line-numbers",
         "shiki not-prose relative overflow-hidden text-[13px] font-[450]",
         props.className,

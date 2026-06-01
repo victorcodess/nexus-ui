@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { join } from "path";
+import { extname, join } from "path";
 import { highlight } from "fumadocs-core/highlight";
 import { ComponentSourceClient } from "./component-source-client";
 
@@ -23,7 +23,24 @@ function resolveSourcePath(src: string) {
     return join(process.cwd(), "lib", libRelative);
   }
 
+  const appRelative = src.startsWith("app/") ? src.slice("app/".length) : null;
+  if (appRelative && !appRelative.includes("..")) {
+    return join(process.cwd(), "app", appRelative);
+  }
+
   return null;
+}
+
+function resolveLanguage(src: string) {
+  const extension = extname(src).toLowerCase();
+  if (extension === ".css") return "css";
+  if (extension === ".json") return "json";
+  if (extension === ".mdx") return "mdx";
+  if (extension === ".js" || extension === ".mjs" || extension === ".cjs") {
+    return "js";
+  }
+  if (extension === ".ts" || extension === ".tsx") return "tsx";
+  return "tsx";
 }
 
 /**
@@ -37,6 +54,6 @@ export async function ComponentSource({ src, title }: ComponentSourceProps) {
   }
 
   const code = readFileSync(resolvedPath, "utf-8");
-  const highlighted = await highlight(code, { lang: "tsx" });
+  const highlighted = await highlight(code, { lang: resolveLanguage(src) });
   return <ComponentSourceClient highlightedCode={highlighted} title={title} />;
 }

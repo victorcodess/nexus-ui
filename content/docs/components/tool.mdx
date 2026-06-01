@@ -79,11 +79,17 @@ bunx shadcn@latest add badge collapsible && bun add @hugeicons/react @hugeicons/
 <ComponentSource src="components/nexus-ui/tool.tsx" title="components/nexus-ui/tool.tsx" />
 <ComponentSource src="components/nexus-ui/codeblock-new.tsx" title="components/nexus-ui/codeblock-new.tsx" />
 <ComponentSource src="lib/shiki/highlighter.ts" title="lib/shiki/highlighter.ts" />
+<ComponentSource src="app/shiki.css" title="app/shiki.css" />
 </Step>
 <Step>
 <h3>Ensure your Shiki CSS is loaded.</h3>
 
-`CodeblockShiki` expects `.shiki` styles. Keep your existing `app/shiki.css` setup (or equivalent) loaded globally.
+`CodeblockShiki` expects `.shiki` styles. Import `app/shiki.css` once at your app root (for example in `app/layout.tsx`):
+
+```tsx
+import "./global.css";
+import "./shiki.css";
+```
 </Step>
 <Step>
 <h3>Update import paths to match your project setup.</h3>
