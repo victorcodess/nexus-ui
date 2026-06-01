@@ -46,6 +46,11 @@ export type TextShimmerProps = Omit<
    * @default 0
    */
   repeatDelay?: number;
+  /**
+   * Disable shimmer animation and render plain text.
+   * @default false
+   */
+  disableShimmer?: boolean;
 };
 
 export function TextShimmer({
@@ -60,6 +65,7 @@ export function TextShimmer({
   invert = false,
   invertLight = false,
   invertDark = false,
+  disableShimmer = false,
   children,
   ...props
 }: TextShimmerProps) {
@@ -96,19 +102,32 @@ export function TextShimmer({
   [data-theme="dark"] [data-nx-text-shimmer="${keyframeName}"] {
     --nx-text-shimmer-beam: var(--nx-text-shimmer-beam-dark);
   }`;
+  const shimmerVariables = disableShimmer
+    ? {}
+    : ({
+        "--nx-text-shimmer-beam-light": lightBeam,
+        "--nx-text-shimmer-beam-dark": darkBeam,
+      } as React.CSSProperties);
+  const shimmerStyle: React.CSSProperties = disableShimmer
+    ? {}
+    : {
+        backgroundImage: `linear-gradient(${90 + angle}deg, ${edge} ${start}%, var(--nx-text-shimmer-beam) 50%, ${edge} ${end}%)`,
+        animation: `${keyframeName} ${totalDuration}s linear infinite`,
+        WebkitTextFillColor: "transparent",
+      };
 
   return (
     <>
-      <style>{keyframes}</style>
+      {!disableShimmer ? <style>{keyframes}</style> : null}
       <Comp
         data-nx-text-shimmer={keyframeName}
-        className={cn("bg-size-[200%_auto] bg-clip-text", className)}
+        className={cn(
+          !disableShimmer && "bg-size-[200%_auto] bg-clip-text",
+          className,
+        )}
         style={{
-          "--nx-text-shimmer-beam-light": lightBeam,
-          "--nx-text-shimmer-beam-dark": darkBeam,
-          backgroundImage: `linear-gradient(${90 + angle}deg, ${edge} ${start}%, var(--nx-text-shimmer-beam) 50%, ${edge} ${end}%)`,
-          animation: `${keyframeName} ${totalDuration}s linear infinite`,
-          WebkitTextFillColor: "transparent",
+          ...shimmerVariables,
+          ...shimmerStyle,
           ...style,
         } as React.CSSProperties}
         {...props}

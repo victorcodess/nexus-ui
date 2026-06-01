@@ -9,6 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
 import { useOnChange } from "@/lib/use-on-change";
 import { cn } from "@/lib/utils";
 
@@ -163,9 +164,14 @@ function ChainOfThoughtTrigger({
     >
       {icon}
       <div className="flex min-w-0 flex-1 items-start gap-1.25 overflow-hidden">
-        <span className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+        <TextShimmer
+          className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap"
+          spread={10}
+          invertLight
+          disableShimmer={!isActive}
+        >
           {children ?? label}
-        </span>
+        </TextShimmer>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2}
@@ -235,8 +241,7 @@ function ChainOfThoughtStep({
 }: ChainOfThoughtStepProps) {
   const { registerStep } = useChainOfThoughtRootContext("ChainOfThoughtStep");
   const stepId = React.useId();
-  const showConnectorResolved =
-    showConnector ?? hasIconInStepTitle(children);
+  const showConnectorResolved = showConnector ?? hasIconInStepTitle(children);
   const isControlled = openProp !== undefined;
   const canAutoManageOpen = !isControlled && hasContent;
   const [internalOpen, setInternalOpen] = React.useState(
@@ -368,9 +373,14 @@ function ChainOfThoughtStepTitle({
             {resolvedIcon}
           </div>
         ) : null}
-        <span className="truncate text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+        <TextShimmer
+          className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap"
+          spread={10}
+          invertLight
+          disableShimmer={!isActive}
+        >
           {label}
-        </span>
+        </TextShimmer>
       </div>
     );
   }
@@ -396,9 +406,14 @@ function ChainOfThoughtStepTitle({
         </div>
       ) : null}
       <div className="flex min-w-0 flex-1 items-start gap-1.25 overflow-hidden">
-        <span className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap group-data-[active=true]:shimmer group-data-[active=true]:shimmer-repeat-delay-0 group-data-[active=true]:shimmer-spread-50 group-data-[active=true]:not-dark:shimmer-invert">
+        <TextShimmer
+          className="truncate text-left text-sm leading-4.5 text-ellipsis whitespace-nowrap"
+          spread={10}
+          invertLight
+          disableShimmer={!isActive}
+        >
           {label}
-        </span>
+        </TextShimmer>
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           strokeWidth={2}

@@ -10,6 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
 import { useOnChange } from "@/lib/use-on-change";
 import { cn } from "@/lib/utils";
 
@@ -158,9 +159,14 @@ function ReasoningTrigger({
         strokeWidth={1.75}
         className="size-4"
       />
-      <span className="text-sm leading-6 group-data-[streaming=true]:shimmer group-data-[streaming=true]:shimmer-repeat-delay-0 group-data-[streaming=true]:shimmer-spread-50 group-data-[streaming=true]:not-dark:shimmer-invert">
+      <TextShimmer
+        className="text-sm leading-6"
+        spread={10}
+        invertLight
+        disableShimmer={!isStreaming}
+      >
         {children ?? label}
-      </span>
+      </TextShimmer>
       <HugeiconsIcon
         icon={ArrowDown01Icon}
         strokeWidth={2.0}
