@@ -75,6 +75,13 @@ type ToolContextValue = {
 
 const ToolContext = createContext<ToolContextValue | null>(null);
 
+function isToolStatus(value: unknown): value is ToolStatus {
+  return (
+    typeof value === "string" &&
+    Object.prototype.hasOwnProperty.call(TOOL_META, value)
+  );
+}
+
 function useToolContext(component: string): ToolContextValue {
   const context = useContext(ToolContext);
   if (!context) {
@@ -99,10 +106,11 @@ type ToolProps = ComponentProps<typeof Collapsible> & {
 };
 
 function Tool({ status, className, style, ...props }: ToolProps) {
-  const meta = TOOL_META[status];
+  const resolvedStatus = isToolStatus(status) ? status : "pending";
+  const meta = TOOL_META[resolvedStatus];
 
   return (
-    <ToolContext.Provider value={{ status, meta }}>
+    <ToolContext.Provider value={{ status: resolvedStatus, meta }}>
       <Collapsible
         data-slot="tool"
         className={cn(
@@ -119,7 +127,7 @@ function Tool({ status, className, style, ...props }: ToolProps) {
         }
         {...props}
       />
-    </ToolContext.Provider> 
+    </ToolContext.Provider>
   );
 }
 
@@ -199,6 +207,8 @@ function ToolPart({ kind, payload, errorText }: ToolPartProps) {
   const { status } = useToolContext("ToolPart");
   const code = stringifyToolPayload(payload);
   const isOutputError = kind === "output" && status === "error";
+  const hasPayload = payload !== undefined && payload !== null;
+  const shouldShowCodeblock = !isOutputError || hasPayload;
   const title = kind === "input" ? "Input" : isOutputError ? "Error" : "Output";
 
   return (
@@ -219,13 +229,14 @@ function ToolPart({ kind, payload, errorText }: ToolPartProps) {
         >
           {errorText ?? "Tool execution failed"}
         </div>
-      ) : (
-        <CodeBlock data-slot={`tool-${kind}-codeblock`} keepBackground>
+      ) : null}
+      {shouldShowCodeblock ? (
+        <CodeBlock data-slot="tool-output-error-codeblock" keepBackground>
           <CodeBlockContent>
             <CodeblockShiki language="json">{code}</CodeblockShiki>
           </CodeBlockContent>
         </CodeBlock>
-      )}
+      ) : null}
     </div>
   );
 }
