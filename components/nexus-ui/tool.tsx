@@ -24,7 +24,11 @@ import {
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
-import { CodeBlock, CodeBlockContent, CodeblockShiki } from "@/components/nexus-ui/codeblock-new";
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeblockShiki,
+} from "@/components/nexus-ui/codeblock-new";
 
 type ToolState = "pending" | "ready" | "running" | "completed" | "error";
 
@@ -140,19 +144,27 @@ function ToolTrigger({ name, className, ...props }: ToolTriggerProps) {
     >
       <div className="flex items-center gap-2">
         <HugeiconsIcon
+          data-slot="tool-trigger-icon"
           icon={meta.icon}
           strokeWidth={2}
           className={cn("size-4 text-(--tool-color)", meta.iconClassName)}
         />
-        <span className="text-sm leading-6 font-[450] text-primary">
+        <span
+          data-slot="tool-trigger-name"
+          className="text-sm leading-6 font-[450] text-primary"
+        >
           {name}
         </span>
-        <Badge className="h-6 bg-(--tool-bg)/80 font-[450] text-(--tool-color) dark:bg-(--tool-color)/10 dark:text-(--tool-color)">
+        <Badge
+          data-slot="tool-trigger-badge"
+          className="h-6 bg-(--tool-bg)/80 font-[450] text-(--tool-color) dark:bg-(--tool-color)/10 dark:text-(--tool-color)"
+        >
           {meta.label}
         </Badge>
       </div>
 
       <HugeiconsIcon
+        data-slot="tool-trigger-chevron"
         icon={ArrowDown01Icon}
         strokeWidth={1.75}
         className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-180"
@@ -167,30 +179,53 @@ function ToolContent({ className, ...props }: ToolContentProps) {
   return (
     <CollapsibleContent
       data-slot="tool-content"
-      className={cn("flex flex-col gap-6 p-3 pt-4", className)}
+      className={cn(
+        "flex flex-col gap-6 p-3 pt-4",
+        "overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down",
+        className,
+      )}
       {...props}
     />
   );
 }
 
 type ToolPartProps = {
-  title: string;
+  kind: "input" | "output";
   payload: unknown;
+  errorText?: string;
 };
 
-function ToolPart({ title, payload }: ToolPartProps) {
+function ToolPart({ kind, payload, errorText }: ToolPartProps) {
+  const { state } = useToolContext("ToolPart");
   const code = stringifyToolPayload(payload);
+  const isOutputError = kind === "output" && state === "error";
+  const title = kind === "input" ? "Input" : isOutputError ? "Error" : "Output";
 
   return (
-    <div className="flex flex-col gap-3">
-      <span className="text-xs leading-4 font-[450] text-muted-foreground uppercase">
+    <div data-slot={`tool-${kind}`} className="flex flex-col gap-3">
+      <span
+        data-slot={`tool-${kind}-title`}
+        className={cn(
+          "text-xs leading-4 font-[450] text-muted-foreground uppercase",
+          isOutputError && "text-destructive",
+        )}
+      >
         {title}
       </span>
-      <CodeBlock keepBackground>
-        <CodeBlockContent>
-          <CodeblockShiki language="json">{code}</CodeblockShiki>
-        </CodeBlockContent>
-      </CodeBlock>
+      {isOutputError ? (
+        <div
+          data-slot="tool-output-error"
+          className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm leading-6 text-destructive dark:bg-destructive/10"
+        >
+          {errorText ?? "Tool execution failed"}
+        </div>
+      ) : (
+        <CodeBlock data-slot={`tool-${kind}-codeblock`} keepBackground>
+          <CodeBlockContent>
+            <CodeblockShiki language="json">{code}</CodeblockShiki>
+          </CodeBlockContent>
+        </CodeBlock>
+      )}
     </div>
   );
 }
@@ -200,31 +235,24 @@ type ToolPayloadProps = {
 };
 
 function ToolInput({ payload }: ToolPayloadProps) {
-  return <ToolPart title="Input" payload={payload} />;
+  return <ToolPart kind="input" payload={payload} />;
 }
 
 type ToolOutputProps = ToolPayloadProps & {
   showWhen?: ToolState[];
+  errorText?: string;
 };
 
-function ToolOutput({ payload, showWhen = ["completed"] }: ToolOutputProps) {
+function ToolOutput({
+  payload,
+  showWhen = ["completed"],
+  errorText,
+}: ToolOutputProps) {
   const { state } = useToolContext("ToolOutput");
   if (!showWhen.includes(state)) return null;
 
-  return <ToolPart title="Output" payload={payload} />;
-}
-
-type ToolErrorProps = {
-  error: unknown;
-  title?: string;
-};
-
-function ToolError({ error, title = "Error" }: ToolErrorProps) {
-  const { state } = useToolContext("ToolError");
-  if (state !== "error") return null;
-
-  return <ToolPart title={title} payload={error} />;
+  return <ToolPart kind="output" payload={payload} errorText={errorText} />;
 }
 
 export type { ToolState };
-export { Tool, ToolTrigger, ToolContent, ToolInput, ToolOutput, ToolError };
+export { Tool, ToolTrigger, ToolContent, ToolInput, ToolOutput };

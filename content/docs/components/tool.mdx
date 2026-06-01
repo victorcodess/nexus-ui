@@ -1,11 +1,15 @@
 ---
 title: Tool
-description: Tool component for displaying and interacting with tools
+description: State-aware tool call UI with JSON input/output codeblocks
 ---
 
 import ToolDefault from "@/components/nexus-ui/examples/tool/default";
+import ToolPending from "@/components/nexus-ui/examples/tool/pending";
+import ToolReady from "@/components/nexus-ui/examples/tool/ready";
+import ToolRunning from "@/components/nexus-ui/examples/tool/running";
+import ToolErrorState from "@/components/nexus-ui/examples/tool/error";
 
-Tool component for displaying and interacting with tools
+State-aware UI for rendering tool calls (input and output JSON) in agent/chat interfaces. `Tool` is provider-agnostic and works well with Vercel AI SDK tool parts by mapping runtime tool states to the component state model.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/default.tsx"
@@ -13,3 +17,369 @@ Tool component for displaying and interacting with tools
 >
   <ToolDefault />
 </DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/tool
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/tool
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/tool
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/tool
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add badge collapsible && npm install @hugeicons/react @hugeicons/core-free-icons @react-symbols/icons shiki
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add badge collapsible && pnpm add @hugeicons/react @hugeicons/core-free-icons @react-symbols/icons shiki
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add badge collapsible && yarn add @hugeicons/react @hugeicons/core-free-icons @react-symbols/icons shiki
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add badge collapsible && bun add @hugeicons/react @hugeicons/core-free-icons @react-symbols/icons shiki
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy the following files into your project.</h3>
+
+<ComponentSource src="components/nexus-ui/tool.tsx" title="components/nexus-ui/tool.tsx" />
+<ComponentSource src="components/nexus-ui/codeblock-new.tsx" title="components/nexus-ui/codeblock-new.tsx" />
+<ComponentSource src="lib/shiki/highlighter.ts" title="lib/shiki/highlighter.ts" />
+</Step>
+<Step>
+<h3>Ensure your Shiki CSS is loaded.</h3>
+
+`CodeblockShiki` expects `.shiki` styles. Keep your existing `app/shiki.css` setup (or equivalent) loaded globally.
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground
+import {
+  Tool,
+  ToolTrigger,
+  ToolContent,
+  ToolInput,
+  ToolOutput,
+  type ToolState,
+} from "@/components/nexus-ui/tool";
+```
+
+```tsx keepBackground noCollapse
+<Tool state="completed" defaultOpen>
+  <ToolTrigger name="get_weather" />
+  <ToolContent>
+    <ToolInput payload={{ city: "Paris", unit: "celsius" }} />
+    <ToolOutput
+      payload={{ city: "Paris", temperature: 22, condition: "sunny" }}
+    />
+  </ToolContent>
+</Tool>
+```
+
+## Examples
+
+### Pending
+
+Set `state="pending"` and render only `ToolTrigger` + `ToolContent` while arguments are still streaming.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/tool/pending.tsx"
+  previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start"
+>
+  <ToolPending />
+</DemoWithCode>
+
+### Ready
+
+Set `state="ready"`, render `ToolInput` with parsed arguments, and omit `ToolOutput` until execution starts.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/tool/ready.tsx"
+  previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start"
+>
+  <ToolReady />
+</DemoWithCode>
+
+### Running
+
+Set `state="running"` and keep only `ToolInput` visible while the tool call is in progress.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/tool/running.tsx"
+  previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start"
+>
+  <ToolRunning />
+</DemoWithCode>
+
+### Error State
+
+Set `state="error"`, keep `ToolInput` visible, and render `ToolOutput` with `errorText` (and `showWhen={["error"]}`) to show a destructive error message.
+
+<DemoWithCode
+  src="components/nexus-ui/examples/tool/error.tsx"
+  previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start"
+>
+  <ToolErrorState />
+</DemoWithCode>
+
+## Vercel AI SDK Integration
+
+`Tool` maps cleanly to AI SDK tool parts by converting streamed tool part state into `ToolState` and passing `input` / `output` payloads directly.
+
+Use it with [Vercel AI SDK](https://sdk.vercel.ai) by:
+
+- mapping tool part lifecycle to `pending | ready | running | completed | error`
+- rendering `part.input` in `ToolInput`
+- rendering `part.output` in `ToolOutput` when available
+- passing `errorText` to `ToolOutput` for `error` state
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react
+```
+
+</Step>
+<Step>
+<h3>Stream messages from your chat API route</h3>
+
+Any standard `streamText(...).toUIMessageStreamResponse()` route works. See [Prompt Input docs](/docs/components/prompt-input#vercel-ai-sdk-integration) for a minimal scaffold.
+
+</Step>
+<Step>
+<h3>Map assistant tool parts into <code className="tracking-0!">Tool</code></h3>
+
+```tsx
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type UIMessage } from "ai";
+import {
+  Tool,
+  ToolTrigger,
+  ToolContent,
+  ToolInput,
+  ToolOutput,
+  type ToolState,
+} from "@/components/nexus-ui/tool";
+
+type ToolPartLike = {
+  type: string;
+  state?: string;
+  input?: unknown;
+  output?: unknown;
+  errorText?: string;
+  error?: unknown;
+};
+
+function mapToolState(
+  part: ToolPartLike,
+  isAwaitingApproval: boolean,
+): ToolState | null {
+  switch (part.state) {
+    case "input-streaming":
+      return "pending";
+    case "input-available":
+      // Optional nuance: represent approval/pause as "ready"
+      return isAwaitingApproval ? "ready" : "running";
+    case "output-available":
+      return "completed";
+    case "output-error":
+      return "error";
+    default:
+      return null;
+  }
+}
+
+function toolNameFromPartType(type: string): string {
+  return type.startsWith("tool-") ? type.slice(5) : type;
+}
+
+export default function ToolCallsFromUseChat() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant) return null;
+
+  const toolParts = assistant.parts.filter(
+    (part): part is ToolPartLike => part.type.startsWith("tool-"),
+  );
+
+  if (toolParts.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      {toolParts.map((part, index) => {
+        const state = mapToolState(part, false);
+        if (!state) return null;
+
+        return (
+          <Tool key={`${part.type}-${index}`} state={state} defaultOpen>
+            <ToolTrigger name={toolNameFromPartType(part.type)} />
+            <ToolContent>
+              <ToolInput payload={part.input} />
+              <ToolOutput
+                payload={part.output}
+                errorText={part.errorText}
+                showWhen={["completed", "error"]}
+              />
+            </ToolContent>
+          </Tool>
+        );
+      })}
+    </div>
+  );
+}
+```
+</Step>
+</Steps>
+
+## API Reference
+
+### Tool
+
+Root wrapper for a single tool call. Provides state context and status color tokens for child components. Wraps [Collapsible Root](https://www.radix-ui.com/primitives/docs/components/collapsible#root).
+
+<TypeTable
+  type={{
+    state: {
+      type: '"pending" | "ready" | "running" | "completed" | "error"',
+      description:
+        "Tool lifecycle state. Drives icon, badge label, and status colors used by descendants.",
+    },
+    open: {
+      type: "boolean",
+      description: "Controlled open state for the collapsible container.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      description: "Initial open state in uncontrolled mode.",
+    },
+    onOpenChange: {
+      type: "(open: boolean) => void",
+      description: "Called when open state changes.",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes merged with the root container styles.",
+    },
+  }}
+/>
+
+### ToolTrigger
+
+Header row for tool name, status icon, status badge, and expand/collapse chevron. Wraps [Collapsible Trigger](https://www.radix-ui.com/primitives/docs/components/collapsible#trigger).
+
+<TypeTable
+  type={{
+    name: {
+      type: "string",
+      description: "Tool name shown in the trigger (for example, get_weather).",
+    },
+    className: {
+      type: "string",
+      description: "Additional classes merged with trigger row styles.",
+    },
+  }}
+/>
+
+### ToolContent
+
+Body wrapper for input/output/error sections. Wraps [Collapsible Content](https://www.radix-ui.com/primitives/docs/components/collapsible#content).
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Additional classes for spacing/layout inside expanded content.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Typically ToolInput and ToolOutput.",
+    },
+  }}
+/>
+
+### ToolInput
+
+Renders the tool input payload in a JSON codeblock.
+
+<TypeTable
+  type={{
+    payload: {
+      type: "unknown",
+      description:
+        "Input payload. Objects are pretty-stringified; strings are rendered as-is.",
+    },
+  }}
+/>
+
+### ToolOutput
+
+Renders tool output payload in a JSON codeblock when the current tool state matches `showWhen`.
+
+<TypeTable
+  type={{
+    payload: {
+      type: "unknown",
+      description:
+        "Output payload. Objects are pretty-stringified; strings are rendered as-is.",
+    },
+    showWhen: {
+      type: 'Array<"pending" | "ready" | "running" | "completed" | "error">',
+      default: '["completed"]',
+      description:
+        "Controls which tool states render the output section.",
+    },
+    errorText: {
+      type: "string",
+      description:
+        "Error message shown as a destructive text block when tool state is error.",
+    },
+  }}
+/>
