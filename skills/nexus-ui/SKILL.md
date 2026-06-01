@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, chain of thought, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, chain of thought, tool, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -42,6 +42,7 @@ npx shadcn@latest add @nexus-ui/image
 npx shadcn@latest add @nexus-ui/feedback-bar
 npx shadcn@latest add @nexus-ui/toaster
 npx shadcn@latest add @nexus-ui/chain-of-thought
+npx shadcn@latest add @nexus-ui/tool
 ```
 
 Or install directly via URL (no registry config needed):
@@ -76,6 +77,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Feedback Bar | `feedback-bar` | Feedback prompt bar for per-message or thread ratings with action and close slots |
 | Toaster | `toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
 | Chain of Thought | `chain-of-thought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
+| Tool | `tool` | State-aware tool call UI with JSON input/output codeblocks (`pending`, `ready`, `running`, `completed`, `error`) |
 
 ## Component APIs
 
@@ -808,6 +810,51 @@ import {
 </ChainOfThought>
 ```
 
+### Tool
+
+State-aware collapsible UI for a single tool invocation: status-driven header (icon + badge), JSON **input**, and optional **output** via Shiki codeblocks. Maps cleanly to Vercel AI SDK tool part states.
+
+**Import:**
+
+```tsx
+import {
+  Tool,
+  ToolTrigger,
+  ToolContent,
+  ToolInput,
+  ToolOutput,
+  type ToolStatus,
+} from "@/components/nexus-ui/tool";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Tool` | Root **Collapsible**; required `status` (`pending` \| `ready` \| `running` \| `completed` \| `error`) sets CSS vars + context for badge/icon styling. |
+| `ToolTrigger` | Header row; required `name` (tool label) plus status badge and chevron. |
+| `ToolContent` | Body for `ToolInput` / `ToolOutput` sections. |
+| `ToolInput` | Renders formatted JSON (or string) **Input** block. |
+| `ToolOutput` | Renders **Output** when `status` is in `showWhen` (default `["completed"]`); on `error` shows `errorText` plus optional payload codeblock. |
+
+**Root props:** `Tool` forwards Collapsible props; `ToolOutput` accepts `showWhen?: ToolStatus[]` and `errorText?: string`.
+
+**Props & hooks:** Internal context only. Registry install adds `codeblock-new.tsx` and `lib/shiki/highlighter.ts` alongside `tool.tsx`.
+
+**Usage notes:** Set `status` from your tool lifecycle (e.g. map AI SDK `tool-invocation` states). Use `ToolOutput` with `showWhen={["completed", "error"]}` when you need output on failure.
+
+**Example:**
+
+```tsx
+<Tool status="running">
+  <ToolTrigger name="search_web" />
+  <ToolContent>
+    <ToolInput payload={{ query: "nexus ui" }} />
+    <ToolOutput payload={result} showWhen={["completed", "error"]} errorText="Search failed" />
+  </ToolContent>
+</Tool>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -907,7 +954,9 @@ components/
 │   ├── image.tsx
 │   ├── feedback-bar.tsx
 │   ├── toaster.tsx
-│   └── chain-of-thought.tsx
+│   ├── chain-of-thought.tsx
+│   ├── codeblock-new.tsx
+│   └── tool.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -933,11 +982,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Feedback Bar:** `@radix-ui/react-slot`, shadcn `tooltip`, `kbd`, `@/lib/utils`
 - **Toaster:** `sonner`, `next-themes`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `@/lib/utils`
 - **Chain of Thought:** `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `collapsible`, `tw-shimmer` (registry CSS), `@/lib/use-on-change`, `@/lib/utils`
+- **Tool:** `@hugeicons/react`, `@hugeicons/core-free-icons`, `shiki`, `@react-symbols/icons`, shadcn `badge`, `collapsible`, registry `codeblock-new.tsx`, `lib/shiki/highlighter.ts`, `@/lib/utils`
 
 ## Documentation
 
 - Website: https://nexus-ui.dev
 - Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster) · [chain-of-thought](https://nexus-ui.dev/docs/components/chain-of-thought)
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster) · [chain-of-thought](https://nexus-ui.dev/docs/components/chain-of-thought) · [tool](https://nexus-ui.dev/docs/components/tool)
 - GitHub: https://github.com/victorcodess/nexus-ui
 - LLM context: https://nexus-ui.dev/llms.txt

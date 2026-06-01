@@ -32,6 +32,7 @@ Copy-paste components into your project. You own the code.
 | `FeedbackBar` | Feedback prompt bar for per-message or thread ratings with action and close slots |
 | `Toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
 | `ChainOfThought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
+| `Tool` | State-aware tool call UI with JSON input/output codeblocks |
 
 ## Quick Start
 
