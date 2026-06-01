@@ -27,7 +27,7 @@ function FeedbackBar({ className, ...props }: FeedbackBarProps) {
       role="group"
       aria-label="Feedback bar"
       className={cn(
-        "inline-flex h-12 w-full max-w-110 rounded-[12px] border bg-secondary text-sm",
+        "inline-flex h-12 w-full max-w-110 rounded-xl border dark:border-accent bg-card text-sm",
         className,
       )}
       {...props}
@@ -146,7 +146,7 @@ function FeedbackBarClose({
     <FeedbackBarAction
       asChild
       className={cn(
-        "flex h-full items-center justify-center border-l px-2",
+        "flex h-full items-center justify-center border-l dark:border-accent px-2",
         className,
       )}
       {...props}

@@ -23,7 +23,7 @@ function FeedbackBarCompactMinimal() {
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="cursor-pointer rounded-full bg-transparent transition-all hover:bg-border! active:scale-97"
+              className="cursor-pointer rounded-full bg-transparent transition-all active:scale-97"
               aria-label="Helpful"
             >
               <HugeiconsIcon
@@ -38,7 +38,7 @@ function FeedbackBarCompactMinimal() {
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="cursor-pointer rounded-full bg-transparent transition-all hover:bg-border! active:scale-97"
+              className="cursor-pointer rounded-full bg-transparent transition-all active:scale-97"
               aria-label="Not helpful"
             >
               <HugeiconsIcon
@@ -56,7 +56,7 @@ function FeedbackBarCompactMinimal() {
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="cursor-pointer rounded-full bg-transparent transition-all hover:bg-border! active:scale-97"
+          className="cursor-pointer rounded-full bg-transparent transition-all active:scale-97"
           aria-label="Close"
         >
           <HugeiconsIcon
