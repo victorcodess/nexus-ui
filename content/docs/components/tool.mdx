@@ -175,10 +175,14 @@ Set `state="error"`, keep `ToolInput` visible, and render `ToolOutput` with `err
 
 Use it with [Vercel AI SDK](https://sdk.vercel.ai) by:
 
-- mapping tool part lifecycle to `pending | ready | running | completed | error`
+- mapping AI SDK tool part states (`input-streaming`, `input-available`, `output-available`, `output-error`) into your UI states (`pending`, `ready`, `running`, `completed`, `error`)
 - rendering `part.input` in `ToolInput`
 - rendering `part.output` in `ToolOutput` when available
 - passing `errorText` to `ToolOutput` for `error` state
+
+`ready` is an app-level state in this mapping (for example, waiting on user approval before execution). AI SDK does not emit `ready` as a native tool part state.
+
+`pending` via `input-streaming` is only available in streaming flows (for example, `streamText` / streamed UI messages).
 
 <Steps>
 <Step>
@@ -192,7 +196,36 @@ npm install ai @ai-sdk/react
 <Step>
 <h3>Stream messages from your chat API route</h3>
 
-Any standard `streamText(...).toUIMessageStreamResponse()` route works. See [Prompt Input docs](/docs/components/prompt-input#vercel-ai-sdk-integration) for a minimal scaffold.
+```ts title="app/api/chat/route.ts"
+import { streamText, convertToModelMessages, tool, type UIMessage } from "ai";
+import { z } from "zod";
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: "anthropic/claude-sonnet-4.5",
+    messages: await convertToModelMessages(messages),
+    tools: {
+      displayWeather: tool({
+        description: "Get weather for a city",
+        inputSchema: z.object({
+          city: z.string(),
+          unit: z.enum(["celsius", "fahrenheit"]),
+        }),
+        execute: async ({ city, unit }) => ({
+          city,
+          unit,
+          temperature: 22,
+          condition: "sunny",
+        }),
+      }),
+    },
+  });
+
+  return result.toUIMessageStreamResponse();
+}
+```
 
 </Step>
 <Step>
@@ -227,9 +260,10 @@ function mapToolState(
 ): ToolState | null {
   switch (part.state) {
     case "input-streaming":
+      // Streaming-only: arguments are still being generated.
       return "pending";
     case "input-available":
-      // Optional nuance: represent approval/pause as "ready"
+      // App-level mapping: use "ready" while waiting for approval/user action.
       return isAwaitingApproval ? "ready" : "running";
     case "output-available":
       return "completed";
