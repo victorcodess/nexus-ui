@@ -43,7 +43,7 @@ const TOOL_META: Record<ToolStatus, ToolMeta> = {
   pending: {
     label: "Pending",
     icon: ToolsIcon,
-    color: { bg: "var(--color-gray-100)", fg: "var(--color-gray-600)" },
+    color: { bg: "var(--color-gray-100)", fg: "var(--color-gray-500)" },
   },
   ready: {
     label: "Ready",
@@ -114,8 +114,8 @@ function Tool({ status, className, style, ...props }: ToolProps) {
       <Collapsible
         data-slot="tool"
         className={cn(
-          "not-prose w-full max-w-100 border border-accent",
-          "data-[state=closed]:rounded-3xl data-[state=open]:rounded-3xl",
+          "not-prose w-full max-w-100 border dark:border-accent",
+          "data-[state=closed]:rounded-xl data-[state=open]:rounded-xl",
           className,
         )}
         style={
@@ -165,7 +165,7 @@ function ToolTrigger({ name, className, ...props }: ToolTriggerProps) {
         </span>
         <Badge
           data-slot="tool-trigger-badge"
-          className="h-6 bg-(--tool-bg)/80 font-[450] text-(--tool-color) dark:bg-(--tool-color)/10 dark:text-(--tool-color)"
+          className="h-6 bg-(--tool-bg)/60 font-[450] text-(--tool-color) dark:bg-(--tool-color)/10 dark:text-(--tool-color)"
         >
           {meta.label}
         </Badge>
@@ -231,7 +231,11 @@ function ToolPart({ kind, payload, errorText }: ToolPartProps) {
         </div>
       ) : null}
       {shouldShowCodeblock ? (
-        <CodeBlock data-slot="tool-output-error-codeblock" keepBackground>
+        <CodeBlock
+          data-slot="tool-output-error-codeblock"
+          className="rounded-lg"
+          keepBackground
+        >
           <CodeBlockContent>
             <CodeblockShiki language="json">{code}</CodeblockShiki>
           </CodeBlockContent>

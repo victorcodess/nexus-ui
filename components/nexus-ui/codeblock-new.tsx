@@ -72,8 +72,9 @@ const CodeBlock = ({
         className={cn(
           "not-prose",
           "my-0 flex w-full flex-col overflow-hidden rounded-xl",
-          "border border-accent",
-          keepBackground ? "bg-secondary dark:bg-background" : "bg-card",
+          keepBackground
+            ? "border-none bg-secondary dark:bg-background"
+            : "border bg-card dark:border-accent",
           "text-[13px] font-[450]",
           className,
         )}
