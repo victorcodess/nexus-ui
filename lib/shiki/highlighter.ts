@@ -1,5 +1,6 @@
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import {
+  bundledLanguages,
   type Highlighter,
   type RegexEngine,
   createHighlighter,
@@ -14,6 +15,8 @@ const Themes = {
   dark: "github-dark",
 };
 
+const allBundledLanguageIds = Object.keys(bundledLanguages);
+
 
 const getJsEngine = (): RegexEngine => {
   jsEngine ??= createJavaScriptRegexEngine();
@@ -21,11 +24,11 @@ const getJsEngine = (): RegexEngine => {
 };
 
 const highlight = async (): Promise<Highlighter> => {
-    highlighter ??= createHighlighter({
-      langs: ["ts", "tsx"],
-      themes: ["github-light", "github-dark"],
-      engine: getJsEngine(),
-    });
-    return highlighter;
-  };
+  highlighter ??= createHighlighter({
+    langs: allBundledLanguageIds,
+    themes: ["github-light", "github-dark"],
+    engine: getJsEngine(),
+  });
+  return highlighter;
+};
 export { highlight, Themes };
