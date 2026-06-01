@@ -350,6 +350,39 @@
           "target": "~/lib/use-on-change.ts"
         }
       ]
+    },
+    {
+      "name": "tool",
+      "type": "registry:ui",
+      "title": "Tool",
+      "description": "Tool call component with state-aware header and JSON input/output blocks",
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons",
+        "@react-symbols/icons",
+        "shiki"
+      ],
+      "registryDependencies": [
+        "badge",
+        "collapsible"
+      ],
+      "files": [
+        {
+          "path": "components/nexus-ui/tool.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/tool.tsx"
+        },
+        {
+          "path": "components/nexus-ui/codeblock-new.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/codeblock-new.tsx"
+        },
+        {
+          "path": "lib/shiki/highlighter.ts",
+          "type": "registry:file",
+          "target": "~/lib/shiki/highlighter.ts"
+        }
+      ]
     }
   ]
 }
