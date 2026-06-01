@@ -30,7 +30,7 @@ import {
   CodeblockShiki,
 } from "@/components/nexus-ui/codeblock-new";
 
-type ToolState = "pending" | "ready" | "running" | "completed" | "error";
+type ToolStatus = "pending" | "ready" | "running" | "completed" | "error";
 
 type ToolMeta = {
   label: string;
@@ -39,7 +39,7 @@ type ToolMeta = {
   iconClassName?: string;
 };
 
-const TOOL_META: Record<ToolState, ToolMeta> = {
+const TOOL_META: Record<ToolStatus, ToolMeta> = {
   pending: {
     label: "Pending",
     icon: ToolsIcon,
@@ -69,7 +69,7 @@ const TOOL_META: Record<ToolState, ToolMeta> = {
 };
 
 type ToolContextValue = {
-  state: ToolState;
+  status: ToolStatus;
   meta: ToolMeta;
 };
 
@@ -95,14 +95,14 @@ function stringifyToolPayload(payload: unknown): string {
 }
 
 type ToolProps = ComponentProps<typeof Collapsible> & {
-  state: ToolState;
+  status: ToolStatus;
 };
 
-function Tool({ state, className, style, ...props }: ToolProps) {
-  const meta = TOOL_META[state];
+function Tool({ status, className, style, ...props }: ToolProps) {
+  const meta = TOOL_META[status];
 
   return (
-    <ToolContext.Provider value={{ state, meta }}>
+    <ToolContext.Provider value={{ status, meta }}>
       <Collapsible
         data-slot="tool"
         className={cn(
@@ -119,7 +119,7 @@ function Tool({ state, className, style, ...props }: ToolProps) {
         }
         {...props}
       />
-    </ToolContext.Provider>
+    </ToolContext.Provider> 
   );
 }
 
@@ -196,9 +196,9 @@ type ToolPartProps = {
 };
 
 function ToolPart({ kind, payload, errorText }: ToolPartProps) {
-  const { state } = useToolContext("ToolPart");
+  const { status } = useToolContext("ToolPart");
   const code = stringifyToolPayload(payload);
-  const isOutputError = kind === "output" && state === "error";
+  const isOutputError = kind === "output" && status === "error";
   const title = kind === "input" ? "Input" : isOutputError ? "Error" : "Output";
 
   return (
@@ -239,7 +239,7 @@ function ToolInput({ payload }: ToolPayloadProps) {
 }
 
 type ToolOutputProps = ToolPayloadProps & {
-  showWhen?: ToolState[];
+  showWhen?: ToolStatus[];
   errorText?: string;
 };
 
@@ -248,11 +248,11 @@ function ToolOutput({
   showWhen = ["completed"],
   errorText,
 }: ToolOutputProps) {
-  const { state } = useToolContext("ToolOutput");
-  if (!showWhen.includes(state)) return null;
+  const { status } = useToolContext("ToolOutput");
+  if (!showWhen.includes(status)) return null;
 
   return <ToolPart kind="output" payload={payload} errorText={errorText} />;
 }
 
-export type { ToolState };
+export type { ToolStatus };
 export { Tool, ToolTrigger, ToolContent, ToolInput, ToolOutput };

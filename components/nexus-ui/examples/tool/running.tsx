@@ -14,7 +14,7 @@ function ToolRunning() {
   };
 
   return (
-    <Tool state="running" defaultOpen>
+    <Tool status="running" defaultOpen>
       <ToolTrigger name="fetch_billing_summary" />
       <ToolContent>
         <ToolInput payload={input} />

@@ -9,7 +9,7 @@ import ToolReady from "@/components/nexus-ui/examples/tool/ready";
 import ToolRunning from "@/components/nexus-ui/examples/tool/running";
 import ToolErrorState from "@/components/nexus-ui/examples/tool/error";
 
-State-aware UI for rendering tool calls (input and output JSON) in agent/chat interfaces. `Tool` is provider-agnostic and works well with Vercel AI SDK tool parts by mapping runtime tool states to the component state model.
+State-aware UI for rendering tool calls (input and output JSON) in agent/chat interfaces. `Tool` is provider-agnostic and works well with Vercel AI SDK tool parts by mapping runtime tool states to the component status model.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/default.tsx"
@@ -107,12 +107,12 @@ import {
   ToolContent,
   ToolInput,
   ToolOutput,
-  type ToolState,
+  type ToolStatus,
 } from "@/components/nexus-ui/tool";
 ```
 
 ```tsx keepBackground noCollapse
-<Tool state="completed" defaultOpen>
+<Tool status="completed" defaultOpen>
   <ToolTrigger name="get_weather" />
   <ToolContent>
     <ToolInput payload={{ city: "Paris", unit: "celsius" }} />
@@ -127,7 +127,7 @@ import {
 
 ### Pending
 
-Set `state="pending"` and render only `ToolTrigger` + `ToolContent` while arguments are still streaming.
+Set `status="pending"` and render only `ToolTrigger` + `ToolContent` while arguments are still streaming.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/pending.tsx"
@@ -138,7 +138,7 @@ Set `state="pending"` and render only `ToolTrigger` + `ToolContent` while argume
 
 ### Ready
 
-Set `state="ready"`, render `ToolInput` with parsed arguments, and omit `ToolOutput` until execution starts.
+Set `status="ready"`, render `ToolInput` with parsed arguments, and omit `ToolOutput` until execution starts.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/ready.tsx"
@@ -149,7 +149,7 @@ Set `state="ready"`, render `ToolInput` with parsed arguments, and omit `ToolOut
 
 ### Running
 
-Set `state="running"` and keep only `ToolInput` visible while the tool call is in progress.
+Set `status="running"` and keep only `ToolInput` visible while the tool call is in progress.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/running.tsx"
@@ -160,7 +160,7 @@ Set `state="running"` and keep only `ToolInput` visible while the tool call is i
 
 ### Error State
 
-Set `state="error"`, keep `ToolInput` visible, and render `ToolOutput` with `errorText` (and `showWhen={["error"]}`) to show a destructive error message.
+Set `status="error"`, keep `ToolInput` visible, and render `ToolOutput` with `errorText` (and `showWhen={["error"]}`) to show a destructive error message.
 
 <DemoWithCode
   src="components/nexus-ui/examples/tool/error.tsx"
@@ -171,7 +171,7 @@ Set `state="error"`, keep `ToolInput` visible, and render `ToolOutput` with `err
 
 ## Vercel AI SDK Integration
 
-`Tool` maps cleanly to AI SDK tool parts by converting streamed tool part state into `ToolState` and passing `input` / `output` payloads directly.
+`Tool` maps cleanly to AI SDK tool parts by converting streamed tool part state into `ToolStatus` and passing `input` / `output` payloads directly.
 
 Use it with [Vercel AI SDK](https://sdk.vercel.ai) by:
 
@@ -242,7 +242,7 @@ import {
   ToolContent,
   ToolInput,
   ToolOutput,
-  type ToolState,
+  type ToolStatus,
 } from "@/components/nexus-ui/tool";
 
 type ToolPartLike = {
@@ -254,10 +254,10 @@ type ToolPartLike = {
   error?: unknown;
 };
 
-function mapToolState(
+function mapToolStatus(
   part: ToolPartLike,
   isAwaitingApproval: boolean,
-): ToolState | null {
+): ToolStatus | null {
   switch (part.state) {
     case "input-streaming":
       // Streaming-only: arguments are still being generated.
@@ -295,11 +295,11 @@ export default function ToolCallsFromUseChat() {
   return (
     <div className="space-y-3">
       {toolParts.map((part, index) => {
-        const state = mapToolState(part, false);
-        if (!state) return null;
+        const status = mapToolStatus(part, false);
+        if (!status) return null;
 
         return (
-          <Tool key={`${part.type}-${index}`} state={state} defaultOpen>
+          <Tool key={`${part.type}-${index}`} status={status} defaultOpen>
             <ToolTrigger name={toolNameFromPartType(part.type)} />
             <ToolContent>
               <ToolInput payload={part.input} />
@@ -323,11 +323,11 @@ export default function ToolCallsFromUseChat() {
 
 ### Tool
 
-Root wrapper for a single tool call. Provides state context and status color tokens for child components. Wraps [Collapsible Root](https://www.radix-ui.com/primitives/docs/components/collapsible#root).
+Root wrapper for a single tool call. Provides status context and status color tokens for child components. Wraps [Collapsible Root](https://www.radix-ui.com/primitives/docs/components/collapsible#root).
 
 <TypeTable
   type={{
-    state: {
+    status: {
       type: '"pending" | "ready" | "running" | "completed" | "error"',
       description:
         "Tool lifecycle state. Drives icon, badge label, and status colors used by descendants.",

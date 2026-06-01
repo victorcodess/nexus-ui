@@ -19,7 +19,7 @@ function ToolErrorState() {
   };
 
   return (
-    <Tool state="error" defaultOpen>
+    <Tool status="error" defaultOpen>
       <ToolTrigger name="send_email" />
       <ToolContent>
         <ToolInput payload={input} />

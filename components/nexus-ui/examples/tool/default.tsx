@@ -25,7 +25,7 @@ function ToolDefault() {
   };
 
   return (
-    <Tool state="completed" defaultOpen>
+    <Tool status="completed" defaultOpen>
       <ToolTrigger name="search_flights" />
       <ToolContent>
         <ToolInput payload={input} />

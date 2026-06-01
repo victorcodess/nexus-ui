@@ -13,7 +13,7 @@ function ToolReady() {
   };
 
   return (
-    <Tool state="ready" defaultOpen>
+    <Tool status="ready" defaultOpen>
       <ToolTrigger name="send_slack_message" />
       <ToolContent>
         <ToolInput payload={input} />

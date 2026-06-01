@@ -2,7 +2,7 @@ import { Tool, ToolContent, ToolTrigger } from "@/components/nexus-ui/tool";
 
 function ToolPending() {
   return (
-    <Tool state="pending" defaultOpen>
+    <Tool status="pending" defaultOpen>
       <ToolTrigger name="extract_receipt_fields" />
       <ToolContent>
         <div className="text-sm text-muted-foreground">
