@@ -114,7 +114,7 @@ function Tool({ status, className, style, ...props }: ToolProps) {
       <Collapsible
         data-slot="tool"
         className={cn(
-          "not-prose w-full max-w-100 border dark:border-accent",
+          "not-prose w-full max-w-100 border dark:border-accent bg-card",
           "data-[state=closed]:rounded-xl data-[state=open]:rounded-xl",
           className,
         )}

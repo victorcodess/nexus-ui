@@ -5,9 +5,11 @@ import ChainOfThoughtDemo from "@/components/nexus-ui/examples/chain-of-thought/
 import TextShimmerDemo from "@/components/nexus-ui/examples/text-shimmer/text-shimmer-demo";
 import ImageDemo from "@/components/nexus-ui/examples/message/imagedemo";
 import TooltipDemo from "@/components/nexus-ui/examples/tooltip-demo";
+import ToolDemo from "@/components/nexus-ui/examples/tool/tool-demo";
 
 export default function DemoPage() {
   return <ChainOfThoughtDemo />;
+  // return <ToolDemo />;
   // return <TooltipDemo />;
   // return <TextShimmerDemo />;
 }
