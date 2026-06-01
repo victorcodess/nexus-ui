@@ -217,13 +217,14 @@ const CodeblockShiki = ({
     };
   }, [codeToHighlight, language]);
 
-  const classNames = cn(
-    "no-scrollbar w-full overflow-auto overscroll-x-none py-0",
-    className,
-  );
-
   return (
-    <div className={classNames} {...props}>
+    <div
+      className={cn(
+        "no-scrollbar w-full overflow-auto overscroll-x-none py-0",
+        className,
+      )}
+      {...props}
+    >
       <pre
         className={cn(
           "shiki",
