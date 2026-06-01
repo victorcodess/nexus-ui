@@ -16,8 +16,9 @@
     "components/prompt-input",
     "components/reasoning",
     "components/suggestions",
-    "components/toaster",
     "components/text-shimmer",
-    "components/thread"
+    "components/thread",
+    "components/toaster",
+    "components/tool"
   ]
 }
