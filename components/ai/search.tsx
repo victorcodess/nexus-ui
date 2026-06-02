@@ -18,7 +18,7 @@ import { useChat, type UseChatHelpers } from '@ai-sdk/react';
 import { DefaultChatTransport, type Tool, type UIToolInvocation } from 'ai';
 import { Markdown } from '../markdown';
 import { Presence } from '@radix-ui/react-presence';
-import type { ChatUIMessage, SearchTool } from '@/lib/ai/types';
+import type { ChatUIMessage, SearchTool, SearchToolOutput } from '@/lib/ai/types';
 
 const Context = createContext<{
   open: boolean;
@@ -197,6 +197,13 @@ export function AISearchInput(props: ComponentProps<'form'>) {
   );
 }
 
+const starterPrompts = [
+  'How do I install nexus-ui in a new Next.js app?',
+  'Show a simple example using the Button component',
+  'How do I customize theme tokens in nexus-ui?',
+  'How can I troubleshoot hydration issues with nexus-ui components?',
+];
+
 function List(props: Omit<ComponentProps<'div'>, 'dir'>) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -263,7 +270,16 @@ const roleName: Record<string, string> = {
   assistant: 'fumadocs',
 };
 
-function Message({ message, ...props }: { message: ChatUIMessage } & ComponentProps<'div'>) {
+function Message({
+  message,
+  showFollowUps = false,
+  onFollowUp,
+  ...props
+}: {
+  message: ChatUIMessage;
+  showFollowUps?: boolean;
+  onFollowUp?: (text: string) => void;
+} & ComponentProps<'div'>) {
   let markdown = '';
   const searchCalls: UIToolInvocation<SearchTool>[] = [];
 
@@ -297,20 +313,87 @@ function Message({ message, ...props }: { message: ChatUIMessage } & ComponentPr
       </div>
 
       {searchCalls.map((call) => {
+        const output = normalizeSearchToolOutput(call.output);
+        const isLoading = !output && call.state !== 'output-error' && call.state !== 'output-denied';
+
         return (
           <div
             key={call.toolCallId}
-            className="flex flex-row gap-2 items-center mt-3 rounded-lg border bg-fd-secondary text-fd-muted-foreground text-xs p-2"
+            className="mt-3 rounded-lg border bg-fd-secondary text-fd-muted-foreground text-xs p-2"
           >
-            <SearchIcon className="size-4" />
+            <div className="flex items-center gap-2">
+              <SearchIcon className="size-4" />
+              <p className="font-medium text-fd-foreground">
+                {isLoading
+                  ? 'Searching nexus-ui docs...'
+                  : output?.confidence === 'none'
+                    ? 'No strong docs match'
+                    : output?.confidence === 'low'
+                      ? 'Low-confidence match'
+                      : 'Grounded in docs'}
+              </p>
+            </div>
             {call.state === 'output-error' || call.state === 'output-denied' ? (
-              <p className="text-fd-error">{call.errorText ?? 'Failed to search'}</p>
+              <p className="mt-1 text-fd-error">{call.errorText ?? 'Failed to search'}</p>
             ) : (
-              <p>{!call.output ? 'Searching…' : `${call.output.length} search results`}</p>
+              <div className="mt-2 space-y-2">
+                {isLoading ? (
+                  <p>Finding the best docs sections for this question.</p>
+                ) : (
+                  <>
+                    <p>
+                      {output?.resultCount ?? 0} result{output?.resultCount === 1 ? '' : 's'}
+                      {output?.querySuggestion ? ` • Try: ${output.querySuggestion}` : ''}
+                    </p>
+                    <div className="space-y-1.5">
+                      {output?.results.slice(0, 3).map((result) => (
+                        <a
+                          key={`${result.url}:${result.section ?? 'overview'}`}
+                          className="block rounded-md border bg-fd-card px-2 py-1.5 text-fd-card-foreground transition-colors hover:bg-fd-accent/60"
+                          href={result.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <p className="text-xs font-medium">{result.title}</p>
+                          {result.section && (
+                            <p className="text-[11px] text-fd-muted-foreground">{result.section}</p>
+                          )}
+                          {result.snippet && (
+                            <p className="line-clamp-2 text-[11px] text-fd-muted-foreground/90">
+                              {result.snippet}
+                            </p>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
         );
       })}
+
+      {showFollowUps && onFollowUp && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {['Show a code example', 'Summarize the steps', 'What should I check next?'].map((prompt) => (
+            <button
+              key={prompt}
+              type="button"
+              className={cn(
+                buttonVariants({
+                  variant: 'secondary',
+                  size: 'sm',
+                  className: 'rounded-full text-xs',
+                }),
+              )}
+              onClick={() => onFollowUp(prompt)}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -418,6 +501,26 @@ export function AISearchPanel() {
 export function AISearchPanelList({ className, style, ...props }: ComponentProps<'div'>) {
   const chat = useChatContext();
   const messages = chat.messages.filter((msg) => msg.role !== 'system');
+  const isLoading = chat.status === 'streaming' || chat.status === 'submitted';
+  const lastAssistantId = [...messages].reverse().find((msg) => msg.role === 'assistant')?.id;
+
+  function sendPrompt(text: string) {
+    void chat.sendMessage({
+      role: 'user',
+      parts: [
+        {
+          type: 'data-client',
+          data: {
+            location: location.href,
+          },
+        },
+        {
+          type: 'text',
+          text,
+        },
+      ],
+    });
+  }
 
   return (
     <List
@@ -430,9 +533,30 @@ export function AISearchPanelList({ className, style, ...props }: ComponentProps
       {...props}
     >
       {messages.length === 0 ? (
-        <div className="text-sm text-fd-muted-foreground/80 size-full flex flex-col items-center justify-center text-center gap-2">
+        <div className="text-sm text-fd-muted-foreground/80 size-full flex flex-col items-center justify-center text-center gap-3">
           <MessageCircleIcon fill="currentColor" stroke="none" />
           <p onClick={(e) => e.stopPropagation()}>Start a new chat below.</p>
+          <div className="flex flex-wrap justify-center gap-1.5 max-w-[95%]">
+            {starterPrompts.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                disabled={isLoading}
+                className={cn(
+                  buttonVariants({
+                    variant: 'secondary',
+                    size: 'sm',
+                    className: 'rounded-full text-xs',
+                  }),
+                )}
+                onClick={() => {
+                  sendPrompt(prompt);
+                }}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="flex flex-col px-3 gap-4">
@@ -445,12 +569,48 @@ export function AISearchPanelList({ className, style, ...props }: ComponentProps
             </div>
           )}
           {messages.map((item) => (
-            <Message key={item.id} message={item} />
+            <Message
+              key={item.id}
+              message={item}
+              showFollowUps={item.role === 'assistant' && item.id === lastAssistantId && !isLoading}
+              onFollowUp={sendPrompt}
+            />
           ))}
         </div>
       )}
     </List>
   );
+}
+
+function normalizeSearchToolOutput(output: unknown): SearchToolOutput | null {
+  if (!output || typeof output !== 'object') return null;
+  const value = output as Record<string, unknown>;
+  if (!Array.isArray(value.results)) return null;
+
+  return {
+    query: typeof value.query === 'string' ? value.query : '',
+    confidence:
+      value.confidence === 'high' || value.confidence === 'medium' || value.confidence === 'low'
+        ? value.confidence
+        : 'none',
+    resultCount: typeof value.resultCount === 'number' ? value.resultCount : value.results.length,
+    querySuggestion: typeof value.querySuggestion === 'string' ? value.querySuggestion : undefined,
+    results: value.results.flatMap((item) => {
+      if (!item || typeof item !== 'object') return [];
+      const result = item as Record<string, unknown>;
+      if (typeof result.title !== 'string' || typeof result.url !== 'string') return [];
+      return [
+        {
+          title: result.title,
+          url: result.url,
+          description: typeof result.description === 'string' ? result.description : undefined,
+          section: typeof result.section === 'string' ? result.section : undefined,
+          snippet: typeof result.snippet === 'string' ? result.snippet : undefined,
+          score: typeof result.score === 'number' ? result.score : 0,
+        },
+      ];
+    }),
+  };
 }
 
 export function useHotKey() {
