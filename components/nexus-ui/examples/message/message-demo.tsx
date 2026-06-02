@@ -62,7 +62,7 @@ const imgUser = "/assets/user-avatar.avif";
 const imgAssistant = "/assets/nexus-avatar.png";
 
 /**
- * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/chat`.
+ * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/demo/chat`.
  */
 const models = [
   {
@@ -387,7 +387,7 @@ export default function MessageDemo() {
   const transport = React.useMemo(
     () =>
       new DefaultChatTransport({
-        api: "/api/chat",
+        api: "/api/demo/chat",
         body: () => ({ model }),
       }),
     [model],

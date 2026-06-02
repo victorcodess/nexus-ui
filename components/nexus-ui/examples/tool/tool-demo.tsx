@@ -122,12 +122,9 @@ function ToolCard({
         status={displayStatus}
         open={isOpen}
         onOpenChange={onOpenChange}
-        className="max-w-none h-fit"
+        className="h-fit max-w-none"
       >
-        <motion.div
-          layout
-          transition={{ duration: 0.22, ease: "easeOut" }}
-        >
+        <motion.div layout transition={{ duration: 0.22, ease: "easeOut" }}>
           <ToolTrigger
             name={part ? toolNameFromPartType(part.type) : entry.fallbackName}
           />
@@ -172,7 +169,8 @@ function ToolCard({
           ) : null}
 
           <AnimatePresence mode="popLayout">
-            {(displayStatus === "completed" || displayStatus === "error") && part ? (
+            {(displayStatus === "completed" || displayStatus === "error") &&
+            part ? (
               <motion.div
                 key="tool-output"
                 layout
@@ -201,7 +199,7 @@ export default function ToolDemo() {
   const [openById, setOpenById] = React.useState<Record<string, boolean>>({});
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
-      api: "/api/chat",
+      api: "/api/demo/chat",
       body: { model: "openai/gpt-4o-mini" },
     }),
   });
@@ -298,7 +296,7 @@ export default function ToolDemo() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.24, delay: 0.08 }}
-          className="mt-4 rounded-2xl bg- card/40 p-4 sm:p-6"
+          className="bg- card/40 mt-4 rounded-2xl p-4 sm:p-6"
         >
           <AnimatePresence mode="popLayout">
             {error ? (

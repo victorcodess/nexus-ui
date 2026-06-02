@@ -87,7 +87,7 @@ const DEFAULT_MODEL = "openai/gpt-4o";
 const TOASTER_ID = "reasoning-demo-toaster";
 
 /**
- * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/chat`.
+ * `value` is either a Vercel AI Gateway id or a Perplexity Sonar id — see `/api/demo/chat`.
  */
 const models = [
   {
@@ -566,7 +566,7 @@ function Messages({
             <AnimatePresence>
               {showFeedbackBar ? (
                 <motion.div
-                  className="mt-4 fl ex w-full justify-center hidden"
+                  className="fl ex mt-4 hidden w-full justify-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -685,7 +685,7 @@ export default function ReasoningDemo() {
   const transport = React.useMemo(
     () =>
       new DefaultChatTransport({
-        api: "/api/chat",
+        api: "/api/demo/chat",
         body: () => ({ model }),
       }),
     [model],
@@ -829,9 +829,7 @@ export default function ReasoningDemo() {
           } as React.CSSProperties
         }
       >
-        <ThreadContent
-          className="mx-auto max-w-2xl gap-(--reasoning-thread-content-gap) pb-(--reasoning-thread-content-bottom-padding)"
-        >
+        <ThreadContent className="mx-auto max-w-2xl gap-(--reasoning-thread-content-gap) pb-(--reasoning-thread-content-bottom-padding)">
           <Messages
             displayRows={displayRows}
             status={status}
@@ -863,7 +861,7 @@ export default function ReasoningDemo() {
         <ThreadScrollToBottom className="bottom-0 z-50" />
       </Thread>
 
-      <div className="fixed right-0 bottom-0 left-0 z-10 flex w-full items-center justify-center border-t border-accent bg-background/70 px-6 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95 opacity- hid den">
+      <div className="opacity- hid den fixed right-0 bottom-0 left-0 z-10 flex w-full items-center justify-center border-t border-accent bg-background/70 px-6 pt-6 pb-12 backdrop-blur-sm dark:bg-background/95">
         <div className="mx-auto w-full max-w-xl space-y-2">
           {error ? (
             <div
