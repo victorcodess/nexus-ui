@@ -1,9 +1,9 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { convertToModelMessages, stepCountIs, streamText, tool, type UIMessage } from 'ai';
+import { convertToModelMessages, stepCountIs, streamText, tool } from 'ai';
 import { z } from 'zod';
 import { source } from '@/lib/source';
 import { Document, type DocumentData } from 'flexsearch';
-import { ChatUIMessage, SearchTool } from '../../../components/ai/search';
+import type { ChatUIMessage, SearchTool } from '@/lib/ai/types';
 
 interface CustomDocument extends DocumentData {
   url: string;

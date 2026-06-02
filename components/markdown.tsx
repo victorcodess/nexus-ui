@@ -95,6 +95,7 @@ function Pre(props: ComponentProps<'pre'>) {
 }
 
 const processor = createProcessor();
+const MaxCacheEntries = 200;
 
 export function Markdown({ text }: { text: string }) {
   const deferredText = useDeferredValue(text);
@@ -109,8 +110,15 @@ export function Markdown({ text }: { text: string }) {
 const cache = new Map<string, Promise<ReactNode>>();
 
 function Renderer({ text }: { text: string }) {
-  const result = cache.get(text) ?? processor.process(text);
-  cache.set(text, result);
+  let result = cache.get(text);
+  if (!result) {
+    result = processor.process(text);
+    cache.set(text, result);
+    if (cache.size > MaxCacheEntries) {
+      const oldestKey = cache.keys().next().value;
+      if (oldestKey) cache.delete(oldestKey);
+    }
+  }
 
   return use(result);
 }

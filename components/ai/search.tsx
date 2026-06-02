@@ -15,20 +15,10 @@ import { Loader2, MessageCircleIcon, RefreshCw, SearchIcon, Send, X } from 'luci
 import { cn } from '../../lib/cn';
 import { buttonVariants } from '../ui/button';
 import { useChat, type UseChatHelpers } from '@ai-sdk/react';
-import { DefaultChatTransport, type Tool, type UIMessage, type UIToolInvocation } from 'ai';
+import { DefaultChatTransport, type Tool, type UIToolInvocation } from 'ai';
 import { Markdown } from '../markdown';
 import { Presence } from '@radix-ui/react-presence';
-
-export type ChatUIMessage = UIMessage<
-  never,
-  {
-    client: {
-      location: string;
-    };
-  }
->;
-
-export type SearchTool = Tool<{ query: string; limit: number }>;
+import type { ChatUIMessage, SearchTool } from '@/lib/ai/types';
 
 const Context = createContext<{
   open: boolean;
@@ -116,7 +106,7 @@ export function AISearchInputActions() {
 const StorageKeyInput = '__ai_search_input';
 export function AISearchInput(props: ComponentProps<'form'>) {
   const { status, sendMessage, stop } = useChatContext();
-  const [input, setInput] = useState(() => localStorage.getItem(StorageKeyInput) ?? '');
+  const [input, setInput] = useState('');
   const isLoading = status === 'streaming' || status === 'submitted';
   const onStart = (e?: SyntheticEvent) => {
     e?.preventDefault();
@@ -139,8 +129,15 @@ export function AISearchInput(props: ComponentProps<'form'>) {
       ],
     });
     setInput('');
-    localStorage.removeItem(StorageKeyInput);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(StorageKeyInput);
+    }
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setInput(localStorage.getItem(StorageKeyInput) ?? '');
+  }, []);
 
   useEffect(() => {
     if (isLoading) document.getElementById('nd-ai-input')?.focus();
@@ -156,7 +153,9 @@ export function AISearchInput(props: ComponentProps<'form'>) {
         disabled={status === 'streaming' || status === 'submitted'}
         onChange={(e) => {
           setInput(e.target.value);
-          localStorage.setItem(StorageKeyInput, e.target.value);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(StorageKeyInput, e.target.value);
+          }
         }}
         onKeyDown={(event) => {
           if (!event.shiftKey && event.key === 'Enter') {
