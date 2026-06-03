@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 /** Matches reasoning-demo message fade timing. */
@@ -59,21 +59,16 @@ export function clearAnimateOnce(key: string) {
 /** Fade-in only the first time this key mounts (survives panel close/open). */
 export function useAnimateOnce(key: string) {
   const reduceMotion = useReducedMotion();
-  const shouldAnimateRef = useRef(!reduceMotion && !animatedKeys.has(key));
-
-  const markDone = useCallback(() => {
-    animatedKeys.add(key);
-    shouldAnimateRef.current = false;
-  }, [key]);
+  const [shouldAnimate] = useState(
+    () => !reduceMotion && !animatedKeys.has(key),
+  );
 
   const onAnimationComplete = useCallback(() => {
-    if (shouldAnimateRef.current) markDone();
-  }, [markDone]);
+    if (shouldAnimate) animatedKeys.add(key);
+  }, [key, shouldAnimate]);
 
   return {
-    initial: shouldAnimateRef.current
-      ? ({ opacity: 0 } as const)
-      : (false as const),
+    initial: shouldAnimate ? ({ opacity: 0 } as const) : (false as const),
     onAnimationComplete,
   };
 }
