@@ -1,6 +1,14 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { z } from "zod";
+import {
+  formatNexusComponentTitle,
+  loadNexusComponentSourceChunks,
+  nexusComponentSourceBlobUrl,
+  pickRelevantSourceSnippet,
+  readNexusComponentSource,
+  slugFromNexusSourceUrl,
+} from "@/lib/nexus-component-sources";
 import { source } from "@/lib/source";
 import { Document, type DocumentData } from "flexsearch";
 import type {
@@ -51,6 +59,10 @@ async function createSearchServer() {
     }
   }
 
+  for (const chunk of await loadNexusComponentSourceChunks()) {
+    search.add(chunk as ChunkDocument);
+  }
+
   return search;
 }
 
@@ -77,6 +89,7 @@ const systemPrompt = [
   "Ground answers in retrieved search results only. If resultCount > 0, never claim the docs lack an answer—synthesize from the returned titles, snippets, and urls.",
   "Do not invent install commands, package names, or APIs. Nexus UI components are added via shadcn (`npx shadcn@latest add @nexus-ui/<name>`), not `npm install nexus-ui` for individual components.",
   "Nexus UI component docs live at /docs/components/<name> (Reasoning, Prompt Input, Message, etc.). If results include that page, answer from it—especially props like `isStreaming`.",
+  "Search also indexes component source files under components/nexus-ui/*.tsx (results titled *(source)*). Prefer source snippets for props, types, exports, and implementation details; use docs for installation and usage guides.",
   "If you call `search` more than once, every query must keep the component or topic name (e.g. `reasoning streaming`, never generic queries like `streaming support` alone).",
   "Nexus UI does not publish a separate Button component page. Button/Avatar/Textarea/etc. come from shadcn/ui under `@/components/ui/*` and appear in installation + component examples—cite those when relevant.",
   "For installation/setup questions, prioritize the shadcn registry flow when present in docs, and mention `Nexus UI-cli` only as an alternative.",
@@ -112,7 +125,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
 
 const searchTool = tool({
   description:
-    "Search nexus-ui docs. For component questions, include the component name in the query (e.g. `reasoning isStreaming`, `prompt-input actions`). Keep the component name in every search if you call this tool twice.",
+    "Search nexus-ui docs and component source (components/nexus-ui/*.tsx). For component questions, include the component name in the query (e.g. `reasoning isStreaming`, `prompt-input actions`). Keep the component name in every search if you call this tool twice.",
   inputSchema: z.object({
     query: z.string(),
     limit: z.number().int().min(1).max(30).default(8),
@@ -147,6 +160,11 @@ const searchTool = tool({
     }
     if (componentSlug) {
       anchored = await applyNexusComponentPageAnchors(
+        componentSlug,
+        query,
+        anchored,
+      );
+      anchored = await applyNexusComponentSourceAnchors(
         componentSlug,
         query,
         anchored,
@@ -420,6 +438,11 @@ function rankSearchResults(
       if (titleMatchesComponent(doc.title, componentSlug)) score += 8;
       if (text.includes("istreaming") || text.includes("streaming")) score += 6;
     }
+    const sourceSlug = slugFromNexusSourceUrl(doc.url);
+    if (componentSlug && sourceSlug === componentSlug) {
+      score += 24;
+      if (doc.title.includes("(source)")) score += 6;
+    }
 
     return {
       title: doc.title,
@@ -517,6 +540,7 @@ function buildQueryVariants(query: string): string[] {
     variants.add(`nexus-ui ${componentSlug} component`);
     variants.add(`${label} isStreaming`);
     variants.add(`@nexus-ui/${componentSlug}`);
+    variants.add(`components/nexus-ui/${componentSlug}.tsx`);
   }
 
   return [...variants].map((v) => v.trim()).filter(Boolean);
@@ -578,6 +602,35 @@ async function applyNexusComponentPageAnchors(
     section: "Overview",
     snippet: snippet ?? page.data.description ?? "",
     score: Math.max(existing?.score ?? 0, 36),
+  });
+
+  return [...byKey.values()].sort((a, b) => b.score - a.score);
+}
+
+async function applyNexusComponentSourceAnchors(
+  slug: string,
+  query: string,
+  ranked: SearchResultItem[],
+): Promise<SearchResultItem[]> {
+  const content = await readNexusComponentSource(slug);
+  if (!content) return ranked;
+
+  const byKey = new Map<string, SearchResultItem>();
+  for (const item of ranked) {
+    byKey.set(`${item.url}::${item.section ?? "Overview"}`, item);
+  }
+
+  const url = nexusComponentSourceBlobUrl(`${slug}.tsx`);
+  const snippet = pickRelevantSourceSnippet(content, query);
+  const key = `${url}::Overview`;
+  const existing = byKey.get(key);
+  byKey.set(key, {
+    title: `${formatNexusComponentTitle(slug)} (source)`,
+    url,
+    description: `components/nexus-ui/${slug}.tsx`,
+    section: "Implementation",
+    snippet,
+    score: Math.max(existing?.score ?? 0, 34),
   });
 
   return [...byKey.values()].sort((a, b) => b.score - a.score);
