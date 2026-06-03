@@ -36,15 +36,16 @@ export function buildDisplayMessages(
   return visible;
 }
 
+/** Stable key for the assistant turn after a user message (pending row + streamed reply). */
 export function displayMessageRowKey(
   message: ChatUIMessage,
   index: number,
   rowList: ChatUIMessage[],
 ) {
-  if (isPendingAssistantMessage(message)) {
+  if (message.role === "assistant") {
     const previous = rowList[index - 1];
     if (previous?.role === "user") {
-      return `${previous.id}::assistant-handoff`;
+      return `${previous.id}::assistant`;
     }
   }
   return message.id;
