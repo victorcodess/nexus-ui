@@ -58,8 +58,8 @@ export function AISearchTrigger({
     <motion.div
       className={cn(
         position === "float" && [
-          "fixed right-5 bottom-6 z-20 transition-opacity duration-200",
-          open && "pointer-events-none opacity-0",
+          "fixed right-5 bottom-6 z-20",
+          open ? "pointer-events-none" : "",
         ],
         "overflow-hidden rounded-full shadow-2xl",
         className,

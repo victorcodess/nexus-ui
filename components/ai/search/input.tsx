@@ -1,9 +1,12 @@
 "use client";
 
 import { type ComponentProps, useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowUp02Icon, SquareIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { askAiInputFade } from "@/components/ai/search/animation";
 import { useChatContext } from "@/components/ai/search/context";
+import { useOnChange } from "@/lib/use-on-change";
 import { sendPromptMessage, StorageKeyInput } from "@/components/ai/search/helpers";
 import {
   PromptInput,
@@ -15,10 +18,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function AISearchInput(props: ComponentProps<"div">) {
+export function AISearchInput({
+  className,
+  fadeIn = false,
+  ...props
+}: ComponentProps<"div"> & { fadeIn?: boolean }) {
   const { status, sendMessage, stop } = useChatContext();
+  const reduceMotion = useReducedMotion();
+  const [enterKey, setEnterKey] = useState(0);
   const [input, setInput] = useState("");
   const isLoading = status === "streaming" || status === "submitted";
+
+  useOnChange(fadeIn, (isEmpty, wasEmpty) => {
+    if (isEmpty && !wasEmpty) {
+      setEnterKey((key) => key + 1);
+    }
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -38,10 +53,10 @@ export function AISearchInput(props: ComponentProps<"div">) {
     if (input.trim()) sendPromptMessage(sendMessage, input, setInput);
   };
 
-  return (
+  const promptInput = (
     <PromptInput
       {...props}
-      className={cn("w-full", props.className)}
+      className="w-full"
       onSubmit={(value) => sendPromptMessage(sendMessage, value, setInput)}
     >
       <PromptInputTextarea
@@ -86,5 +101,21 @@ export function AISearchInput(props: ComponentProps<"div">) {
         </PromptInputActionGroup>
       </PromptInputActions>
     </PromptInput>
+  );
+
+  if (reduceMotion || !fadeIn) {
+    return <div className={cn("w-full", className)}>{promptInput}</div>;
+  }
+
+  return (
+    <motion.div
+      key={enterKey}
+      className={cn("w-full", className)}
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={askAiInputFade}
+    >
+      {promptInput}
+    </motion.div>
   );
 }

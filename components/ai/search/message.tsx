@@ -304,7 +304,10 @@ export const ChatMessage = React.forwardRef<
           <MessageStack>
             {showThinking ? (
               <MessageContent>
-                <TextShimmer invertLight className="text-sm leading-6 text-muted-foreground">
+                <TextShimmer
+                  invertLight
+                  className="text-sm leading-6 text-muted-foreground"
+                >
                   Thinking...
                 </TextShimmer>
               </MessageContent>
@@ -364,57 +367,55 @@ export const ChatMessage = React.forwardRef<
                 onAnimationComplete={actionsAnim.onAnimationComplete}
               >
                 <MessageActions>
-                    <MessageActionGroup>
-                      <MessageAction asChild tooltip="Copy response">
+                  <MessageActionGroup>
+                    <MessageAction asChild tooltip="Copy response">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className={messageActionButtonClass}
+                        aria-label="Copy response"
+                        onClick={() => void copyMessageText(assistant.markdown)}
+                      >
+                        <HugeiconsIcon
+                          icon={Copy01Icon}
+                          strokeWidth={2.0}
+                          className="size-4"
+                        />
+                      </Button>
+                    </MessageAction>
+                    {canRegenerate ? (
+                      <MessageAction asChild tooltip="Regenerate">
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon-sm"
                           className={messageActionButtonClass}
-                          aria-label="Copy response"
-                          onClick={() =>
-                            void copyMessageText(assistant.markdown)
-                          }
+                          aria-label="Regenerate"
+                          disabled={busy}
+                          onClick={() => {
+                            clearAnimateOnce(`${turnKey}:response`);
+                            clearAnimateOnce(`${turnKey}:actions`);
+                            void regenerate({ messageId: message.id });
+                          }}
                         >
                           <HugeiconsIcon
-                            icon={Copy01Icon}
+                            icon={RepeatIcon}
                             strokeWidth={2.0}
                             className="size-4"
                           />
                         </Button>
                       </MessageAction>
-                      {canRegenerate ? (
-                        <MessageAction asChild tooltip="Regenerate">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-sm"
-                            className={messageActionButtonClass}
-                            aria-label="Regenerate"
-                            disabled={busy}
-                            onClick={() => {
-                              clearAnimateOnce(`${turnKey}:response`);
-                              clearAnimateOnce(`${turnKey}:actions`);
-                              void regenerate({ messageId: message.id });
-                            }}
-                          >
-                            <HugeiconsIcon
-                              icon={RepeatIcon}
-                              strokeWidth={2.0}
-                              className="size-4"
-                            />
-                          </Button>
-                        </MessageAction>
-                      ) : null}
-                      {citationSources.length > 0 ? (
-                        <MessageAction className="ml-1">
-                          <Citation citations={citationSources}>
-                            <CitationSourcesBadge />
-                          </Citation>
-                        </MessageAction>
-                      ) : null}
-                    </MessageActionGroup>
-                  </MessageActions>
+                    ) : null}
+                    {citationSources.length > 0 ? (
+                      <MessageAction className="ml-1">
+                        <Citation citations={citationSources}>
+                          <CitationSourcesBadge />
+                        </Citation>
+                      </MessageAction>
+                    ) : null}
+                  </MessageActionGroup>
+                </MessageActions>
               </motion.div>
             ) : null}
           </MessageStack>

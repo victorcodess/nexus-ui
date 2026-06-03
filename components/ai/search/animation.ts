@@ -21,6 +21,13 @@ export const askAiActionsFade = {
 
 export const askAiAssistantRowDelay = 0.14;
 
+/** Prompt input enters after suggestion stagger. */
+export const askAiInputFade = {
+  ease: askAiMessageEase,
+  duration: 0.30,
+  delay: 0.38,
+} as const;
+
 export const askAiStaggerStep = 0.06;
 export const askAiStaggerDelay = 0.08;
 
@@ -52,9 +59,7 @@ export function clearAnimateOnce(key: string) {
 /** Fade-in only the first time this key mounts (survives panel close/open). */
 export function useAnimateOnce(key: string) {
   const reduceMotion = useReducedMotion();
-  const shouldAnimateRef = useRef(
-    !reduceMotion && !animatedKeys.has(key),
-  );
+  const shouldAnimateRef = useRef(!reduceMotion && !animatedKeys.has(key));
 
   const markDone = useCallback(() => {
     animatedKeys.add(key);
