@@ -262,7 +262,7 @@ export function DocsPage({
                   githubUrl={editUrl ?? "#"}
                   trigger={
                     <span className="flex h-4 w-full items-center gap-1 text-[13px] leading-5 font-normal">
-                      Ask AI{" "}
+                      Open in chat{" "}
                       <HugeiconsIcon
                         icon={AiMagicIcon}
                         strokeWidth={2.5}

@@ -59,12 +59,12 @@ export function AISearchPanelHeader({
   return (
     <div
       className={cn(
-        "sticky top-0 flex h-12 w-full items-center justify-between gap-2 bg-background pr-2 pl-4 lg:pr-4 lg:pl-6",
+        "sticky top-0 flex h-12 w-full items-center justify-between gap-2 bg-background pr-2 pl-4 lg:pr-4 lg:pl-6.5",
         className,
       )}
       {...props}
     >
-      <span className="text-sm font-medium text-primary">AI Chat</span>
+      <span className="text-sm font-medium text-primary">Nexus AI</span>
       <TooltipProvider delayDuration={400}>
         <div className="flex items-center gap-1">
           <Tooltip>

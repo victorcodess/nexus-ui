@@ -29,7 +29,10 @@ import {
 } from "@/components/nexus-ui/thread";
 import { Toaster, toast } from "@/components/nexus-ui/toaster";
 import type { ChatUIMessage } from "@/lib/ai/types";
-import { useAISearchContext, useChatContext } from "@/components/ai/search/context";
+import {
+  useAISearchContext,
+  useChatContext,
+} from "@/components/ai/search/context";
 import { AISearchPanelHeader } from "@/components/ai/search/header";
 import {
   buildDisplayMessages,
@@ -92,7 +95,7 @@ export function AISearchPanel() {
           onPointerDownOutside={preventDismissOutside}
           className={cn(
             "z-30 overflow-hidden text-foreground [--ai-chat-width:400px] 2xl:[--ai-chat-width:460px]",
-            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] w-(--ai-chat-width) gap-0 border-s dark:border-t-0 p-0 shadow-none",
+            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] w-(--ai-chat-width) gap-0 border-s p-0 shadow-none dark:border-t-0",
             "in-[#nd-docs-layout]:[grid-area:toc] in-[#nd-notebook-layout]:col-start-5 in-[#nd-notebook-layout]:row-span-full",
             "dark:border-accent",
           )}
@@ -287,8 +290,7 @@ export function AISearchPanelList({
   const threadVars = {
     maskImage:
       "linear-gradient(to bottom, transparent, white 1rem, white calc(100% - 1rem), transparent 100%)",
-    "--panel-thread-height":
-      threadHeight > 0 ? `${threadHeight}px` : "100%",
+    "--panel-thread-height": threadHeight > 0 ? `${threadHeight}px` : "100%",
     "--panel-thread-content-gap": "12px",
     "--panel-thread-content-bottom-padding": "160px",
     "--panel-min-height-misc": "14px",
@@ -298,40 +300,44 @@ export function AISearchPanelList({
   return (
     <div
       ref={threadMeasureRef}
-      className={cn("relative min-h-0 h-full", className)}
+      className={cn("relative h-full min-h-0", className)}
       {...props}
     >
-      <Thread className="h-full min-h-0" style={threadVars}>
-      <ThreadContent
-        className={cn(
-          "mx-auto max-w-(--ai-chat-width) gap-(--panel-thread-content-gap) p-0 px-2 pb-(--panel-thread-content-bottom-padding) pt-4",
-          displayMessages.length === 0 && "h-full pb-3",
-        )}
-      >
-        {displayMessages.length === 0 ? (
-          <div className="flex h-full w-full flex-col items-center justify-end gap-3">
-            <Suggestions
-              onSelect={(prompt) => sendPromptMessage(chat.sendMessage, prompt)}
-            >
-              <SuggestionList className="justify-start">
-                {starterPrompts.map((prompt) => (
-                  <Suggestion key={prompt} disabled={isLoading}>
-                    {prompt}
-                  </Suggestion>
-                ))}
-              </SuggestionList>
-            </Suggestions>
-          </div>
-        ) : (
-          <PanelMessages
-            displayMessages={displayMessages}
-            isLoading={isLoading}
-            lastAssistantIndex={lastAssistantIndex}
-            onFollowUp={(prompt) => sendPromptMessage(chat.sendMessage, prompt)}
-          />
-        )}
-      </ThreadContent>
-      <ThreadScrollToBottom className="bottom-2 z-10" />
+      <Thread className="h-full min-h-0" style={threadVars} initial={"instant"}>
+        <ThreadContent
+          className={cn(
+            "mx-auto max-w-(--ai-chat-width) gap-(--panel-thread-content-gap) p-0 px-2 pt-4 pb-(--panel-thread-content-bottom-padding)",
+            displayMessages.length === 0 && "h-full pb-3",
+          )}
+        >
+          {displayMessages.length === 0 ? (
+            <div className="flex h-full w-full flex-col items-center justify-end gap-3">
+              <Suggestions
+                onSelect={(prompt) =>
+                  sendPromptMessage(chat.sendMessage, prompt)
+                }
+              >
+                <SuggestionList className="justify-start">
+                  {starterPrompts.map((prompt) => (
+                    <Suggestion key={prompt} disabled={isLoading}>
+                      {prompt}
+                    </Suggestion>
+                  ))}
+                </SuggestionList>
+              </Suggestions>
+            </div>
+          ) : (
+            <PanelMessages
+              displayMessages={displayMessages}
+              isLoading={isLoading}
+              lastAssistantIndex={lastAssistantIndex}
+              onFollowUp={(prompt) =>
+                sendPromptMessage(chat.sendMessage, prompt)
+              }
+            />
+          )}
+        </ThreadContent>
+        <ThreadScrollToBottom className="bottom-2 z-10" />
       </Thread>
     </div>
   );

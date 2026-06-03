@@ -76,7 +76,7 @@ export function AISearchTrigger({
         data-state={open ? "open" : "closed"}
         variant="default"
         className={cn(
-          "h-9 w-full justify-start gap-2 overflow-hidden rounded-full border-none text-sm font-normal shadow-none outline-0 transition-colors duration-150 hover:bg-primary focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.99]",
+          "h-9 w-full justify-start gap-2 overflow-hidden rounded-full border-none text-sm font-normal shadow-none outline-0 transition-colors duration-150 hover:bg-primary focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]",
           isHovered ? "pr-3! pl-2.5!" : "pl-2!",
         )}
         onMouseEnter={handleHoverStart}
