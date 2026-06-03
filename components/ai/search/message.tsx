@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import * as React from "react";
 import { type ComponentProps, useCallback, useState } from "react";
 import {
@@ -65,6 +66,39 @@ import {
   followupPrompts,
   normalizeSearchToolOutput,
 } from "@/components/ai/search/helpers";
+
+function nexusPath(href: string) {
+  if (href.startsWith("/")) return href;
+  try {
+    const u = new URL(href);
+    if (u.hostname === "nexus-ui.dev")
+      return `${u.pathname}${u.search}${u.hash}`;
+  } catch {
+    /* external */
+  }
+  return null;
+}
+
+const askAiMarkdownProps = {
+  linkSafety: { enabled: false },
+  components: {
+    a: ({ href, children, className }: ComponentProps<"a">) => {
+      if (!href || href === "streamdown:incomplete-link") {
+        return <span className={className}>{children}</span>;
+      }
+      const path = nexusPath(href);
+      return path ? (
+        <Link href={path} className={className}>
+          {children}
+        </Link>
+      ) : (
+        <a href={href} target="_blank" rel="noreferrer" className={className}>
+          {children}
+        </a>
+      );
+    },
+  },
+} as const;
 
 const messageActionButtonClass =
   "cursor-pointer rounded-full bg-transparent text-muted-foreground transition-all hover:bg-muted active:scale-97";
@@ -220,7 +254,7 @@ export const ChatMessage = React.forwardRef<
         {isUser ? (
           <MessageStack>
             <MessageContent>
-              <MessageMarkdown>{userMarkdown}</MessageMarkdown>
+              <MessageMarkdown {...askAiMarkdownProps}>{userMarkdown}</MessageMarkdown>
             </MessageContent>
             <MessageActions className={hoverRevealActionsClass}>
               <MessageActionGroup>
@@ -284,7 +318,10 @@ export const ChatMessage = React.forwardRef<
 
             {showAssistantResponse && assistant ? (
               <MessageContent>
-                <MessageMarkdown isAnimating={assistant.textIsStreaming}>
+                <MessageMarkdown
+                  {...askAiMarkdownProps}
+                  isAnimating={assistant.textIsStreaming}
+                >
                   {assistant.markdown}
                 </MessageMarkdown>
               </MessageContent>
