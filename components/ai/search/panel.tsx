@@ -43,6 +43,13 @@ import { AISearchInput } from "@/components/ai/search/input";
 import { ChatMessage } from "@/components/ai/search/message";
 
 const panelDescription = "Grounded in nexus-ui docs. Verify important details.";
+const panelInputId = "nd-ai-input";
+
+function focusPanelInput() {
+  requestAnimationFrame(() => {
+    document.getElementById(panelInputId)?.focus();
+  });
+}
 
 function preventDismissOutside(event: Event) {
   event.preventDefault();
@@ -77,6 +84,10 @@ export function AISearchPanel() {
           embedded
           showCloseButton={false}
           showOverlay={false}
+          onOpenAutoFocus={(event) => {
+            event.preventDefault();
+            focusPanelInput();
+          }}
           onInteractOutside={preventDismissOutside}
           onPointerDownOutside={preventDismissOutside}
           className={cn(
@@ -100,6 +111,10 @@ export function AISearchPanel() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         showCloseButton={false}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          focusPanelInput();
+        }}
         onInteractOutside={preventDismissOutside}
         onPointerDownOutside={preventDismissOutside}
         className={cn(

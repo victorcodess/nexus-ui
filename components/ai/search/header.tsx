@@ -65,7 +65,7 @@ export function AISearchPanelHeader({
       {...props}
     >
       <span className="text-sm font-medium text-primary">AI Chat</span>
-      <TooltipProvider delayDuration={0}>
+      <TooltipProvider delayDuration={400}>
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
