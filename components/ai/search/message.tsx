@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 import { type ComponentProps, useCallback, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   AiBrain01Icon,
   CheckmarkCircle01Icon,
@@ -32,6 +33,7 @@ import {
   MessageMarkdown,
   MessageStack,
 } from "@/components/nexus-ui/message";
+import { TextDotsLoader } from "@/components/nexus-ui/loader";
 import { TextShimmer } from "@/components/nexus-ui/text-shimmer";
 import {
   Suggestions,
@@ -63,7 +65,14 @@ import { toast } from "@/components/nexus-ui/toaster";
 import { cn } from "@/lib/utils";
 import { useChatContext } from "@/components/ai/search/context";
 import {
+  askAiActionsFade,
+  askAiMessageFade,
+  clearAnimateOnce,
+  useAnimateOnce,
+} from "@/components/ai/search/animation";
+import {
   followupPrompts,
+  isPendingAssistantMessage,
   normalizeSearchToolOutput,
 } from "@/components/ai/search/helpers";
 
@@ -154,6 +163,8 @@ export const ChatMessage = React.forwardRef<
   HTMLDivElement,
   {
     message: ChatUIMessage;
+    /** Stable per-turn key from `displayMessageRowKey` for animate-once scopes. */
+    turnKey: string;
     showFollowUps?: boolean;
     isStreaming?: boolean;
     canRegenerate?: boolean;
@@ -164,6 +175,7 @@ export const ChatMessage = React.forwardRef<
 >(function ChatMessage(
   {
     message,
+    turnKey,
     showFollowUps = false,
     isStreaming = false,
     canRegenerate = false,
@@ -176,10 +188,15 @@ export const ChatMessage = React.forwardRef<
   ref,
 ) {
   const { regenerate, status } = useChatContext();
+  const reduceMotion = useReducedMotion();
   const [reaction, setReaction] = useState<"helpful" | "not-helpful" | null>(
     null,
   );
   const busy = status === "streaming" || status === "submitted";
+  const responseFade = reduceMotion ? { duration: 0 } : askAiMessageFade;
+  const actionsFade = reduceMotion ? { duration: 0 } : askAiActionsFade;
+  const responseAnim = useAnimateOnce(`${turnKey}:response`);
+  const actionsAnim = useAnimateOnce(`${turnKey}:actions`);
 
   const isUser = message.role === "user";
   const userMarkdown = isUser
@@ -194,18 +211,12 @@ export const ChatMessage = React.forwardRef<
     ? getCitationSourcesFromSearchCalls(assistant.searchCalls)
     : [];
 
-  const showInitialLoading =
-    isStreaming &&
-    assistant &&
-    !assistant.hasReasoning &&
-    !assistant.hasToolSteps &&
-    assistant.markdown.trim().length === 0 &&
-    !assistant.textIsStreaming;
+  const assistantIsPending = isPendingAssistantMessage(message);
 
   const showReasoning =
     assistant && (assistant.hasReasoning || assistant.reasoningIsStreaming);
 
-  const showChain = assistant?.hasToolSteps ?? false;
+  const showChain = Boolean(assistant?.hasToolSteps);
 
   const hasActiveSearch =
     assistant?.searchCalls.some((call) => isSearchCallPending(call)) ?? false;
@@ -233,6 +244,17 @@ export const ChatMessage = React.forwardRef<
     assistant.markdown.trim().length > 0 &&
     !isStreaming &&
     !assistant.textIsStreaming;
+
+  const showThinking =
+    assistant &&
+    !showReasoning &&
+    !showChain &&
+    !showAssistantResponse &&
+    !showMissingResponse &&
+    (assistantIsPending ||
+      (isStreaming &&
+        assistant.markdown.trim().length === 0 &&
+        !assistant.textIsStreaming));
 
   const toggleReaction = useCallback((vote: "helpful" | "not-helpful") => {
     setReaction((current) => (current === vote ? null : vote));
@@ -280,9 +302,9 @@ export const ChatMessage = React.forwardRef<
           </MessageStack>
         ) : (
           <MessageStack>
-            {showInitialLoading ? (
+            {showThinking ? (
               <MessageContent>
-                <TextShimmer className="text-sm leading-6 text-muted-foreground">
+                <TextShimmer invertLight className="text-sm leading-6 text-muted-foreground">
                   Thinking...
                 </TextShimmer>
               </MessageContent>
@@ -290,10 +312,7 @@ export const ChatMessage = React.forwardRef<
 
             {showReasoning && assistant ? (
               <Reasoning
-                isStreaming={
-                  assistant.reasoningIsStreaming ||
-                  (isStreaming && assistant.markdown.trim().length === 0)
-                }
+                isStreaming={assistant.reasoningIsStreaming}
                 className="mb-1 ml-2"
               >
                 <ReasoningTrigger />
@@ -318,65 +337,85 @@ export const ChatMessage = React.forwardRef<
             ) : null}
 
             {showAssistantResponse && assistant ? (
-              <MessageContent>
-                <MessageMarkdown
-                  {...askAiMarkdownProps}
-                  isAnimating={assistant.textIsStreaming}
-                >
-                  {assistant.markdown}
-                </MessageMarkdown>
-              </MessageContent>
+              <motion.div
+                className="w-full"
+                initial={responseAnim.initial}
+                animate={{ opacity: 1 }}
+                transition={responseFade}
+                onAnimationComplete={responseAnim.onAnimationComplete}
+              >
+                <MessageContent>
+                  <MessageMarkdown
+                    {...askAiMarkdownProps}
+                    isAnimating={assistant.textIsStreaming}
+                  >
+                    {assistant.markdown}
+                  </MessageMarkdown>
+                </MessageContent>
+              </motion.div>
             ) : null}
 
             {showAssistantActions && assistant ? (
-              <MessageActions>
-                <MessageActionGroup>
-                  <MessageAction asChild tooltip="Copy response">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      className={messageActionButtonClass}
-                      aria-label="Copy response"
-                      onClick={() => void copyMessageText(assistant.markdown)}
-                    >
-                      <HugeiconsIcon
-                        icon={Copy01Icon}
-                        strokeWidth={2.0}
-                        className="size-4"
-                      />
-                    </Button>
-                  </MessageAction>
-                  {canRegenerate ? (
-                    <MessageAction asChild tooltip="Regenerate">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className={messageActionButtonClass}
-                        aria-label="Regenerate"
-                        disabled={busy}
-                        onClick={() =>
-                          void regenerate({ messageId: message.id })
-                        }
-                      >
-                        <HugeiconsIcon
-                          icon={RepeatIcon}
-                          strokeWidth={2.0}
-                          className="size-4"
-                        />
-                      </Button>
-                    </MessageAction>
-                  ) : null}
-                  {citationSources.length > 0 ? (
-                    <MessageAction className="ml-1">
-                      <Citation citations={citationSources}>
-                        <CitationSourcesBadge />
-                      </Citation>
-                    </MessageAction>
-                  ) : null}
-                </MessageActionGroup>
-              </MessageActions>
+              <motion.div
+                className="w-full"
+                initial={actionsAnim.initial}
+                animate={{ opacity: 1 }}
+                transition={actionsFade}
+                onAnimationComplete={actionsAnim.onAnimationComplete}
+              >
+                <MessageActions>
+                    <MessageActionGroup>
+                      <MessageAction asChild tooltip="Copy response">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          className={messageActionButtonClass}
+                          aria-label="Copy response"
+                          onClick={() =>
+                            void copyMessageText(assistant.markdown)
+                          }
+                        >
+                          <HugeiconsIcon
+                            icon={Copy01Icon}
+                            strokeWidth={2.0}
+                            className="size-4"
+                          />
+                        </Button>
+                      </MessageAction>
+                      {canRegenerate ? (
+                        <MessageAction asChild tooltip="Regenerate">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            className={messageActionButtonClass}
+                            aria-label="Regenerate"
+                            disabled={busy}
+                            onClick={() => {
+                              clearAnimateOnce(`${turnKey}:response`);
+                              clearAnimateOnce(`${turnKey}:actions`);
+                              void regenerate({ messageId: message.id });
+                            }}
+                          >
+                            <HugeiconsIcon
+                              icon={RepeatIcon}
+                              strokeWidth={2.0}
+                              className="size-4"
+                            />
+                          </Button>
+                        </MessageAction>
+                      ) : null}
+                      {citationSources.length > 0 ? (
+                        <MessageAction className="ml-1">
+                          <Citation citations={citationSources}>
+                            <CitationSourcesBadge />
+                          </Citation>
+                        </MessageAction>
+                      ) : null}
+                    </MessageActionGroup>
+                  </MessageActions>
+              </motion.div>
             ) : null}
           </MessageStack>
         )}

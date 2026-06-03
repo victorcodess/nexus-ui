@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { type ComponentProps, type CSSProperties, useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { useMediaQuery } from "fumadocs-core/utils/use-media-query";
 import { cn } from "@/lib/utils";
 import { useOnChange } from "@/lib/use-on-change";
@@ -41,6 +42,13 @@ import {
   sendPromptMessage,
   starterPrompts,
 } from "@/components/ai/search/helpers";
+import {
+  askAiAssistantRowDelay,
+  askAiMessageFade,
+  askAiStaggerItemVariants,
+  askAiStaggerListVariants,
+  useAnimateOnce,
+} from "@/components/ai/search/animation";
 import { useHotKey } from "@/components/ai/search/hotkey";
 import { AISearchInput } from "@/components/ai/search/input";
 import { ChatMessage } from "@/components/ai/search/message";
@@ -141,12 +149,99 @@ type PanelMessagesProps = {
   onFollowUp: (prompt: string) => void;
 };
 
+function StarterSuggestions({
+  isLoading,
+  onSelect,
+}: {
+  isLoading: boolean;
+  onSelect: (prompt: string) => void;
+}) {
+  const { open } = useAISearchContext();
+  const reduceMotion = useReducedMotion();
+  const [staggerKey, setStaggerKey] = React.useState(0);
+
+  useOnChange(open, (openNow, wasOpen) => {
+    if (openNow && wasOpen === false) {
+      setStaggerKey((key) => key + 1);
+    }
+  });
+
+  if (reduceMotion) {
+    return (
+      <Suggestions onSelect={onSelect}>
+        <SuggestionList className="justify-start">
+          {starterPrompts.map((prompt) => (
+            <Suggestion key={prompt} disabled={isLoading}>
+              {prompt}
+            </Suggestion>
+          ))}
+        </SuggestionList>
+      </Suggestions>
+    );
+  }
+
+  return (
+    <Suggestions onSelect={onSelect}>
+      <motion.div
+        key={staggerKey}
+        role="group"
+        aria-label="Suggestions"
+        data-slot="suggestion-list"
+        className="flex flex-row flex-wrap items-center justify-start gap-2 duration-150"
+        initial="hidden"
+        animate="visible"
+        variants={askAiStaggerListVariants}
+      >
+        {starterPrompts.map((prompt) => (
+          <motion.div key={prompt} variants={askAiStaggerItemVariants}>
+            <Suggestion disabled={isLoading}>{prompt}</Suggestion>
+          </motion.div>
+        ))}
+      </motion.div>
+    </Suggestions>
+  );
+}
+
+function PanelMessageRow({
+  rowKey,
+  isAssistant,
+  reduceMotion,
+  children,
+}: {
+  rowKey: string;
+  isAssistant: boolean;
+  reduceMotion: boolean | null;
+  children: React.ReactNode;
+}) {
+  const rowAnim = useAnimateOnce(`row:${rowKey}`);
+
+  return (
+    <motion.div
+      className="w-full"
+      initial={rowAnim.initial}
+      animate={{ opacity: 1 }}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : {
+              ...askAiMessageFade,
+              delay: isAssistant ? askAiAssistantRowDelay : 0,
+            }
+      }
+      onAnimationComplete={rowAnim.onAnimationComplete}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function PanelMessages({
   displayMessages,
   isLoading,
   lastAssistantIndex,
   onFollowUp,
 }: PanelMessagesProps) {
+  const reduceMotion = useReducedMotion();
   const previousUserMessageRef = React.useRef<HTMLDivElement | null>(null);
   const [previousUserMessageHeight, setPreviousUserMessageHeight] =
     React.useState(0);
@@ -213,40 +308,50 @@ function PanelMessages({
             } as React.CSSProperties)
           : undefined;
 
+        const isAssistant = item.role === "assistant";
+        const rowKey = displayMessageRowKey(item, index, displayMessages);
+
         return (
-          <ChatMessage
-            key={displayMessageRowKey(item, index, displayMessages)}
-            ref={
-              index === previousUserMessageIndex
-                ? attachPreviousUserMessageRef
-                : undefined
-            }
-            message={item}
-            messageClassName={
-              useAssistantMinHeight
-                ? "min-h-[calc(var(--panel-thread-height)-var(--panel-prev-user-height)-var(--panel-thread-content-gap)-var(--panel-thread-content-bottom-padding)-var(--panel-min-height-misc))]"
-                : undefined
-            }
-            messageStyle={assistantMinHeightStyle}
-            isStreaming={
-              isLoading &&
-              item.role === "assistant" &&
-              index === lastAssistantIndex
-            }
-            canRegenerate={
-              !isPendingAssistantMessage(item) &&
-              item.role === "assistant" &&
-              index === lastAssistantIndex &&
-              !isLoading
-            }
-            showFollowUps={
-              !isPendingAssistantMessage(item) &&
-              item.role === "assistant" &&
-              index === lastAssistantIndex &&
-              !isLoading
-            }
-            onFollowUp={onFollowUp}
-          />
+          <PanelMessageRow
+            key={rowKey}
+            rowKey={rowKey}
+            isAssistant={isAssistant}
+            reduceMotion={reduceMotion}
+          >
+            <ChatMessage
+              ref={
+                index === previousUserMessageIndex
+                  ? attachPreviousUserMessageRef
+                  : undefined
+              }
+              message={item}
+              turnKey={rowKey}
+              messageClassName={
+                useAssistantMinHeight
+                  ? "min-h-[calc(var(--panel-thread-height)-var(--panel-prev-user-height)-var(--panel-thread-content-gap)-var(--panel-thread-content-bottom-padding)-var(--panel-min-height-misc))]"
+                  : undefined
+              }
+              messageStyle={assistantMinHeightStyle}
+              isStreaming={
+                isLoading &&
+                isAssistant &&
+                index === lastAssistantIndex
+              }
+              canRegenerate={
+                !isPendingAssistantMessage(item) &&
+                isAssistant &&
+                index === lastAssistantIndex &&
+                !isLoading
+              }
+              showFollowUps={
+                !isPendingAssistantMessage(item) &&
+                isAssistant &&
+                index === lastAssistantIndex &&
+                !isLoading
+              }
+              onFollowUp={onFollowUp}
+            />
+          </PanelMessageRow>
         );
       })}
     </>
@@ -312,19 +417,12 @@ export function AISearchPanelList({
         >
           {displayMessages.length === 0 ? (
             <div className="flex h-full w-full flex-col items-center justify-end gap-3">
-              <Suggestions
+              <StarterSuggestions
+                isLoading={isLoading}
                 onSelect={(prompt) =>
                   sendPromptMessage(chat.sendMessage, prompt)
                 }
-              >
-                <SuggestionList className="justify-start">
-                  {starterPrompts.map((prompt) => (
-                    <Suggestion key={prompt} disabled={isLoading}>
-                      {prompt}
-                    </Suggestion>
-                  ))}
-                </SuggestionList>
-              </Suggestions>
+              />
             </div>
           ) : (
             <PanelMessages
