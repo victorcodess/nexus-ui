@@ -22,7 +22,8 @@ export function AISearchInput(props: ComponentProps<"div">) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setInput(localStorage.getItem(StorageKeyInput) ?? "");
+    const stored = localStorage.getItem(StorageKeyInput) ?? "";
+    queueMicrotask(() => setInput(stored));
   }, []);
 
   useEffect(() => {
