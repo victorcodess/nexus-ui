@@ -1,6 +1,6 @@
-export { AISearch, useAISearchContext } from "./search/context";
-export { useHotKey } from "./search/hotkey";
-export { AISearchTrigger } from "./search/trigger";
-export { AISearchPanelHeader } from "./search/header";
-export { AISearchInput } from "./search/input";
-export { AISearchPanel, AISearchPanelList } from "./search/panel";
+export { AISearch, useAISearchContext } from "@/components/ai/search/context";
+export { AISearchPanelHeader } from "@/components/ai/search/header";
+export { useHotKey } from "@/components/ai/search/hotkey";
+export { AISearchInput } from "@/components/ai/search/input";
+export { AISearchPanel, AISearchPanelList } from "@/components/ai/search/panel";
+export { AISearchTrigger } from "@/components/ai/search/trigger";

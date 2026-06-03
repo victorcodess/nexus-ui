@@ -7,7 +7,12 @@ import {
   Copy01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { cn } from "../../../lib/cn";
+import { useAISearchContext, useChatContext } from "@/components/ai/search/context";
+import {
+  formatConversationForCopy,
+  isChatEmpty,
+  StorageKeyInput,
+} from "@/components/ai/search/helpers";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -16,12 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/nexus-ui/toaster";
-import { useAISearchContext, useChatContext } from "./context";
-import {
-  formatConversationForCopy,
-  isChatEmpty,
-  StorageKeyInput,
-} from "./helpers";
+import { cn } from "@/lib/utils";
 
 const headerActionButtonClass =
   "cursor-pointer rounded-full text-secondary-foreground active:scale-97 disabled:opacity-50 hover:dark:bg-secondary";

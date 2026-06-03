@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useEffectEvent } from 'react';
-import { useAISearchContext } from './context';
+import { useAISearchContext } from "@/components/ai/search/context";
 
 export function useHotKey() {
   const { open, setOpen } = useAISearchContext();

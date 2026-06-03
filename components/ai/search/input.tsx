@@ -3,8 +3,8 @@
 import { type ComponentProps, useEffect, useState } from "react";
 import { ArrowUp02Icon, SquareIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { cn } from "../../../lib/cn";
-import { Button } from "../../ui/button";
+import { useChatContext } from "@/components/ai/search/context";
+import { sendPromptMessage, StorageKeyInput } from "@/components/ai/search/helpers";
 import {
   PromptInput,
   PromptInputAction,
@@ -12,8 +12,8 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
-import { useChatContext } from "./context";
-import { sendPromptMessage, StorageKeyInput } from "./helpers";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function AISearchInput(props: ComponentProps<"div">) {
   const { status, sendMessage, stop } = useChatContext();
