@@ -60,7 +60,7 @@ function AISearchPanelBody() {
     <div className="relative flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:gap-3">
       <AISearchPanelHeader />
       <AISearchPanelList className="min-h-0 flex-1" />
-      <div className="flex items-center justify-center p-2 pt-1 lg:p-4 lg:pt-1">
+      <div className="flex items-center justify-center p-3 pt-1 lg:p-4 lg:pt-1">
         <AISearchInput />
       </div>
       <div className="absolute">
@@ -118,7 +118,7 @@ export function AISearchPanel() {
         onInteractOutside={preventDismissOutside}
         onPointerDownOutside={preventDismissOutside}
         className={cn(
-          "top-4 left-1/2 flex h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-none translate-x-[-50%] translate-y-0 flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-none",
+          "top-4 left-1/2 flex h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-none translate-x-[-50%] translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-[35px] p-0 sm:max-w-none dark:border-accent",
         )}
       >
         <DialogTitle className="sr-only">Ask AI</DialogTitle>
@@ -289,9 +289,9 @@ export function AISearchPanelList({
       "linear-gradient(to bottom, transparent, white 1rem, white calc(100% - 1rem), transparent 100%)",
     "--panel-thread-height":
       threadHeight > 0 ? `${threadHeight}px` : "100%",
-    "--panel-thread-content-gap": "24px",
+    "--panel-thread-content-gap": "12px",
     "--panel-thread-content-bottom-padding": "160px",
-    "--panel-min-height-misc": "-5px",
+    "--panel-min-height-misc": "14px",
     ...style,
   } as CSSProperties;
 
@@ -304,7 +304,7 @@ export function AISearchPanelList({
       <Thread className="h-full min-h-0" style={threadVars}>
       <ThreadContent
         className={cn(
-          "mx-auto max-w-(--ai-chat-width) gap-(--panel-thread-content-gap) p-0 px-1 pb-(--panel-thread-content-bottom-padding) lg:px-2",
+          "mx-auto max-w-(--ai-chat-width) gap-(--panel-thread-content-gap) p-0 px-2 pb-(--panel-thread-content-bottom-padding) pt-4",
           displayMessages.length === 0 && "h-full pb-3",
         )}
       >

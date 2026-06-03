@@ -203,8 +203,7 @@ export const ChatMessage = React.forwardRef<
     !assistant.textIsStreaming;
 
   const showReasoning =
-    assistant &&
-    (assistant.hasReasoning || assistant.reasoningIsStreaming);
+    assistant && (assistant.hasReasoning || assistant.reasoningIsStreaming);
 
   const showChain = assistant?.hasToolSteps ?? false;
 
@@ -254,7 +253,9 @@ export const ChatMessage = React.forwardRef<
         {isUser ? (
           <MessageStack>
             <MessageContent>
-              <MessageMarkdown {...askAiMarkdownProps}>{userMarkdown}</MessageMarkdown>
+              <MessageMarkdown {...askAiMarkdownProps}>
+                {userMarkdown}
+              </MessageMarkdown>
             </MessageContent>
             <MessageActions className={hoverRevealActionsClass}>
               <MessageActionGroup>
@@ -337,9 +338,7 @@ export const ChatMessage = React.forwardRef<
                       size="icon-sm"
                       className={messageActionButtonClass}
                       aria-label="Copy response"
-                      onClick={() =>
-                        void copyMessageText(assistant.markdown)
-                      }
+                      onClick={() => void copyMessageText(assistant.markdown)}
                     >
                       <HugeiconsIcon
                         icon={Copy01Icon}
@@ -383,9 +382,9 @@ export const ChatMessage = React.forwardRef<
         )}
       </Message>
 
-      {showFollowUps && onFollowUp && (
+      {/* {showFollowUps && onFollowUp && (
         <Suggestions onSelect={onFollowUp} className="mt-3">
-          <SuggestionList className="justify-start">
+          <SuggestionList className="justify-start gap-1.5">
             {followupPrompts.map((prompt) => (
               <Suggestion key={prompt} variant="outline" className="text-xs">
                 {prompt}
@@ -393,7 +392,7 @@ export const ChatMessage = React.forwardRef<
             ))}
           </SuggestionList>
         </Suggestions>
-      )}
+      )} */}
     </div>
   );
 });
@@ -418,8 +417,7 @@ function SearchChainOfThought({
 }) {
   const hasActiveSearch = searchCalls.some((call) => isSearchCallPending(call));
   const hasToolError = searchCalls.some(
-    (call) =>
-      call.state === "output-error" || call.state === "output-denied",
+    (call) => call.state === "output-error" || call.state === "output-denied",
   );
   const allToolStepsDone = searchCalls.length > 0 && !hasActiveSearch;
   const showCompleteRow = allToolStepsDone;
@@ -456,9 +454,7 @@ function SearchChainOfThought({
         {showCompleteRow ? (
           <ChainOfThoughtComplete
             label={
-              hasToolError
-                ? "Finished with partial errors"
-                : "Search complete"
+              hasToolError ? "Finished with partial errors" : "Search complete"
             }
             icon={
               <HugeiconsIcon
@@ -482,9 +478,7 @@ function SearchToolStep({ call }: { call: UIToolInvocation<SearchTool> }) {
     return (
       <ChainOfThoughtStep status="error">
         <ChainOfThoughtStepTitle
-          icon={
-            <HugeiconsIcon icon={Search01Icon} className="size-4" />
-          }
+          icon={<HugeiconsIcon icon={Search01Icon} className="size-4" />}
           label={call.errorText ?? "Failed to search docs"}
         />
       </ChainOfThoughtStep>
@@ -540,7 +534,9 @@ function getCitationSourcesFromSearchCalls(
       sources.push({
         url: result.url,
         title: result.title,
-        description: [result.section, result.snippet].filter(Boolean).join(" — "),
+        description: [result.section, result.snippet]
+          .filter(Boolean)
+          .join(" — "),
       });
     }
   }

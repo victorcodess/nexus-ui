@@ -48,7 +48,7 @@ export function AISearchInput(props: ComponentProps<"div">) {
         id="nd-ai-input"
         value={input}
         placeholder={
-          isLoading ? "Generating grounded answer..." : "Ask nexus-ui docs"
+          isLoading ? "Generating grounded answer..." : "Ask Nexus AI"
         }
         disabled={isLoading}
         onChange={(e) => {
