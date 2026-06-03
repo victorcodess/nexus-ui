@@ -51,6 +51,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "flexsearch": "^0.8.212",
+    "framer-motion": "^12.40.0",
     "fumadocs-core": "16.6.2",
     "fumadocs-mdx": "14.2.7",
     "fumadocs-ui": "16.6.2",
