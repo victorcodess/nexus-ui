@@ -1,9 +1,10 @@
 "use client";
 
-import { type ComponentProps, useEffect } from "react";
-import { MessageCircleIcon } from "lucide-react";
+import * as React from "react";
+import { type ComponentProps, type CSSProperties, useEffect } from "react";
 import { useMediaQuery } from "fumadocs-core/utils/use-media-query";
 import { cn } from "@/lib/utils";
+import { useOnChange } from "@/lib/use-on-change";
 import {
   Dialog,
   DialogContent,
@@ -27,18 +28,19 @@ import {
   ThreadScrollToBottom,
 } from "@/components/nexus-ui/thread";
 import { Toaster, toast } from "@/components/nexus-ui/toaster";
-import { useAISearchContext, useChatContext } from "./context";
-import { useHotKey } from "./hotkey";
+import type { ChatUIMessage } from "@/lib/ai/types";
+import { useAISearchContext, useChatContext } from "@/components/ai/search/context";
+import { AISearchPanelHeader } from "@/components/ai/search/header";
 import {
   buildDisplayMessages,
   displayMessageRowKey,
   isPendingAssistantMessage,
   sendPromptMessage,
   starterPrompts,
-} from "./helpers";
-import { AISearchInput } from "./input";
-import { ChatMessage } from "./message";
-import { AISearchPanelHeader } from "./header";
+} from "@/components/ai/search/helpers";
+import { useHotKey } from "@/components/ai/search/hotkey";
+import { AISearchInput } from "@/components/ai/search/input";
+import { ChatMessage } from "@/components/ai/search/message";
 
 const panelDescription = "Grounded in nexus-ui docs. Verify important details.";
 
@@ -79,7 +81,7 @@ export function AISearchPanel() {
           onPointerDownOutside={preventDismissOutside}
           className={cn(
             "z-30 overflow-hidden text-foreground [--ai-chat-width:400px] 2xl:[--ai-chat-width:460px]",
-            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] w-(--ai-chat-width) gap-0 border-s p-0 shadow-none",
+            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] w-(--ai-chat-width) gap-0 border-s dark:border-t-0 p-0 shadow-none",
             "in-[#nd-docs-layout]:[grid-area:toc] in-[#nd-notebook-layout]:col-start-5 in-[#nd-notebook-layout]:row-span-full",
             "dark:border-accent",
           )}
@@ -114,6 +116,125 @@ export function AISearchPanel() {
   );
 }
 
+type PanelMessagesProps = {
+  displayMessages: ChatUIMessage[];
+  isLoading: boolean;
+  lastAssistantIndex: number;
+  onFollowUp: (prompt: string) => void;
+};
+
+function PanelMessages({
+  displayMessages,
+  isLoading,
+  lastAssistantIndex,
+  onFollowUp,
+}: PanelMessagesProps) {
+  const previousUserMessageRef = React.useRef<HTMLDivElement | null>(null);
+  const [previousUserMessageHeight, setPreviousUserMessageHeight] =
+    React.useState(0);
+
+  const previousUserMessageIndex = React.useMemo(() => {
+    const lastIndex = displayMessages.length - 1;
+    if (lastIndex < 0 || displayMessages[lastIndex]?.role !== "assistant") {
+      return -1;
+    }
+
+    for (let index = lastIndex - 1; index >= 0; index -= 1) {
+      if (displayMessages[index]?.role === "user") {
+        return index;
+      }
+    }
+
+    return -1;
+  }, [displayMessages]);
+
+  const attachPreviousUserMessageRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      previousUserMessageRef.current = node;
+      setPreviousUserMessageHeight(node?.clientHeight ?? 0);
+    },
+    [],
+  );
+
+  useOnChange(previousUserMessageIndex, (current) => {
+    if (current < 0) {
+      setPreviousUserMessageHeight(0);
+    }
+  });
+
+  React.useLayoutEffect(() => {
+    if (previousUserMessageIndex < 0) return;
+
+    const element = previousUserMessageRef.current;
+    if (!element) {
+      return;
+    }
+
+    const measureHeight = () => {
+      setPreviousUserMessageHeight(element.clientHeight);
+    };
+
+    const resizeObserver = new ResizeObserver(measureHeight);
+    resizeObserver.observe(element);
+
+    return () => resizeObserver.disconnect();
+  }, [previousUserMessageIndex]);
+
+  return (
+    <>
+      {displayMessages.map((item, index) => {
+        const isLast = index === displayMessages.length - 1;
+        const assistantTurnNumber = displayMessages
+          .slice(0, index + 1)
+          .filter((row) => row.role === "assistant").length;
+        const useAssistantMinHeight =
+          item.role === "assistant" && isLast && assistantTurnNumber >= 2;
+        const assistantMinHeightStyle = useAssistantMinHeight
+          ? ({
+              "--panel-prev-user-height": `${previousUserMessageHeight}px`,
+            } as React.CSSProperties)
+          : undefined;
+
+        return (
+          <ChatMessage
+            key={displayMessageRowKey(item, index, displayMessages)}
+            ref={
+              index === previousUserMessageIndex
+                ? attachPreviousUserMessageRef
+                : undefined
+            }
+            message={item}
+            messageClassName={
+              useAssistantMinHeight
+                ? "min-h-[calc(var(--panel-thread-height)-var(--panel-prev-user-height)-var(--panel-thread-content-gap)-var(--panel-thread-content-bottom-padding)-var(--panel-min-height-misc))]"
+                : undefined
+            }
+            messageStyle={assistantMinHeightStyle}
+            isStreaming={
+              isLoading &&
+              item.role === "assistant" &&
+              index === lastAssistantIndex
+            }
+            canRegenerate={
+              !isPendingAssistantMessage(item) &&
+              item.role === "assistant" &&
+              index === lastAssistantIndex &&
+              !isLoading
+            }
+            showFollowUps={
+              !isPendingAssistantMessage(item) &&
+              item.role === "assistant" &&
+              index === lastAssistantIndex &&
+              !isLoading
+            }
+            onFollowUp={onFollowUp}
+          />
+        );
+      })}
+    </>
+  );
+}
+
 export function AISearchPanelList({
   className,
   style,
@@ -125,28 +246,53 @@ export function AISearchPanelList({
   const lastAssistantIndex = displayMessages.findLastIndex(
     (message) => message.role === "assistant",
   );
+  const threadMeasureRef = React.useRef<HTMLDivElement>(null);
+  const [threadHeight, setThreadHeight] = React.useState(0);
+
+  React.useLayoutEffect(() => {
+    const element = threadMeasureRef.current;
+    if (!element) return;
+
+    const measureHeight = () => {
+      setThreadHeight(element.clientHeight);
+    };
+
+    measureHeight();
+    const resizeObserver = new ResizeObserver(measureHeight);
+    resizeObserver.observe(element);
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!chat.error) return;
     toast.error("Ask AI request failed", { description: chat.error.message });
   }, [chat.error]);
 
-  return (
-    <Thread
-      className={cn("h-(--panel-thread-height)", className)}
-      style={{
-        maskImage:
-          "linear-gradient(to bottom, transparent, white 1rem, white calc(100% - 1rem), transparent 100%)",
-        // "--panel-thread-height": "75vh",
-        // "--panel-thread-content-gap": "24px",
-        // "--panel-thread-content-bottom-padding": "160px",
-        // "--panel-min-height-misc": "2px",
+  const threadVars = {
+    maskImage:
+      "linear-gradient(to bottom, transparent, white 1rem, white calc(100% - 1rem), transparent 100%)",
+    "--panel-thread-height":
+      threadHeight > 0 ? `${threadHeight}px` : "100%",
+    "--panel-thread-content-gap": "24px",
+    "--panel-thread-content-bottom-padding": "160px",
+    "--panel-min-height-misc": "-5px",
+    ...style,
+  } as CSSProperties;
 
-        ...style,
-      }}
+  return (
+    <div
+      ref={threadMeasureRef}
+      className={cn("relative min-h-0 h-full", className)}
       {...props}
     >
-      <ThreadContent className={cn("(--reasoning-thread-content-bottom-padding) max-w-(--ai-chat-width) gap-(--reasoning-thread-content-gap) px-1 pb-40 lg:px-2", displayMessages.length === 0 && "h-full mx-auto pb-3")}>
+      <Thread className="h-full min-h-0" style={threadVars}>
+      <ThreadContent
+        className={cn(
+          "mx-auto max-w-(--ai-chat-width) gap-(--panel-thread-content-gap) p-0 px-1 pb-(--panel-thread-content-bottom-padding) lg:px-2",
+          displayMessages.length === 0 && "h-full pb-3",
+        )}
+      >
         {displayMessages.length === 0 ? (
           <div className="flex h-full w-full flex-col items-center justify-end gap-3">
             <Suggestions
@@ -162,37 +308,16 @@ export function AISearchPanelList({
             </Suggestions>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {displayMessages.map((item, index) => (
-              <ChatMessage
-                key={displayMessageRowKey(item, index, displayMessages)}
-                message={item}
-                isStreaming={
-                  isLoading &&
-                  item.role === "assistant" &&
-                  index === lastAssistantIndex
-                }
-                canRegenerate={
-                  !isPendingAssistantMessage(item) &&
-                  item.role === "assistant" &&
-                  index === lastAssistantIndex &&
-                  !isLoading
-                }
-                showFollowUps={
-                  !isPendingAssistantMessage(item) &&
-                  item.role === "assistant" &&
-                  index === lastAssistantIndex &&
-                  !isLoading
-                }
-                onFollowUp={(prompt) =>
-                  sendPromptMessage(chat.sendMessage, prompt)
-                }
-              />
-            ))}
-          </div>
+          <PanelMessages
+            displayMessages={displayMessages}
+            isLoading={isLoading}
+            lastAssistantIndex={lastAssistantIndex}
+            onFollowUp={(prompt) => sendPromptMessage(chat.sendMessage, prompt)}
+          />
         )}
       </ThreadContent>
-      <ThreadScrollToBottom />
-    </Thread>
+      <ThreadScrollToBottom className="bottom-2 z-10" />
+      </Thread>
+    </div>
   );
 }
