@@ -173,7 +173,7 @@ export function DocsPage({
         id="nd-page"
         data-full={full}
         className={cn(
-          "mx-auto flex w-full max-w-[750px] flex-col gap-4 px-4 py-6 [grid-area:main] md:px-6 md:pt-8 xl:px-8 xl:pt-10",
+          "mx-auto flex w-full max-w-[750px] flex-col gap-4 px-4 py-6 [grid-area:main] md:px-6 md:pt-8 xl:px-8 xl:pt-10 mt-14",
           full ? "max-w-[1168px]" : "xl:layout:[--fd-toc-width:262px]",
           className,
         )}

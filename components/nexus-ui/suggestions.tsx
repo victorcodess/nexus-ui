@@ -70,7 +70,7 @@ function SuggestionList({
       role="group"
       aria-label="Suggestions"
       className={cn(
-        "flex animate-in gap-2 duration-150 fade-in-0",
+        "flex gap-2 duration-150",
         orientation === "horizontal"
           ? "flex-row flex-wrap items-center justify-center"
           : "flex-col items-start",
