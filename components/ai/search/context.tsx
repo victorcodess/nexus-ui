@@ -3,6 +3,7 @@
 import { createContext, type ReactNode, use, useMemo, useState } from 'react';
 import { useChat, type UseChatHelpers } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
+import { logAskAiDebug } from '@/lib/ask-ai/client-logger';
 import type { ChatUIMessage } from '@/lib/ai/types';
 
 const Context = createContext<{
@@ -18,6 +19,10 @@ export function AISearch({ children }: { children: ReactNode }) {
     transport: new DefaultChatTransport({
       api: '/api/chat',
     }),
+    // TEMP: remove with lib/ask-ai/
+    onData: (part) => {
+      if (part.type === 'data-debug') logAskAiDebug(part.data);
+    },
   });
 
   return (

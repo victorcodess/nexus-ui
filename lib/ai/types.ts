@@ -1,4 +1,5 @@
 import type { Tool, UIMessage } from 'ai';
+import type { AskAiDebugPayload } from '@/lib/ask-ai/debug';
 
 export type ChatUIMessage = UIMessage<
   never,
@@ -6,6 +7,8 @@ export type ChatUIMessage = UIMessage<
     client: {
       location: string;
     };
+    /** TEMP: transient debug events → browser console via onData */
+    debug: AskAiDebugPayload;
   }
 >;
 
