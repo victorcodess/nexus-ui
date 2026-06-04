@@ -10,8 +10,11 @@ import {
 } from "@/components/ai/search/animation";
 import { useChatContext } from "@/components/ai/search/context";
 import {
+  ASK_AI_INPUT_MAX_CHARS,
+  clampAskAiInput,
   sendPromptMessage,
   StorageKeyInput,
+  warnAskAiInputTooLong,
 } from "@/components/ai/search/helpers";
 import {
   PromptInput,
@@ -38,7 +41,7 @@ export function AISearchInput({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = localStorage.getItem(StorageKeyInput) ?? "";
+    const stored = clampAskAiInput(localStorage.getItem(StorageKeyInput) ?? "");
     queueMicrotask(() => setInput(stored));
   }, []);
 
@@ -68,9 +71,19 @@ export function AISearchInput({
         }
         disabled={isLoading}
         onChange={(e) => {
-          setInput(e.target.value);
+          const value = e.target.value;
+          if (value.length > ASK_AI_INPUT_MAX_CHARS) {
+            warnAskAiInputTooLong(value.length);
+            const clamped = clampAskAiInput(value);
+            setInput(clamped);
+            if (typeof window !== "undefined") {
+              localStorage.setItem(StorageKeyInput, clamped);
+            }
+            return;
+          }
+          setInput(value);
           if (typeof window !== "undefined") {
-            localStorage.setItem(StorageKeyInput, e.target.value);
+            localStorage.setItem(StorageKeyInput, value);
           }
         }}
       />

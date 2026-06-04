@@ -2,9 +2,24 @@
 
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { isTextUIPart } from 'ai';
+import { toast } from '@/components/nexus-ui/toaster';
 import type { ChatUIMessage, SearchToolOutput } from '@/lib/ai/types';
 
 export const StorageKeyInput = '__ai_search_input';
+export const ASK_AI_INPUT_MAX_CHARS = 1000;
+
+export function warnAskAiInputTooLong(textLength: number) {
+  if (textLength <= ASK_AI_INPUT_MAX_CHARS) return false;
+  toast.warning("Message is too long", {
+    id: "ask-ai-input-max-length",
+    description: `Ask AI messages are limited to ${ASK_AI_INPUT_MAX_CHARS} characters.`,
+  });
+  return true;
+}
+
+export function clampAskAiInput(text: string) {
+  return text.slice(0, ASK_AI_INPUT_MAX_CHARS);
+}
 const StorageKeyAskAiClientId = '__ask_ai_client_id';
 
 /** Sent only when the server cannot resolve an IP (local dev, etc.). */
@@ -109,6 +124,7 @@ export function sendPromptMessage(
 ) {
   const message = text.trim();
   if (message.length === 0) return;
+  if (warnAskAiInputTooLong(message.length)) return;
 
   void sendMessage({
     role: 'user',
