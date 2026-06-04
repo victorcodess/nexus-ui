@@ -44,7 +44,7 @@ export function AISearchPanelHeader({
       return;
     }
     await navigator.clipboard.writeText(text);
-    toast.success("Conversation copied");
+    toast.default("Conversation copied");
   };
 
   const clearConversation = () => {
@@ -53,7 +53,7 @@ export function AISearchPanelHeader({
     if (typeof window !== "undefined") {
       localStorage.removeItem(StorageKeyInput);
     }
-    toast.success("Conversation cleared");
+    toast.default("Conversation cleared");
   };
 
   return (

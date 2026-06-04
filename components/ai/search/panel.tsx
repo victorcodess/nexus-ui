@@ -421,16 +421,19 @@ export function AISearchPanelList({
     const { isRateLimited, message } = parseAskAiChatError(
       chat.error.message ?? "",
     );
-    toast.error(
-      isRateLimited ? "Daily Ask AI limit reached" : "Ask AI request failed",
-      {
-        description: isRateLimited
-          ? message ||
-            "You've used all Ask AI messages for today. Try again tomorrow."
-          : message,
+    if (isRateLimited) {
+      toast.warning("Daily Ask AI limit reached", {
+        description:
+          message ||
+          "You've used all Ask AI messages for today. Try again tomorrow.",
         duration: 15_000,
-      },
-    );
+      });
+      return;
+    }
+    toast.error("Ask AI request failed", {
+      description: message,
+      duration: 15_000,
+    });
   }, [chat.error]);
 
   const threadVars = {

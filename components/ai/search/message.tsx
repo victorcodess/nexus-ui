@@ -119,7 +119,7 @@ const hoverRevealActionsClass =
 async function copyMessageText(text: string) {
   if (!text.trim()) return;
   await navigator.clipboard.writeText(text);
-  toast.success("Copied to clipboard");
+  toast.default("Copied to clipboard");
 }
 
 function isSearchCallPending(call: UIToolInvocation<SearchTool>): boolean {
