@@ -30,11 +30,6 @@ export function AskAiUsageLabel({ className }: { className?: string }) {
 
   useEffect(() => {
     if (!open) return;
-    if (status === "submitted") {
-      setUsage((u) =>
-        u ? { ...u, remaining: Math.max(0, u.remaining - 1) } : u,
-      );
-    }
     void loadUsage().then(setUsage);
   }, [open, status]);
 
