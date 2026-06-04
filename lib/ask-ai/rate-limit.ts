@@ -2,7 +2,7 @@ import { parseAskAiClientSessionId } from "@/lib/ask-ai/client-session";
 import { getRedisClient } from "@/lib/install-tracking/storage";
 
 const KEY_PREFIX = "ask-ai:rate:";
-const DEFAULT_MAX = 20;
+const DEFAULT_MAX = 30;
 const DEFAULT_UNKNOWN_MAX = 5;
 
 export type AskAiRateLimitUnavailable = "unavailable";
