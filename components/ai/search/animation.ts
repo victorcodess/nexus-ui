@@ -29,7 +29,7 @@ export const askAiPanelSlide = {
 /** Prompt input enters after suggestion stagger. */
 export const askAiInputFade = {
   ease: askAiMessageEase,
-  duration: 0.30,
+  duration: 0.3,
   delay: 0.38,
 } as const;
 

@@ -4,9 +4,15 @@ import { type ComponentProps, useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUp02Icon, SquareIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { askAiInputFade, useAskAiEmptyEnter } from "@/components/ai/search/animation";
+import {
+  askAiInputFade,
+  useAskAiEmptyEnter,
+} from "@/components/ai/search/animation";
 import { useChatContext } from "@/components/ai/search/context";
-import { sendPromptMessage, StorageKeyInput } from "@/components/ai/search/helpers";
+import {
+  sendPromptMessage,
+  StorageKeyInput,
+} from "@/components/ai/search/helpers";
 import {
   PromptInput,
   PromptInputAction,
