@@ -518,6 +518,8 @@ function CodeBlockFencedView({
   const trimmed = useMemo(() => trimTrailingNewlines(code), [code]);
   const raw = useMemo(() => buildRawHighlightResult(trimmed), [trimmed]);
   const title = (language || "code").toLowerCase();
+  const showLineNumbers =
+    lineNumbers !== false && trimmed.split("\n").length > 1;
 
   return (
     <CodeBlockFigureChrome
@@ -532,7 +534,7 @@ function CodeBlockFencedView({
         code={trimmed}
         codePlugin={codePlugin}
         language={language}
-        lineNumbers={lineNumbers}
+        lineNumbers={showLineNumbers}
         lineNumbersStart={startLine ?? 1}
         raw={raw}
       />
