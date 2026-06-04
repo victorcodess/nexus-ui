@@ -20,6 +20,7 @@ import {
 } from "ai";
 import type {
   ChatUIMessage,
+  SearchResultItem,
   SearchTool,
   SearchToolOutput,
 } from "@/lib/ai/types";
@@ -558,6 +559,14 @@ function SearchToolStep({ call }: { call: UIToolInvocation<SearchTool> }) {
   );
 }
 
+function sourceCitationKey(
+  item: Pick<SearchResultItem, "url" | "title" | "section">,
+  index?: number,
+): string {
+  const base = `${item.url}:${item.title}:${item.section ?? ""}`;
+  return index === undefined ? base : `${base}:${index}`;
+}
+
 function getCitationSourcesFromSearchCalls(
   searchCalls: UIToolInvocation<SearchTool>[],
 ) {
@@ -568,7 +577,7 @@ function getCitationSourcesFromSearchCalls(
     const output = normalizeSearchToolOutput(call.output);
     if (!output) continue;
     for (const result of output.results.slice(0, 3)) {
-      const key = `${result.url}:${result.title}`;
+      const key = sourceCitationKey(result);
       if (seen.has(key)) continue;
       seen.add(key);
       sources.push({
@@ -589,13 +598,17 @@ function SourceCitationList({ output }: { output: SearchToolOutput | null }) {
   const sources = output.results.slice(0, 3).map((result) => ({
     url: result.url,
     title: result.title,
+    section: result.section,
     description: [result.section, result.snippet].filter(Boolean).join(" — "),
   }));
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {sources.map((source) => (
-        <Citation key={`${source.url}:${source.title}`} citations={[source]}>
+      {sources.map((source, index) => (
+        <Citation
+          key={sourceCitationKey(source, index)}
+          citations={[source]}
+        >
           <CitationTrigger />
           <CitationContent>
             <CitationItem />
