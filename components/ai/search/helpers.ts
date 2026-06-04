@@ -5,6 +5,21 @@ import { isTextUIPart } from 'ai';
 import type { ChatUIMessage, SearchToolOutput } from '@/lib/ai/types';
 
 export const StorageKeyInput = '__ai_search_input';
+const StorageKeyAskAiClientId = '__ask_ai_client_id';
+
+/** Sent only when the server cannot resolve an IP (local dev, etc.). */
+export function getAskAiClientSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const stored = localStorage.getItem(StorageKeyAskAiClientId);
+    if (stored) return stored;
+    const id = crypto.randomUUID();
+    localStorage.setItem(StorageKeyAskAiClientId, id);
+    return id;
+  } catch {
+    return '';
+  }
+}
 
 /** Placeholder row while waiting for the first assistant stream chunk. */
 export const PENDING_ASSISTANT_MESSAGE_ID = "__nexus-pending-assistant__";

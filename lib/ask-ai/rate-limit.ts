@@ -1,8 +1,11 @@
+import { parseAskAiClientSessionId } from "@/lib/ask-ai/client-session";
 import { getRedisClient } from "@/lib/install-tracking/storage";
 
 const KEY_PREFIX = "ask-ai:rate:";
-/** Requests allowed per IP per UTC calendar day. */
 const DEFAULT_MAX = 20;
+const DEFAULT_UNKNOWN_MAX = 5;
+
+export type AskAiRateLimitUnavailable = "unavailable";
 
 export type AskAiRateLimitResult = {
   ok: boolean;
@@ -22,11 +25,48 @@ function isDisabled() {
   return process.env.ASK_AI_RATE_LIMIT_DISABLED === "true";
 }
 
-function limits() {
-  const max = Number(process.env.ASK_AI_RATE_LIMIT_MAX ?? DEFAULT_MAX);
-  return {
-    max: Number.isFinite(max) && max > 0 ? Math.floor(max) : DEFAULT_MAX,
-  };
+function maxPerDay(unknownIdentity: boolean) {
+  const envMax = Number(
+    process.env[
+      unknownIdentity ? "ASK_AI_RATE_LIMIT_UNKNOWN_MAX" : "ASK_AI_RATE_LIMIT_MAX"
+    ] ?? (unknownIdentity ? DEFAULT_UNKNOWN_MAX : DEFAULT_MAX),
+  );
+  const fallback = unknownIdentity ? DEFAULT_UNKNOWN_MAX : DEFAULT_MAX;
+  return Number.isFinite(envMax) && envMax > 0 ? Math.floor(envMax) : fallback;
+}
+
+function rateLimitBucket(req: Request): { bucket: string; max: number } {
+  const ip = getClientIp(req);
+  if (ip !== "unknown") {
+    return { bucket: ip, max: maxPerDay(false) };
+  }
+
+  const sessionId = parseAskAiClientSessionId(req.headers);
+  if (sessionId) {
+    return { bucket: `session:${sessionId}`, max: maxPerDay(true) };
+  }
+
+  return { bucket: "unknown", max: maxPerDay(true) };
+}
+
+/** Prefer Vercel’s forwarded IP on production. */
+function getClientIp(request: Request): string {
+  const vercelForwarded = request.headers.get("x-vercel-forwarded-for")?.trim();
+  if (vercelForwarded) {
+    const first = vercelForwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+
+  return "unknown";
 }
 
 function utcDayId(): string {
@@ -40,27 +80,6 @@ function utcMidnightAfter(now = Date.now()): number {
 
 function secondsUntilUtcMidnight(now = Date.now()): number {
   return Math.max(1, Math.ceil((utcMidnightAfter(now) - now) / 1000));
-}
-
-/**
- * Best-effort client id for public docs (no auth).
- * On Vercel, `x-forwarded-for` / `x-real-ip` are set at the edge (not client-controlled).
- * Weak against VPN rotation; all unidentified clients share the `unknown` bucket.
- */
-export function getAskAiClientId(req: Request): string {
-  const realIp = req.headers.get("x-real-ip")?.trim();
-  if (realIp) return realIp;
-
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
-  }
-
-  const cfIp = req.headers.get("cf-connecting-ip")?.trim();
-  if (cfIp) return cfIp;
-
-  return "unknown";
 }
 
 function formatTimeUntilReset(resetMs: number): string {
@@ -78,18 +97,21 @@ export function dailyRateLimitMessage(
   return `You've used all ${result.limit} Ask AI messages for today. Try again tomorrow (${until}).`;
 }
 
-function checkDevMemory(id: string, max: number): AskAiRateLimitResult {
+function checkDevMemory(
+  clientId: string,
+  max: number,
+): AskAiRateLimitResult {
   if (!globalThis.__askAiRateLimitDev) {
     globalThis.__askAiRateLimitDev = new Map();
   }
 
   const now = Date.now();
-  const bucketKey = `${id}:${utcDayId()}`;
+  const key = `${clientId}:${utcDayId()}`;
   const reset = utcMidnightAfter(now);
-  let window = globalThis.__askAiRateLimitDev.get(bucketKey);
+  let window = globalThis.__askAiRateLimitDev.get(key);
   if (!window || window.expiresAt <= now) {
     window = { count: 0, expiresAt: reset };
-    globalThis.__askAiRateLimitDev.set(bucketKey, window);
+    globalThis.__askAiRateLimitDev.set(key, window);
   }
 
   window.count += 1;
@@ -103,22 +125,23 @@ function checkDevMemory(id: string, max: number): AskAiRateLimitResult {
 }
 
 async function checkRedis(
-  id: string,
+  clientId: string,
   max: number,
-): Promise<AskAiRateLimitResult> {
+): Promise<AskAiRateLimitResult | AskAiRateLimitUnavailable> {
   const redis = getRedisClient();
   const reset = utcMidnightAfter();
 
   if (!redis) {
     if (process.env.NODE_ENV === "production") {
-      console.warn(
-        "[ask-ai] Rate limit skipped: UPSTASH_REDIS_REST_URL/TOKEN not set",
+      console.error(
+        "[ask-ai] Rate limit unavailable: UPSTASH_REDIS_REST_URL/TOKEN not set",
       );
+      return "unavailable";
     }
-    return checkDevMemory(id, max);
+    return checkDevMemory(clientId, max);
   }
 
-  const key = `${KEY_PREFIX}${id}:${utcDayId()}`;
+  const key = `${KEY_PREFIX}${clientId}:${utcDayId()}`;
   const count = await redis.incr(key);
   const ttlSec = secondsUntilUtcMidnight();
   if (count === 1) {
@@ -138,12 +161,20 @@ async function checkRedis(
 
 export async function checkAskAiRateLimit(
   req: Request,
-): Promise<AskAiRateLimitResult | null> {
+): Promise<AskAiRateLimitResult | AskAiRateLimitUnavailable | null> {
   if (isDisabled()) return null;
+  const { bucket, max } = rateLimitBucket(req);
+  return checkRedis(bucket, max);
+}
 
-  const { max } = limits();
-  const id = getAskAiClientId(req);
-  return checkRedis(id, max);
+export function rateLimitUnavailableResponse() {
+  return Response.json(
+    {
+      error: "Ask AI is temporarily unavailable. Please try again later.",
+      code: "service_unavailable",
+    },
+    { status: 503 },
+  );
 }
 
 type AskAiApiErrorBody = {

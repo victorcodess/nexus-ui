@@ -18,6 +18,7 @@ import { createDebugEmitter } from "@/lib/ask-ai/emit";
 import {
   checkAskAiRateLimit,
   rateLimitResponse,
+  rateLimitUnavailableResponse,
 } from "@/lib/ask-ai/rate-limit";
 import type { ChatUIMessage, SearchTool } from "@/lib/ai/types";
 import {
@@ -51,6 +52,9 @@ const systemPrompt = [
 
 export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
   const rateLimit = await checkAskAiRateLimit(req);
+  if (rateLimit === "unavailable") {
+    return rateLimitUnavailableResponse();
+  }
   if (rateLimit && !rateLimit.ok) {
     return rateLimitResponse(rateLimit);
   }
