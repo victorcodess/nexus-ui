@@ -20,6 +20,7 @@ import {
   PromptInputActions,
   PromptInputTextarea,
 } from "@/components/nexus-ui/prompt-input";
+import { AskAiUsageLabel } from "@/components/ai/search/usage";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -73,7 +74,15 @@ export function AISearchInput({
           }
         }}
       />
-      <PromptInputActions className="justify-end">
+      <PromptInputActions className="justify-between">
+        <PromptInputActionGroup>
+          <PromptInputAction
+            tooltip={{ content: "Usage limit for today", side: "left" }}
+          >
+            <AskAiUsageLabel />
+          </PromptInputAction>
+        </PromptInputActionGroup>
+
         <PromptInputActionGroup>
           <PromptInputAction asChild>
             <Button
@@ -103,17 +112,15 @@ export function AISearchInput({
     </PromptInput>
   );
 
-  if (reduceMotion || !active) {
-    return <div className={cn("w-full", className)}>{promptInput}</div>;
-  }
+  const showEnter = active && !reduceMotion;
 
   return (
     <motion.div
       key={enterKey}
       className={cn("w-full", className)}
-      initial={{ opacity: 0, y: 4 }}
+      initial={showEnter ? { opacity: 0, y: 4 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={askAiInputFade}
+      transition={showEnter ? askAiInputFade : { duration: 0 }}
     >
       {promptInput}
     </motion.div>

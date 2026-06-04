@@ -15,6 +15,13 @@ export type AskAiRateLimitResult = {
   reset: number;
 };
 
+export type AskAiRateLimitUsage = {
+  limit: number;
+  used: number;
+  remaining: number;
+  reset: number;
+};
+
 type DevWindow = { count: number; expiresAt: number };
 
 declare global {
@@ -28,7 +35,9 @@ function isDisabled() {
 function maxPerDay(unknownIdentity: boolean) {
   const envMax = Number(
     process.env[
-      unknownIdentity ? "ASK_AI_RATE_LIMIT_UNKNOWN_MAX" : "ASK_AI_RATE_LIMIT_MAX"
+      unknownIdentity
+        ? "ASK_AI_RATE_LIMIT_UNKNOWN_MAX"
+        : "ASK_AI_RATE_LIMIT_MAX"
     ] ?? (unknownIdentity ? DEFAULT_UNKNOWN_MAX : DEFAULT_MAX),
   );
   const fallback = unknownIdentity ? DEFAULT_UNKNOWN_MAX : DEFAULT_MAX;
@@ -97,10 +106,36 @@ export function dailyRateLimitMessage(
   return `You've used all ${result.limit} Ask AI messages for today. Try again tomorrow (${until}).`;
 }
 
-function checkDevMemory(
-  clientId: string,
-  max: number,
-): AskAiRateLimitResult {
+async function peekBucketCount(bucket: string): Promise<number> {
+  const redis = getRedisClient();
+  const dayKey = `${KEY_PREFIX}${bucket}:${utcDayId()}`;
+  if (redis) {
+    const n = Number(await redis.get(dayKey));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+  const win = globalThis.__askAiRateLimitDev?.get(`${bucket}:${utcDayId()}`);
+  return win && win.expiresAt > Date.now() ? win.count : 0;
+}
+
+export async function getAskAiRateLimitUsage(
+  req: Request,
+): Promise<AskAiRateLimitUsage | AskAiRateLimitUnavailable | null> {
+  if (isDisabled()) return null;
+  const { bucket, max } = rateLimitBucket(req);
+  if (!getRedisClient() && process.env.NODE_ENV === "production") {
+    return "unavailable";
+  }
+  const used = await peekBucketCount(bucket);
+  const reset = utcMidnightAfter();
+  return {
+    limit: max,
+    used,
+    remaining: Math.max(0, max - used),
+    reset,
+  };
+}
+
+function checkDevMemory(clientId: string, max: number): AskAiRateLimitResult {
   if (!globalThis.__askAiRateLimitDev) {
     globalThis.__askAiRateLimitDev = new Map();
   }
