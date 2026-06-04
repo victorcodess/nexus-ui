@@ -15,6 +15,10 @@ import {
   searchToolOutputPayload,
 } from "@/lib/ask-ai/debug";
 import { createDebugEmitter } from "@/lib/ask-ai/emit";
+import {
+  checkAskAiRateLimit,
+  rateLimitResponse,
+} from "@/lib/ask-ai/rate-limit";
 import type { ChatUIMessage, SearchTool } from "@/lib/ai/types";
 import {
   buildRetrievalQueryFromMessages,
@@ -46,6 +50,11 @@ const systemPrompt = [
 ].join("\n");
 
 export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
+  const rateLimit = await checkAskAiRateLimit(req);
+  if (rateLimit && !rateLimit.ok) {
+    return rateLimitResponse(rateLimit);
+  }
+
   const reqJson = await req.json();
   const messages: ChatUIMessage[] = reqJson.messages ?? [];
   const userQuery = extractLatestUserText(messages);

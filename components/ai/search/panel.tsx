@@ -54,6 +54,7 @@ import {
 import { useHotKey } from "@/components/ai/search/hotkey";
 import { AISearchInput } from "@/components/ai/search/input";
 import { ChatMessage } from "@/components/ai/search/message";
+import { parseAskAiChatError } from "@/lib/ask-ai/rate-limit";
 
 const panelDescription = "Grounded in nexus-ui docs. Verify important details.";
 const panelInputId = "nd-ai-input";
@@ -412,7 +413,19 @@ export function AISearchPanelList({
 
   useEffect(() => {
     if (!chat.error) return;
-    toast.error("Ask AI request failed", { description: chat.error.message });
+    const { isRateLimited, message } = parseAskAiChatError(
+      chat.error.message ?? "",
+    );
+    toast.error(
+      isRateLimited ? "Daily Ask AI limit reached" : "Ask AI request failed",
+      {
+        description: isRateLimited
+          ? message ||
+            "You've used all Ask AI messages for today. Try again tomorrow."
+          : message,
+        duration: 15_000,
+      },
+    );
   }, [chat.error]);
 
   const threadVars = {
