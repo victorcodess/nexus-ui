@@ -45,9 +45,11 @@ import {
 import {
   askAiAssistantRowDelay,
   askAiMessageFade,
+  askAiPanelSlide,
   askAiStaggerItemVariants,
   askAiStaggerListVariants,
   useAnimateOnce,
+  useAskAiEmptyEnter,
 } from "@/components/ai/search/animation";
 import { useHotKey } from "@/components/ai/search/hotkey";
 import { AISearchInput } from "@/components/ai/search/input";
@@ -66,7 +68,23 @@ function preventDismissOutside(event: Event) {
   event.preventDefault();
 }
 
+function AnimatedSheetPanel({ open, children }: { open: boolean; children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      className="flex h-full min-h-0 w-(--ai-chat-width) shrink-0 flex-col"
+      initial={reduceMotion ? false : { x: "100%" }}
+      animate={{ x: reduceMotion || open ? 0 : "100%" }}
+      transition={askAiPanelSlide}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function AISearchPanelBody() {
+  const { open } = useAISearchContext();
   const chat = useChatContext();
   const isLoading = chat.status === "streaming" || chat.status === "submitted";
   const isEmpty =
@@ -77,7 +95,7 @@ function AISearchPanelBody() {
       <AISearchPanelHeader />
       <AISearchPanelList className="min-h-0 flex-1" />
       <div className="flex items-center justify-center p-3 pt-1 lg:p-4 lg:pt-1">
-        <AISearchInput fadeIn={isEmpty} />
+        <AISearchInput open={open} isEmpty={isEmpty} />
       </div>
       <div className="absolute">
         <Toaster position="bottom-left" />
@@ -107,17 +125,23 @@ export function AISearchPanel() {
           onInteractOutside={preventDismissOutside}
           onPointerDownOutside={preventDismissOutside}
           className={cn(
-            "z-30 overflow-hidden text-foreground [--ai-chat-width:400px] 2xl:[--ai-chat-width:460px]",
-            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] w-(--ai-chat-width) gap-0 border-s p-0 shadow-none dark:border-t-0",
+            "z-30 text-foreground [--ai-chat-width:400px] 2xl:[--ai-chat-width:460px]",
+            "sticky top-14 ms-auto h-[calc(100dvh-3.5rem)] gap-0 border-s p-0 shadow-none dark:border-t-0",
             "in-[#nd-docs-layout]:[grid-area:toc] in-[#nd-notebook-layout]:col-start-5 in-[#nd-notebook-layout]:row-span-full",
             "dark:border-accent",
+            "overflow-hidden transition-[width] duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            open
+              ? "w-(--ai-chat-width)"
+              : "pointer-events-none w-0 min-w-0 border-transparent",
           )}
         >
           <SheetTitle className="sr-only">Ask AI</SheetTitle>
           <SheetDescription className="sr-only">
             {panelDescription}
           </SheetDescription>
-          <AISearchPanelBody />
+          <AnimatedSheetPanel open={open}>
+            <AISearchPanelBody />
+          </AnimatedSheetPanel>
         </SheetContent>
       </Sheet>
     );
@@ -131,8 +155,6 @@ export function AISearchPanel() {
           event.preventDefault();
           focusPanelInput();
         }}
-        onInteractOutside={preventDismissOutside}
-        onPointerDownOutside={preventDismissOutside}
         className={cn(
           "top-4 left-1/2 flex h-[calc(100dvh-2rem)] w-[calc(100%-1rem)] max-w-none translate-x-[-50%] translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-[35px] p-0 sm:max-w-none dark:border-accent",
         )}
@@ -157,13 +179,18 @@ type PanelMessagesProps = {
 function StarterSuggestions({
   isLoading,
   onSelect,
+  open,
+  isEmpty,
 }: {
   isLoading: boolean;
   onSelect: (prompt: string) => void;
+  open: boolean;
+  isEmpty: boolean;
 }) {
   const reduceMotion = useReducedMotion();
+  const { active, enterKey } = useAskAiEmptyEnter(open, isEmpty);
 
-  if (reduceMotion) {
+  if (reduceMotion || !active) {
     return (
       <Suggestions onSelect={onSelect}>
         <SuggestionList className="justify-start">
@@ -180,6 +207,7 @@ function StarterSuggestions({
   return (
     <Suggestions onSelect={onSelect}>
       <motion.div
+        key={enterKey}
         role="group"
         aria-label="Suggestions"
         data-slot="suggestion-list"
@@ -357,6 +385,7 @@ export function AISearchPanelList({
   style,
   ...props
 }: ComponentProps<"div">) {
+  const { open } = useAISearchContext();
   const chat = useChatContext();
   const isLoading = chat.status === "streaming" || chat.status === "submitted";
   const displayMessages = buildDisplayMessages(chat.messages, isLoading);
@@ -413,6 +442,8 @@ export function AISearchPanelList({
             <div className="flex h-full w-full flex-col items-center justify-end gap-3">
               <StarterSuggestions
                 isLoading={isLoading}
+                open={open}
+                isEmpty={displayMessages.length === 0}
                 onSelect={(prompt) =>
                   sendPromptMessage(chat.sendMessage, prompt)
                 }

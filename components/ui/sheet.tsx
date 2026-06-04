@@ -61,10 +61,11 @@ function SheetContent({
 }) {
   const content = (
     <SheetPrimitive.Content
+      {...(embedded ? { forceMount: true as const } : {})}
       data-slot="sheet-content"
       className={cn(
         embedded
-          ? "flex flex-col gap-4 bg-background outline-none data-[state=closed]:hidden"
+          ? "flex flex-col gap-4 bg-background outline-none overflow-hidden"
           : cn(
               "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
               side === "right" &&

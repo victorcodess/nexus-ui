@@ -244,6 +244,9 @@
     @apply bg-white dark:bg-gray-900;
   }
   /* Prevent Radix from adding scrollbar compensation (we use overflow-y: scroll instead) */
+  html:has(body[data-scroll-locked]) {
+    overflow: hidden !important;
+  }
   body[data-scroll-locked] {
     margin-right: 0 !important;
     padding-right: 0 !important;

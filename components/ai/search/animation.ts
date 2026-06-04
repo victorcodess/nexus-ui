@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 
 /** Matches reasoning-demo message fade timing. */
@@ -20,6 +20,11 @@ export const askAiActionsFade = {
 } as const;
 
 export const askAiAssistantRowDelay = 0.14;
+
+export const askAiPanelSlide = {
+  duration: 0.3,
+  ease: askAiMessageEase,
+} as const;
 
 /** Prompt input enters after suggestion stagger. */
 export const askAiInputFade = {
@@ -49,6 +54,23 @@ export const askAiStaggerItemVariants = {
     transition: askAiMessageFade,
   },
 } as const;
+
+/** Re-run empty-state enter animations when the panel opens (forceMount) or chat clears. */
+export function useAskAiEmptyEnter(open: boolean, isEmpty: boolean) {
+  const [enterKey, setEnterKey] = useState(0);
+  const prev = useRef({ open, isEmpty });
+
+  useLayoutEffect(() => {
+    const opened = open && !prev.current.open;
+    const emptied = isEmpty && !prev.current.isEmpty;
+    if (open && isEmpty && (opened || (emptied && prev.current.open))) {
+      setEnterKey((key) => key + 1);
+    }
+    prev.current = { open, isEmpty };
+  }, [open, isEmpty]);
+
+  return { active: open && isEmpty, enterKey };
+}
 
 const animatedKeys = new Set<string>();
 

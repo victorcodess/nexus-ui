@@ -4,9 +4,8 @@ import { type ComponentProps, useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUp02Icon, SquareIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { askAiInputFade } from "@/components/ai/search/animation";
+import { askAiInputFade, useAskAiEmptyEnter } from "@/components/ai/search/animation";
 import { useChatContext } from "@/components/ai/search/context";
-import { useOnChange } from "@/lib/use-on-change";
 import { sendPromptMessage, StorageKeyInput } from "@/components/ai/search/helpers";
 import {
   PromptInput,
@@ -20,20 +19,15 @@ import { cn } from "@/lib/utils";
 
 export function AISearchInput({
   className,
-  fadeIn = false,
+  open = false,
+  isEmpty = false,
   ...props
-}: ComponentProps<"div"> & { fadeIn?: boolean }) {
+}: ComponentProps<"div"> & { open?: boolean; isEmpty?: boolean }) {
   const { status, sendMessage, stop } = useChatContext();
   const reduceMotion = useReducedMotion();
-  const [enterKey, setEnterKey] = useState(0);
+  const { active, enterKey } = useAskAiEmptyEnter(open, isEmpty);
   const [input, setInput] = useState("");
   const isLoading = status === "streaming" || status === "submitted";
-
-  useOnChange(fadeIn, (isEmpty, wasEmpty) => {
-    if (isEmpty && !wasEmpty) {
-      setEnterKey((key) => key + 1);
-    }
-  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -103,7 +97,7 @@ export function AISearchInput({
     </PromptInput>
   );
 
-  if (reduceMotion || !fadeIn) {
+  if (reduceMotion || !active) {
     return <div className={cn("w-full", className)}>{promptInput}</div>;
   }
 
