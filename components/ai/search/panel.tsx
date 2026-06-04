@@ -69,7 +69,13 @@ function preventDismissOutside(event: Event) {
   event.preventDefault();
 }
 
-function AnimatedSheetPanel({ open, children }: { open: boolean; children: React.ReactNode }) {
+function AnimatedSheetPanel({
+  open,
+  children,
+}: {
+  open: boolean;
+  children: React.ReactNode;
+}) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -88,8 +94,7 @@ function AISearchPanelBody() {
   const { open } = useAISearchContext();
   const chat = useChatContext();
   const isLoading = chat.status === "streaming" || chat.status === "submitted";
-  const isEmpty =
-    buildDisplayMessages(chat.messages, isLoading).length === 0;
+  const isEmpty = buildDisplayMessages(chat.messages, isLoading).length === 0;
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:gap-3">

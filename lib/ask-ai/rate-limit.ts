@@ -2,7 +2,7 @@ import { getRedisClient } from "@/lib/install-tracking/storage";
 
 const KEY_PREFIX = "ask-ai:rate:";
 /** Requests allowed per IP per UTC calendar day. */
-const DEFAULT_MAX = 5;
+const DEFAULT_MAX = 20;
 
 export type AskAiRateLimitResult = {
   ok: boolean;
