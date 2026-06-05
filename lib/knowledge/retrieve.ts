@@ -19,8 +19,6 @@ import type {
   RetrieveOptions,
   RetrieveResult,
 } from "@/lib/knowledge/types";
-import { retrieveCompletePayload } from "@/lib/ask-ai/debug";
-
 type IndexedChunk = KnowledgeChunk & DocumentData;
 
 type KnowledgeIndex = {
@@ -29,26 +27,10 @@ type KnowledgeIndex = {
   corpusById: Map<string, IndexedChunk>;
 };
 
-let pendingIndexStats: {
-  corpusSize: number;
-  durationMs: number;
-  byKind: Record<string, number>;
-} | null = null;
-
 const knowledgeIndex = createKnowledgeIndex();
 
 async function createKnowledgeIndex(): Promise<KnowledgeIndex> {
-  const started = Date.now();
   const corpus = await buildKnowledgeCorpus();
-  const byKind = corpus.reduce<Record<string, number>>((acc, chunk) => {
-    acc[chunk.kind] = (acc[chunk.kind] ?? 0) + 1;
-    return acc;
-  }, {});
-  pendingIndexStats = {
-    corpusSize: corpus.length,
-    durationMs: Date.now() - started,
-    byKind,
-  };
 
   const index = new Document<IndexedChunk>({
     preset: "score",
@@ -291,54 +273,27 @@ export async function retrieveKnowledge(
   query: string,
   options: RetrieveOptions = {},
 ): Promise<RetrieveResult> {
-  const started = Date.now();
   const { index, corpus, corpusById } = await knowledgeIndex;
   const limit = options.limit ?? 12;
   const includeImplementation = options.includeImplementation ?? true;
-  const label = options.debugLabel ?? "retrieve";
-  const { emit } = options;
-
-  if (emit && pendingIndexStats) {
-    emit("knowledge index ready", pendingIndexStats);
-    pendingIndexStats = null;
-  }
-
-  emit?.(`${label} retrieve start`, {
-    query: query || "(empty)",
-    limit,
-    includeImplementation,
-  });
 
   const variants = buildQueryVariants(query);
   let found = await flexsearchCandidates(index, corpusById, variants);
-  let searchStrategy: "flexsearch" | "corpus-fallback" = "flexsearch";
 
   if (found.size === 0 && query.trim()) {
     found = new Map(
       rankChunks(query, corpus).map((chunk) => [chunk.id, chunk] as const),
     );
-    searchStrategy = "corpus-fallback";
   }
 
   const ranked = rankChunks(query, [...found.values()]);
   const chunks = selectChunks(ranked, { limit, includeImplementation });
 
-  const result = {
+  return {
     query,
     chunks,
     confidence: computeConfidence(chunks),
   };
-
-  emit?.(`${label} retrieve complete`, {
-    ...retrieveCompletePayload(result, {
-      durationMs: Date.now() - started,
-      variants,
-      candidatesFound: found.size,
-    }),
-    searchStrategy,
-  });
-
-  return result;
 }
 
 export function formatRetrievedContext(result: RetrieveResult): string {

@@ -17,10 +17,6 @@ export interface RetrieveOptions {
   limit?: number;
   /** Include up to 3 non-citeable implementation/skill chunks for model context. */
   includeImplementation?: boolean;
-  /** TEMP: label in debug stream; remove with `lib/ask-ai/`. */
-  debugLabel?: string;
-  /** TEMP: streams debug events to the client; remove with `lib/ask-ai/`. */
-  emit?: (message: string, data?: Record<string, unknown>) => void;
 }
 
 export interface RetrieveResult {

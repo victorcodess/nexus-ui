@@ -10,12 +10,6 @@ import {
 } from "ai";
 import { z } from "zod";
 import {
-  createAskAiRequestId,
-  retrieveCompletePayload,
-  searchToolOutputPayload,
-} from "@/lib/ask-ai/debug";
-import { createDebugEmitter } from "@/lib/ask-ai/emit";
-import {
   checkAskAiRateLimit,
   rateLimitResponse,
   rateLimitUnavailableResponse,
@@ -23,7 +17,6 @@ import {
 import type { ChatUIMessage, SearchTool } from "@/lib/ai/types";
 import {
   buildRetrievalQueryFromMessages,
-  extractLatestUserText,
   formatRetrievedContext,
   KNOWLEDGE_CONTEXT,
   retrieveKnowledge,
@@ -61,46 +54,26 @@ export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
 
   const reqJson = await req.json();
   const messages: ChatUIMessage[] = reqJson.messages ?? [];
-  const userQuery = extractLatestUserText(messages);
   const retrievalQuery = buildRetrievalQueryFromMessages(
     messages,
     KNOWLEDGE_CONTEXT.retrievalQueryMaxChars,
   );
   const modelId = process.env.OPENROUTER_MODEL ?? "openai/gpt-4o";
-  const requestId = createAskAiRequestId();
 
   const stream = createUIMessageStream<ChatUIMessage>({
     originalMessages: messages,
     async execute({ writer }) {
-      const emit = createDebugEmitter(writer, requestId);
-
-      emit("chat request", {
-        userQuery,
-        retrievalQuery,
-        messageCount: messages.length,
-        model: modelId,
-      });
-
       const preRetrieved = await retrieveKnowledge(retrievalQuery, {
         limit: KNOWLEDGE_CONTEXT.preRetrieveLimit,
         includeImplementation: true,
-        debugLabel: "pre-retrieve",
-        emit,
       });
       const contextBlock = formatRetrievedContext(preRetrieved);
-      emit("pre-retrieve context injected", {
-        contextChars: contextBlock.length,
-        confidence: preRetrieved.confidence,
-        chunkCount: preRetrieved.chunks.length,
-      });
-
-      emit("model stream start", { model: modelId });
 
       const result = streamText({
         model: openrouter.chat(modelId),
         stopWhen: stepCountIs(8),
         tools: {
-          search: createSearchTool(emit),
+          search: createSearchTool(),
         },
         messages: [
           {
@@ -114,7 +87,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
                   type: "text",
                   text: `[Client Context: ${JSON.stringify(part.data)}]`,
                 };
-              if (part.type === "data-debug") return undefined;
             },
           })),
         ],
@@ -127,37 +99,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
           openai: {
             parallelToolCalls: false,
           },
-        },
-        onStepFinish({ stepNumber, finishReason, text, toolCalls, usage }) {
-          emit(`step ${stepNumber} finished`, {
-            finishReason,
-            textLength: text.length,
-            toolCallCount: toolCalls.length,
-            toolNames: toolCalls.map((call) => call.toolName),
-            usage: {
-              inputTokens: usage.inputTokens,
-              outputTokens: usage.outputTokens,
-              totalTokens: usage.totalTokens,
-            },
-          });
-        },
-        onFinish({ finishReason, steps, text, totalUsage }) {
-          emit("model stream finished", {
-            finishReason,
-            stepCount: steps.length,
-            textLength: text.length,
-            totalUsage: {
-              inputTokens: totalUsage.inputTokens,
-              outputTokens: totalUsage.outputTokens,
-              totalTokens: totalUsage.totalTokens,
-            },
-          });
-        },
-        onError: (error) => {
-          emit("stream error", {
-            errorMessage:
-              error instanceof Error ? error.message : String(error),
-          });
         },
       });
 
@@ -172,7 +113,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/chat">) {
   return createUIMessageStreamResponse({ stream });
 }
 
-function createSearchTool(emit: ReturnType<typeof createDebugEmitter>) {
+function createSearchTool() {
   return tool({
     description:
       "Search Nexus UI docs, skill reference, and implementation source. Use to refine when <retrieved_context> is insufficient. Keep the user's topic in the query.",
@@ -181,19 +122,11 @@ function createSearchTool(emit: ReturnType<typeof createDebugEmitter>) {
       limit: z.number().int().min(1).max(30).default(8),
     }),
     async execute({ query, limit }) {
-      const started = Date.now();
       const result = await retrieveKnowledge(query, {
         limit: Math.max(limit, KNOWLEDGE_CONTEXT.searchToolLimit),
         includeImplementation: true,
-        debugLabel: "tool-search",
-        emit,
       });
-      const output = toSearchToolOutput(result, limit);
-      emit("search tool result", {
-        query,
-        ...searchToolOutputPayload(output, Date.now() - started),
-      });
-      return output;
+      return toSearchToolOutput(result, limit);
     },
   }) satisfies SearchTool;
 }

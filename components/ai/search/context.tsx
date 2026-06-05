@@ -4,7 +4,6 @@ import { createContext, type ReactNode, use, useMemo, useState } from "react";
 import { useChat, type UseChatHelpers } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { getAskAiClientSessionId } from "@/components/ai/search/helpers";
-import { logAskAiDebug } from "@/lib/ask-ai/client-logger";
 import { ASK_AI_CLIENT_ID_HEADER } from "@/lib/ask-ai/client-session";
 import type { ChatUIMessage } from "@/lib/ai/types";
 
@@ -31,10 +30,6 @@ export function AISearch({ children }: { children: ReactNode }) {
   const chat = useChat<ChatUIMessage>({
     id: "search",
     transport,
-    // TEMP: remove with lib/ask-ai/
-    onData: (part) => {
-      if (part.type === "data-debug") logAskAiDebug(part.data);
-    },
   });
 
   return (
