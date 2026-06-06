@@ -267,7 +267,7 @@ const ModelSelectorSearch = React.forwardRef<
         data-slot="model-selector-search"
         autoComplete={autoComplete}
         className={cn(
-          "inline-flex h-8 w-full items-center gap-2 rounded-[6px] bg-muted p-1.5 ps-8.5 pe-2 text-[13px] leading-6 font-[350] text-muted-foreground transition-all placeholder:text-muted-foreground hover:bg-border/50 focus-visible:ring-2 focus-visible:outline-0 focus-visible:ring-border dark:focus-visible:ring-ring",
+          "inline-flex h-8 w-full items-center gap-2 rounded-sm bg-muted p-1.5 ps-8.5 pe-2 text-[13px] leading-6 font-[350] text-muted-foreground transition-all placeholder:text-muted-foreground hover:bg-border/50 focus-visible:ring-2 focus-visible:outline-0 focus-visible:ring-border dark:focus-visible:ring-ring",
           className,
         )}
         onKeyDown={(e) => {

@@ -143,7 +143,7 @@ function Image({
         <div
           data-slot="image"
           className={cn(
-            "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-[20px] border dark:border-muted",
+            "group/image relative inline-flex aspect-auto max-w-full min-w-64 flex-col overflow-hidden rounded-2xl border dark:border-muted",
             className,
           )}
           {...props}

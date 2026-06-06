@@ -78,7 +78,7 @@ function PromptInput({
           role="group"
           aria-label="Chat input"
           className={cn(
-            "relative flex h-auto w-full cursor-text flex-col gap-0 overflow-hidden rounded-[24px] border border-border bg-card dark:border-border/50 dark:bg-input/30",
+            "relative flex h-auto w-full cursor-text flex-col gap-0 overflow-hidden rounded-3xl border border-border bg-card dark:border-border/50 dark:bg-input/30",
             className,
           )}
           onClick={handleClick}

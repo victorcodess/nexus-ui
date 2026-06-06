@@ -177,7 +177,7 @@ function inferDetailedSubtitleMode(
 }
 
 const attachmentVariants = cva(
-  "group relative cursor-default overflow-hidden rounded-[6px] border border-muted bg-secondary text-muted-foreground",
+  "group relative cursor-default overflow-hidden rounded-sm border border-muted bg-secondary text-muted-foreground",
   {
     variants: {
       variant: {
@@ -187,7 +187,7 @@ const attachmentVariants = cva(
         detailed:
           "relative flex h-15 w-auto min-w-[200px] max-w-[250px] shrink-0 items-center justify-start p-2 pr-3",
         pasted:
-          "relative flex w-[156px] h-[144px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-[6px] p-2 gap-2",
+          "relative flex w-[156px] h-[144px] shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm p-2 gap-2",
       },
     },
     defaultVariants: {
@@ -766,7 +766,7 @@ function Attachment({
         <AttachmentPreview pastedExcerptMaxChars={pastedExcerptMaxChars} />
 
         {!readOnly ? (
-          <div className="flex h-6 w-full items-center justify-between gap-2 rounded-[6px] bg-card pr-1 pl-2">
+          <div className="flex h-6 w-full items-center justify-between gap-2 rounded-sm bg-card pr-1 pl-2">
             <span className="text-xs leading-4 font-[350] text-muted-foreground uppercase">
               Pasted
             </span>
@@ -833,8 +833,8 @@ const attachmentPreviewVariants = cva(
       variant: {
         compact:
           "absolute inset-0 size-full rounded-[inherit] border-0 bg-transparent",
-        inline: "size-6 rounded-[4px] border border-input",
-        detailed: "size-11 rounded-[6px] border border-input",
+        inline: "size-6 rounded-xs border border-input",
+        detailed: "size-11 rounded-sm border border-input",
         pasted:
           "min-h-0 w-full flex-1 shrink self-stretch items-start justify-start border-0 bg-transparent p-0",
       },

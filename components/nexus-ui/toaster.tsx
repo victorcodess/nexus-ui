@@ -153,7 +153,7 @@ function ToastCard({
   return (
     <div
       className={cn(
-        "relative flex w-full items-start justify-between gap-2 rounded-[12px] px-4 py-3 shadow-[0_8px_10px_rgb(0,0,0,0.02)] transition-colors lg:w-90 xl:w-120",
+        "relative flex w-full items-start justify-between gap-2 rounded-lg px-4 py-3 shadow-[0_8px_10px_rgb(0,0,0,0.02)] transition-colors lg:w-90 xl:w-120",
         "border border-(--toast-color)/5 bg-(--toast-bg) text-(--toast-color)",
         "dark:bg-(--toast-bg)",
         "[--toast-bg:var(--popover)] [--toast-color:var(--popover-foreground)]",

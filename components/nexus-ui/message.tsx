@@ -124,7 +124,7 @@ function MessageContent({ className, ...props }: MessageContentProps) {
     <div
       data-slot="message-content"
       className={cn(
-        "rounded-[20px] text-sm leading-6.5 text-primary",
+        "rounded-2xl text-sm leading-6.5 text-primary",
         from === "user"
           ? "w-fit bg-secondary px-4 py-2"
           : "mb-1 w-full bg-transparent px-2",
