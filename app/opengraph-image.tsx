@@ -1,27 +1,12 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "fs/promises";
 import { join } from "path";
+import { loadOgFonts, OG_FONT_FAMILY } from "@/lib/og-fonts";
 import { SITE_TITLE, SITE_DESCRIPTION_SHORT } from "@/lib/site";
 
 export const alt = SITE_TITLE;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-async function loadGoogleFont(font: string, weight: number, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`;
-  try {
-    const css = await (await fetch(url)).text();
-    const resource = css.match(
-      /src: url\((.+)\) format\('(opentype|truetype)'\)/,
-    )?.[1];
-    if (!resource) return null;
-    const response = await fetch(resource);
-    if (!response.ok) return null;
-    return response.arrayBuffer();
-  } catch {
-    return null;
-  }
-}
 
 export default async function Image() {
   const assetsDir = join(process.cwd(), "public", "assets");
@@ -32,19 +17,7 @@ export default async function Image() {
   const svgLeftDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgLeft).toString("base64")}`;
   const svgRightDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgRight).toString("base64")}`;
 
-  const text = `${SITE_TITLE} ${SITE_DESCRIPTION_SHORT} nexus-ui.dev`;
-  const [fontRegular, fontMedium] = await Promise.all([
-    loadGoogleFont("Inter", 400, text),
-    loadGoogleFont("Inter", 500, text),
-  ]);
-  const fonts = [
-    fontRegular
-      ? ({ name: "Inter", data: fontRegular, style: "normal", weight: 400 } as const)
-      : null,
-    fontMedium
-      ? ({ name: "Inter", data: fontMedium, style: "normal", weight: 500 } as const)
-      : null,
-  ].filter((font): font is NonNullable<typeof font> => font !== null);
+  const fonts = await loadOgFonts();
 
   return new ImageResponse(
     <div
@@ -110,7 +83,7 @@ export default async function Image() {
         </svg>
         <h1
           style={{
-            fontFamily: "Inter",
+            fontFamily: OG_FONT_FAMILY,
             fontSize: 48,
             fontWeight: 500,
             color: "#171717",
