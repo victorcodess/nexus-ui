@@ -106,12 +106,24 @@ export function dailyRateLimitMessage(
   return `You've used all ${result.limit} Ask AI messages for today. Try again tomorrow (${until}).`;
 }
 
-async function peekBucketCount(bucket: string): Promise<number> {
+function logRedisRateLimitError(op: string, err: unknown) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(`[ask-ai] Redis ${op} failed:`, message);
+}
+
+async function peekBucketCount(
+  bucket: string,
+): Promise<number | AskAiRateLimitUnavailable> {
   const redis = getRedisClient();
   const dayKey = `${KEY_PREFIX}${bucket}:${utcDayId()}`;
   if (redis) {
-    const n = Number(await redis.get(dayKey));
-    return Number.isFinite(n) && n > 0 ? n : 0;
+    try {
+      const n = Number(await redis.get(dayKey));
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    } catch (err) {
+      logRedisRateLimitError("get", err);
+      if (process.env.NODE_ENV === "production") return "unavailable";
+    }
   }
   const win = globalThis.__askAiRateLimitDev?.get(`${bucket}:${utcDayId()}`);
   return win && win.expiresAt > Date.now() ? win.count : 0;
@@ -126,6 +138,7 @@ export async function getAskAiRateLimitUsage(
     return "unavailable";
   }
   const used = await peekBucketCount(bucket);
+  if (used === "unavailable") return "unavailable";
   const reset = utcMidnightAfter();
   return {
     limit: max,
@@ -177,21 +190,27 @@ async function checkRedis(
   }
 
   const key = `${KEY_PREFIX}${clientId}:${utcDayId()}`;
-  const count = await redis.incr(key);
-  const ttlSec = secondsUntilUtcMidnight();
-  if (count === 1) {
-    await redis.expire(key, ttlSec);
-  } else {
-    const ttl = await redis.ttl(key);
-    if (ttl < 0) await redis.expire(key, ttlSec);
-  }
+  try {
+    const count = await redis.incr(key);
+    const ttlSec = secondsUntilUtcMidnight();
+    if (count === 1) {
+      await redis.expire(key, ttlSec);
+    } else {
+      const ttl = await redis.ttl(key);
+      if (ttl < 0) await redis.expire(key, ttlSec);
+    }
 
-  return {
-    ok: count <= max,
-    limit: max,
-    remaining: Math.max(0, max - count),
-    reset,
-  };
+    return {
+      ok: count <= max,
+      limit: max,
+      remaining: Math.max(0, max - count),
+      reset,
+    };
+  } catch (err) {
+    logRedisRateLimitError("incr", err);
+    if (process.env.NODE_ENV === "production") return "unavailable";
+    return checkDevMemory(clientId, max);
+  }
 }
 
 export async function checkAskAiRateLimit(
