@@ -520,7 +520,7 @@ function CitationCarouselPrev({
       data-slot="citation-carousel-prev"
       disabled={!canScrollPrev}
       className={cn(
-        "flex size-6.5 cursor-pointer items-center justify-center rounded-full text-primary outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50",
+        "flex size-6 cursor-pointer items-center justify-center rounded-full text-muted-foreground outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50 active:scale-97",
         className,
       )}
       onClick={scrollPrev}
@@ -549,7 +549,7 @@ function CitationCarouselNext({
       data-slot="citation-carousel-next"
       disabled={!canScrollNext}
       className={cn(
-        "flex size-6.5 cursor-pointer items-center justify-center rounded-full text-primary outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50",
+        "flex size-6 cursor-pointer items-center justify-center rounded-full text-muted-foreground outline-0 transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-accent/50 active:scale-97",
         className,
       )}
       onClick={scrollNext}
