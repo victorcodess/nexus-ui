@@ -61,7 +61,7 @@
     "motion": "^12.34.0",
     "next": "^16.1.7",
     "next-themes": "^0.4.6",
-    "radix-ui": "^1.4.3",
+    "radix-ui": "^1.5.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-symbols": "^0.0.6",
