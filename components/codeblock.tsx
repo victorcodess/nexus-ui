@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import {
   type ComponentProps,
+  type CSSProperties,
   createContext,
   type HTMLAttributes,
   type ReactNode,
@@ -281,7 +282,7 @@ export function CodeBlock({
                 ? undefined
                 : `line ${Number(props["data-line-numbers-start"] ?? 1) - 1}`,
               ...viewportProps.style,
-            } as object
+            } as CSSProperties
           }
         >
           {children}

@@ -3,6 +3,7 @@ import { ArrowDown01Icon, Share05Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   type ComponentProps,
+  type CSSProperties,
   createContext,
   type PointerEvent,
   type RefCallback,
@@ -256,7 +257,7 @@ export function SidebarViewport(props: ScrollAreaProps) {
           {
             maskImage:
               "linear-gradient(to bottom, transparent, white 12px, white calc(100% - 12px), transparent)",
-          } as object
+          } as CSSProperties
         }
       >
         {props.children}

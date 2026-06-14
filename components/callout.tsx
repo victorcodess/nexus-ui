@@ -6,7 +6,7 @@ import {
   Tick01Icon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
 export type CalloutType = 'info' | 'warn' | 'error' | 'success' | 'warning' | 'idea';
@@ -73,7 +73,7 @@ export function CalloutContainer({
           '--callout-color': colors.fg,
           '--callout-bg': colors.bg,
           ...style,
-        } as object
+        } as CSSProperties
       }
       {...props}
     >
