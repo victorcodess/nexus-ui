@@ -6,6 +6,7 @@ export const NEXUS_COMPONENT_SLUGS = [
   "suggestions",
   "chain-of-thought",
   "citation",
+  "questions",
   "attachments",
   "model-selector",
   "toaster",
