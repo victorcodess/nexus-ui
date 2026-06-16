@@ -98,7 +98,7 @@ function QuestionsMultipleQuestions() {
 
         <QuestionsFooter>
           <QuestionsSkip />
-          <QuestionsSubmit disableUntilLastQuestion />
+          <QuestionsSubmit />
         </QuestionsFooter>
       </Questions>
       <Toaster id={TOASTER_ID} />
