@@ -39,19 +39,24 @@ export type QuestionInput = {
   prompt: React.ReactNode;
   options: QuestionOptionInput[];
   required?: boolean;
-  allowOther?: boolean;
 };
 
 export const QUESTION_OTHER_VALUE = "__other__";
+export const QUESTION_NO_PREFERENCE_VALUE = "__no_preference__";
+export const QUESTION_NO_PREFERENCE_LABEL = "[No Preference]";
 
 export type RegisteredQuestion = {
   id: string;
   type: QuestionType;
   prompt: React.ReactNode;
   required?: boolean;
-  allowOther?: boolean;
   index: number;
   options?: QuestionOptionInput[];
+};
+
+type QuestionScope = {
+  id: string;
+  type: QuestionType;
 };
 
 export type QuestionSubmissionAnswer = {
@@ -59,17 +64,26 @@ export type QuestionSubmissionAnswer = {
   label: React.ReactNode;
 };
 
-export type SingleQuestionAnswerState =
-  | { status: "answered"; value: string; other?: string }
-  | { status: "skipped"; value: null };
+const NO_PREFERENCE_ANSWER: QuestionSubmissionAnswer = {
+  value: QUESTION_NO_PREFERENCE_VALUE,
+  label: QUESTION_NO_PREFERENCE_LABEL,
+};
 
-export type MultipleQuestionAnswerState =
-  | { status: "answered"; value: string[]; other?: string }
-  | { status: "skipped"; value: [] };
+export type SingleQuestionAnswerState = {
+  type: "single";
+  value: string;
+  other?: string;
+};
+
+export type MultipleQuestionAnswerState = {
+  type: "multiple";
+  value: string[];
+  other?: string;
+};
 
 export type QuestionAnswerState =
-  | ({ type: "single" } & SingleQuestionAnswerState)
-  | ({ type: "multiple" } & MultipleQuestionAnswerState);
+  | SingleQuestionAnswerState
+  | MultipleQuestionAnswerState;
 
 export type QuestionsSubmission = Array<
   | {
@@ -84,7 +98,7 @@ export type QuestionsSubmission = Array<
       prompt: React.ReactNode;
       type: "single";
       status: "skipped";
-      answer: null;
+      answer: QuestionSubmissionAnswer;
     }
   | {
       questionId: string;
@@ -98,7 +112,7 @@ export type QuestionsSubmission = Array<
       prompt: React.ReactNode;
       type: "multiple";
       status: "skipped";
-      answer: [];
+      answer: QuestionSubmissionAnswer[];
     }
 >;
 
@@ -106,7 +120,7 @@ function isQuestionAnswered(
   question: RegisteredQuestion,
   answer: QuestionAnswerState | undefined,
 ): boolean {
-  if (!answer || answer.status === "skipped") return false;
+  if (!answer || answer.type !== question.type) return false;
 
   if (question.type === "single") {
     if (answer.value === QUESTION_OTHER_VALUE) {
@@ -116,6 +130,37 @@ function isQuestionAnswered(
   }
 
   return answer.value.length > 0 || Boolean(answer.other?.trim());
+}
+
+function isBlockedByRequired(
+  question: RegisteredQuestion | undefined,
+  answers: Record<string, QuestionAnswerState>,
+): boolean {
+  return Boolean(
+    question?.required && !isQuestionAnswered(question, answers[question.id]),
+  );
+}
+
+function isOtherAnswer(
+  answer: QuestionAnswerState | undefined,
+  type: QuestionType,
+): boolean {
+  if (!answer || answer.type !== type) return false;
+  if (type === "single") return answer.value === QUESTION_OTHER_VALUE;
+  return (
+    answer.value.includes(QUESTION_OTHER_VALUE) || Boolean(answer.other?.trim())
+  );
+}
+
+function canSubmitQuestions(
+  questions: RegisteredQuestion[],
+  answers: Record<string, QuestionAnswerState>,
+): boolean {
+  if (questions.length === 0) return false;
+  return !questions.some(
+    (question) =>
+      question.required && !isQuestionAnswered(question, answers[question.id]),
+  );
 }
 
 function optionLabel(
@@ -138,14 +183,14 @@ function skippedSubmission(
         prompt: question.prompt,
         type: "single",
         status: "skipped",
-        answer: null,
+        answer: NO_PREFERENCE_ANSWER,
       }
     : {
         questionId: question.id,
         prompt: question.prompt,
         type: "multiple",
         status: "skipped",
-        answer: [],
+        answer: [NO_PREFERENCE_ANSWER],
       };
 }
 
@@ -155,15 +200,11 @@ function buildSubmission(
 ): QuestionsSubmission {
   return questions.map((question) => {
     const answer = answers[question.id];
-    if (!answer || answer.status === "skipped" || answer.type !== question.type) {
+    if (!isQuestionAnswered(question, answer)) {
       return skippedSubmission(question);
     }
 
-    if (
-      question.type === "single" &&
-      answer.type === "single" &&
-      answer.status === "answered"
-    ) {
+    if (question.type === "single" && answer?.type === "single") {
       return {
         questionId: question.id,
         prompt: question.prompt,
@@ -176,33 +217,29 @@ function buildSubmission(
       };
     }
 
-    if (
-      question.type !== "multiple" ||
-      answer.type !== "multiple" ||
-      answer.status !== "answered"
-    ) {
-      return skippedSubmission(question);
+    if (question.type === "multiple" && answer?.type === "multiple") {
+      const submissionAnswers = answer.value.map((value) => ({
+        value,
+        label: optionLabel(question, value, answer.other),
+      }));
+
+      if (answer.other?.trim() && !answer.value.includes(QUESTION_OTHER_VALUE)) {
+        submissionAnswers.push({
+          value: QUESTION_OTHER_VALUE,
+          label: answer.other.trim(),
+        });
+      }
+
+      return {
+        questionId: question.id,
+        prompt: question.prompt,
+        type: "multiple",
+        status: "answered",
+        answer: submissionAnswers,
+      };
     }
 
-    const submissionAnswers = answer.value.map((value) => ({
-      value,
-      label: optionLabel(question, value, answer.other),
-    }));
-
-    if (answer.other?.trim() && !answer.value.includes(QUESTION_OTHER_VALUE)) {
-      submissionAnswers.push({
-        value: QUESTION_OTHER_VALUE,
-        label: answer.other.trim(),
-      });
-    }
-
-    return {
-      questionId: question.id,
-      prompt: question.prompt,
-      type: "multiple",
-      status: "answered",
-      answer: submissionAnswers,
-    };
+    return skippedSubmission(question);
   });
 }
 
@@ -212,36 +249,15 @@ function createQuestionsFromItems(items: QuestionInput[]): RegisteredQuestion[] 
     type: item.type,
     prompt: item.prompt,
     required: item.required ?? false,
-    allowOther: item.allowOther ?? true,
     index,
     options: item.options,
   }));
 }
 
-function isSameRegisteredQuestion(
-  a: RegisteredQuestion,
-  b: RegisteredQuestion,
-): boolean {
-  return (
-    a.id === b.id &&
-    a.type === b.type &&
-    a.prompt === b.prompt &&
-    a.required === b.required &&
-    a.allowOther === b.allowOther &&
-    a.index === b.index &&
-    a.options === b.options
-  );
-}
-
 type QuestionsRootContextValue = {
   questions: RegisteredQuestion[];
-  usesItemsMetadata: boolean;
-  registerQuestion: (question: RegisteredQuestion) => () => void;
   index: number;
-  setIndex: (index: number) => void;
   answers: Record<string, QuestionAnswerState>;
-  setAnswer: (questionId: string, answer: QuestionAnswerState) => void;
-  markSkipped: (questionId: string) => void;
   selectSingle: (
     questionId: string,
     value: string,
@@ -250,30 +266,20 @@ type QuestionsRootContextValue = {
   ) => void;
   toggleMultiple: (questionId: string, value: string) => void;
   setMultipleOther: (questionId: string, other: string) => void;
+  clearAnswer: (questionId: string) => void;
   skip: () => void;
   submit: () => void;
   goNext: () => void;
   goPrev: () => void;
-  canSkip: boolean;
-  canSubmit: boolean;
-  canGoPrev: boolean;
-  canGoNext: boolean;
-  isLastQuestion: boolean;
   carouselApi: CarouselApi | null;
   setCarouselApi: (api: CarouselApi | undefined) => void;
-  carouselCurrent: number;
-  carouselCount: number;
   onDismiss?: () => void;
 };
 
 const QuestionsRootContext =
   React.createContext<QuestionsRootContextValue | null>(null);
 
-const QuestionsSlideContext = React.createContext<{ index: number } | null>(
-  null,
-);
-
-const QuestionContext = React.createContext<RegisteredQuestion | null>(null);
+const QuestionContext = React.createContext<QuestionScope | null>(null);
 
 function useQuestionsRoot(component: string): QuestionsRootContextValue {
   const ctx = React.useContext(QuestionsRootContext);
@@ -283,7 +289,7 @@ function useQuestionsRoot(component: string): QuestionsRootContextValue {
   return ctx;
 }
 
-function useQuestion(component: string): RegisteredQuestion {
+function useQuestion(component: string): QuestionScope {
   const ctx = React.useContext(QuestionContext);
   if (!ctx) {
     throw new Error(`${component} must be used within Question`);
@@ -291,14 +297,9 @@ function useQuestion(component: string): RegisteredQuestion {
   return ctx;
 }
 
-export type QuestionsProps = React.ComponentProps<typeof Card> & {
-  items?: QuestionInput[];
-  index?: number;
-  defaultIndex?: number;
-  onIndexChange?: (index: number) => void;
-  value?: Record<string, QuestionAnswerState>;
-  defaultValue?: Record<string, QuestionAnswerState>;
-  onValueChange?: (value: Record<string, QuestionAnswerState>) => void;
+export type QuestionsProps = Omit<React.ComponentProps<typeof Card>, "onSubmit"> & {
+  items: QuestionInput[];
+  autoAdvance?: boolean;
   onSubmit?: (submission: QuestionsSubmission) => void;
   onSkip?: (questionId: string) => void;
   onDismiss?: () => void;
@@ -307,165 +308,24 @@ export type QuestionsProps = React.ComponentProps<typeof Card> & {
 function Questions({
   className,
   items,
-  index: indexProp,
-  defaultIndex = 0,
-  onIndexChange,
-  value: valueProp,
-  defaultValue,
-  onValueChange,
+  autoAdvance = true,
   onSubmit,
   onSkip,
   onDismiss,
   children,
   ...props
 }: QuestionsProps) {
-  const itemsQuestions = React.useMemo(
-    () => (items ? createQuestionsFromItems(items) : null),
-    [items],
+  const questions = React.useMemo(() => createQuestionsFromItems(items), [items]);
+  const [index, setIndex] = React.useState(0);
+  const [answers, setAnswers] = React.useState<Record<string, QuestionAnswerState>>(
+    {},
   );
-  const [registeredQuestionsMap, setRegisteredQuestionsMap] = React.useState<
-    Map<string, RegisteredQuestion>
-  >(() => new Map());
-  const [internalIndex, setInternalIndex] = React.useState(defaultIndex);
-  const [internalAnswers, setInternalAnswers] = React.useState<
-    Record<string, QuestionAnswerState>
-  >(defaultValue ?? {});
-  const [carouselApi, setCarouselApi] = React.useState<CarouselApi | null>(
-    null,
-  );
-
-  const isIndexControlled = indexProp !== undefined;
-  const index = isIndexControlled ? indexProp : internalIndex;
-
-  const isAnswersControlled = valueProp !== undefined;
-  const answers = isAnswersControlled ? valueProp : internalAnswers;
-
-  const setAnswers = React.useCallback(
-    (
-      updater:
-        | Record<string, QuestionAnswerState>
-        | ((
-            prev: Record<string, QuestionAnswerState>,
-          ) => Record<string, QuestionAnswerState>),
-    ) => {
-      if (isAnswersControlled) {
-        const next =
-          typeof updater === "function" ? updater(answers) : updater;
-        onValueChange?.(next);
-        return;
-      }
-
-      setInternalAnswers((prev) => {
-        const next =
-          typeof updater === "function" ? updater(prev) : updater;
-        onValueChange?.(next);
-        return next;
-      });
-    },
-    [answers, isAnswersControlled, onValueChange],
-  );
-
-  const setIndex = React.useCallback(
-    (nextIndex: number) => {
-      if (!isIndexControlled) {
-        setInternalIndex(nextIndex);
-      }
-      onIndexChange?.(nextIndex);
-    },
-    [isIndexControlled, onIndexChange],
-  );
-
-  const questions = React.useMemo(() => {
-    if (itemsQuestions) return itemsQuestions;
-    return Array.from(registeredQuestionsMap.values()).sort(
-      (a, b) => a.index - b.index,
-    );
-  }, [itemsQuestions, registeredQuestionsMap]);
-
-  const usesItemsMetadata = itemsQuestions != null;
-
-  const registerQuestion = React.useCallback(
-    (question: RegisteredQuestion) => {
-      if (usesItemsMetadata) {
-        return () => {};
-      }
-
-      setRegisteredQuestionsMap((prev) => {
-        const existing = prev.get(question.id);
-        if (existing && isSameRegisteredQuestion(existing, question)) {
-          return prev;
-        }
-        const next = new Map(prev);
-        next.set(question.id, question);
-        return next;
-      });
-
-      return () => {
-        setRegisteredQuestionsMap((prev) => {
-          if (!prev.has(question.id)) return prev;
-          const next = new Map(prev);
-          next.delete(question.id);
-          return next;
-        });
-      };
-    },
-    [usesItemsMetadata],
-  );
+  const answersRef = React.useRef(answers);
+  const [carouselApi, setCarouselApi] = React.useState<CarouselApi | null>(null);
 
   const questionCount = questions.length;
   const clampedIndex =
-    questionCount === 0
-      ? 0
-      : Math.min(Math.max(0, index), questionCount - 1);
-  const currentQuestion = questions[clampedIndex] ?? null;
-  const isLastQuestion =
-    questionCount === 0 || clampedIndex >= questionCount - 1;
-
-  const getQuestionById = React.useCallback(
-    (questionId: string) => questions.find((q) => q.id === questionId),
-    [questions],
-  );
-
-  const markSkipped = React.useCallback(
-    (questionId: string) => {
-      setAnswers((prev) => {
-        const question = getQuestionById(questionId);
-        if (!question) return prev;
-
-        const existing = prev[questionId];
-        if (existing && isQuestionAnswered(question, existing)) {
-          return prev;
-        }
-
-        return {
-          ...prev,
-          [questionId]:
-            question.type === "single"
-              ? { type: "single", status: "skipped", value: null }
-              : { type: "multiple", status: "skipped", value: [] },
-        };
-      });
-    },
-    [getQuestionById, setAnswers],
-  );
-
-  const setAnswer = React.useCallback(
-    (questionId: string, answer: QuestionAnswerState) => {
-      setAnswers((prev) => ({ ...prev, [questionId]: answer }));
-    },
-    [setAnswers],
-  );
-
-  const maybeSkipCurrent = React.useCallback(
-    (question: RegisteredQuestion | null) => {
-      if (!question) return;
-      const answer = answers[question.id];
-      if (!isQuestionAnswered(question, answer)) {
-        markSkipped(question.id);
-      }
-    },
-    [answers, markSkipped],
-  );
+    questionCount === 0 ? 0 : Math.min(Math.max(0, index), questionCount - 1);
 
   const goToIndex = React.useCallback(
     (nextIndex: number) => {
@@ -474,8 +334,18 @@ function Questions({
       setIndex(target);
       carouselApi?.scrollTo(target);
     },
-    [carouselApi, questionCount, setIndex],
+    [carouselApi, questionCount],
   );
+
+  const clearAnswer = React.useCallback((questionId: string) => {
+    setAnswers((prev) => {
+      if (!(questionId in prev)) return prev;
+      const next = { ...prev };
+      delete next[questionId];
+      answersRef.current = next;
+      return next;
+    });
+  }, []);
 
   const selectSingle = React.useCallback(
     (
@@ -484,93 +354,71 @@ function Questions({
       other?: string,
       options?: { autoAdvance?: boolean },
     ) => {
-      setAnswer(questionId, {
-        type: "single",
-        status: "answered",
-        value,
-        ...(other ? { other } : {}),
+      setAnswers((prev) => {
+        const next = {
+          ...prev,
+          [questionId]: {
+            type: "single" as const,
+            value,
+            ...(other ? { other } : {}),
+          },
+        };
+        answersRef.current = next;
+        return next;
       });
 
-      if (options?.autoAdvance === false) return;
+      if (options?.autoAdvance === false || !autoAdvance) return;
 
       const questionIndex = questions.findIndex((q) => q.id === questionId);
       if (questionIndex < 0 || questionIndex >= questions.length - 1) return;
       goToIndex(questionIndex + 1);
     },
-    [goToIndex, questions, setAnswer],
+    [autoAdvance, goToIndex, questions],
   );
 
-  const toggleMultiple = React.useCallback(
-    (questionId: string, value: string) => {
-      setAnswers((prev) => {
-        const existing = prev[questionId];
-        const currentValues =
-          existing?.type === "multiple" && existing.status === "answered"
-            ? existing.value
-            : [];
-        const nextValues = currentValues.includes(value)
-          ? currentValues.filter((item) => item !== value)
-          : [...currentValues, value];
+  const toggleMultiple = React.useCallback((questionId: string, value: string) => {
+    setAnswers((prev) => {
+      const existing = prev[questionId];
+      const currentValues =
+        existing?.type === "multiple" ? existing.value : [];
+      const nextValues = currentValues.includes(value)
+        ? currentValues.filter((item) => item !== value)
+        : [...currentValues, value];
 
-        return {
-          ...prev,
-          [questionId]: {
-            type: "multiple",
-            status: "answered",
-            value: nextValues,
-            ...(existing?.type === "multiple" &&
-            existing.status === "answered" &&
-            existing.other
-              ? { other: existing.other }
-              : {}),
-          },
-        };
-      });
-    },
-    [setAnswers],
-  );
+      return {
+        ...prev,
+        [questionId]: {
+          type: "multiple",
+          value: nextValues,
+          ...(existing?.type === "multiple" && existing.other
+            ? { other: existing.other }
+            : {}),
+        },
+      };
+    });
+  }, []);
 
-  const setMultipleOther = React.useCallback(
-    (questionId: string, other: string) => {
-      setAnswers((prev) => {
-        const existing = prev[questionId];
-        const currentValues =
-          existing?.type === "multiple" && existing.status === "answered"
-            ? existing.value
-            : [];
+  const setMultipleOther = React.useCallback((questionId: string, other: string) => {
+    setAnswers((prev) => {
+      const existing = prev[questionId];
+      const currentValues = existing?.type === "multiple" ? existing.value : [];
 
-        return {
-          ...prev,
-          [questionId]: {
-            type: "multiple",
-            status: "answered",
-            value: currentValues,
-            other,
-          },
-        };
-      });
-    },
-    [setAnswers],
-  );
+      return {
+        ...prev,
+        [questionId]: {
+          type: "multiple",
+          value: currentValues,
+          other,
+        },
+      };
+    });
+  }, []);
 
   const goNext = React.useCallback(() => {
     const current = questions[clampedIndex];
-    if (!current) return;
-    if (current.required && !isQuestionAnswered(current, answers[current.id])) {
-      return;
-    }
-    maybeSkipCurrent(current);
-    if (clampedIndex < questionCount - 1) {
-      goToIndex(clampedIndex + 1);
-    }
-  }, [
-    answers,
-    clampedIndex,
-    goToIndex,
-    maybeSkipCurrent,
-    questionCount,
-    questions,
-  ]);
+    if (!current || isBlockedByRequired(current, answers)) return;
+    if (clampedIndex < questionCount - 1) goToIndex(clampedIndex + 1);
+  }, [answers, clampedIndex, goToIndex, questionCount, questions]);
 
   const goPrev = React.useCallback(() => {
     if (clampedIndex > 0) {
@@ -580,64 +428,46 @@ function Questions({
 
   const skip = React.useCallback(() => {
     const current = questions[clampedIndex];
-    if (!current || isLastQuestion) return;
-    if (current.required && !isQuestionAnswered(current, answers[current.id])) {
-      return;
-    }
-    markSkipped(current.id);
+    if (!current || clampedIndex >= questionCount - 1) return;
+    if (isBlockedByRequired(current, answers)) return;
     onSkip?.(current.id);
     goToIndex(clampedIndex + 1);
-  }, [
-    answers,
-    clampedIndex,
-    goToIndex,
-    isLastQuestion,
-    markSkipped,
-    onSkip,
-    questions,
-  ]);
+  }, [answers, clampedIndex, goToIndex, onSkip, questionCount, questions]);
 
   const submit = React.useCallback(() => {
-    const allQuestionsAnswered =
-      questions.length > 0 &&
-      questions.every((q) => isQuestionAnswered(q, answers[q.id]));
-
-    if (!allQuestionsAnswered) return;
+    if (!canSubmitQuestions(questions, answers)) return;
 
     onSubmit?.(buildSubmission(questions, answers));
+    answersRef.current = {};
     setAnswers({});
     goToIndex(0);
-  }, [answers, goToIndex, onSubmit, questions, setAnswers]);
+  }, [answers, goToIndex, onSubmit, questions]);
 
   React.useEffect(() => {
     if (!carouselApi) return;
+
     const onSelect = () => {
       const newIndex = carouselApi.selectedScrollSnap();
       const oldIndex = carouselApi.previousScrollSnap();
       if (newIndex === oldIndex) return;
 
       const oldQuestion = questions[oldIndex];
-      if (newIndex > oldIndex && oldQuestion) {
-        if (
-          oldQuestion.required &&
-          !isQuestionAnswered(oldQuestion, answers[oldQuestion.id])
-        ) {
-          carouselApi.scrollTo(oldIndex);
-          return;
-        }
-        maybeSkipCurrent(oldQuestion);
+      if (
+        newIndex > oldIndex &&
+        isBlockedByRequired(oldQuestion, answersRef.current)
+      ) {
+        carouselApi.scrollTo(oldIndex);
+        return;
       }
 
       setIndex(newIndex);
     };
 
     carouselApi.on("select", onSelect);
-    carouselApi.on("reInit", onSelect);
     return () => {
       carouselApi.off("select", onSelect);
-      carouselApi.off("reInit", onSelect);
     };
-  }, [answers, carouselApi, maybeSkipCurrent, questions, setIndex]);
+  }, [carouselApi, questions]);
 
   React.useEffect(() => {
     if (!carouselApi) return;
@@ -646,86 +476,33 @@ function Questions({
     }
   }, [carouselApi, clampedIndex]);
 
-  const currentAnswered = currentQuestion
-    ? isQuestionAnswered(currentQuestion, answers[currentQuestion.id])
-    : false;
-
-  const canSkip =
-    !isLastQuestion &&
-    Boolean(currentQuestion) &&
-    !(currentQuestion?.required && !currentAnswered);
-
-  const canSubmit =
-    questions.length > 0 &&
-    questions.every((q) => isQuestionAnswered(q, answers[q.id]));
-
-  const canGoPrev = clampedIndex > 0;
-  const canGoNext =
-    !isLastQuestion &&
-    Boolean(currentQuestion) &&
-    !(currentQuestion?.required && !currentAnswered);
-
-  const carouselCount = carouselApi?.scrollSnapList().length ?? questionCount;
-  const carouselCurrent =
-    questionCount === 0 ? 0 : Math.min(clampedIndex + 1, questionCount);
-
-  const setCarouselApiCb = React.useCallback(
-    (api: CarouselApi | undefined) => {
-      setCarouselApi(api ?? null);
-    },
-    [],
-  );
-
   const rootValue = React.useMemo<QuestionsRootContextValue>(
     () => ({
       questions,
-      usesItemsMetadata,
-      registerQuestion,
       index: clampedIndex,
-      setIndex: goToIndex,
       answers,
-      setAnswer,
-      markSkipped,
       selectSingle,
       toggleMultiple,
       setMultipleOther,
+      clearAnswer,
       skip,
       submit,
       goNext,
       goPrev,
-      canSkip,
-      canSubmit,
-      canGoPrev,
-      canGoNext,
-      isLastQuestion,
       carouselApi,
-      setCarouselApi: setCarouselApiCb,
-      carouselCurrent,
-      carouselCount,
+      setCarouselApi: (api) => setCarouselApi(api ?? null),
       onDismiss,
     }),
     [
       answers,
-      canGoNext,
-      canGoPrev,
-      canSkip,
-      canSubmit,
-      carouselApi,
-      carouselCount,
-      carouselCurrent,
       clampedIndex,
+      carouselApi,
+      clearAnswer,
       goNext,
       goPrev,
-      goToIndex,
-      isLastQuestion,
-      markSkipped,
       onDismiss,
       questions,
-      registerQuestion,
-      usesItemsMetadata,
       selectSingle,
-      setAnswer,
-      setCarouselApiCb,
       setMultipleOther,
       skip,
       submit,
@@ -751,68 +528,38 @@ function Questions({
 
 export type QuestionProps = {
   id: string;
-  type: QuestionType;
-  prompt: React.ReactNode;
-  required?: boolean;
-  allowOther?: boolean;
-  index?: number;
   children?: React.ReactNode;
 };
 
-function QuestionRegistration({
-  meta,
-  children,
-}: {
-  meta: RegisteredQuestion;
-  children: React.ReactNode;
-}) {
-  const { registerQuestion } = useQuestionsRoot("QuestionRegistration");
+function Question({ id, children }: QuestionProps) {
+  const { questions } = useQuestionsRoot("Question");
+  const registered = questions.find((question) => question.id === id);
 
-  React.useLayoutEffect(() => {
-    return registerQuestion(meta);
-  }, [meta, registerQuestion]);
+  if (!registered) {
+    throw new Error(`Question "${id}" is not in Questions items`);
+  }
 
-  return children;
-}
-
-function Question({
-  id,
-  type,
-  prompt,
-  required = false,
-  allowOther = true,
-  index: indexProp,
-  children,
-}: QuestionProps) {
-  const { usesItemsMetadata } = useQuestionsRoot("Question");
-  const slide = React.useContext(QuestionsSlideContext);
-  const index = indexProp ?? slide?.index ?? 0;
-
-  const meta = React.useMemo<RegisteredQuestion>(
-    () => ({ id, type, prompt, required, allowOther, index }),
-    [allowOther, id, index, prompt, required, type],
+  const scope = React.useMemo<QuestionScope>(
+    () => ({ id: registered.id, type: registered.type }),
+    [registered.id, registered.type],
   );
 
-  const content = (
-    <QuestionContext.Provider value={meta}>
+  return (
+    <QuestionContext.Provider value={scope}>
       <CardContent data-slot="question" className="w-full p-1.5">
         {children}
       </CardContent>
     </QuestionContext.Provider>
   );
-
-  if (usesItemsMetadata) {
-    return content;
-  }
-
-  return <QuestionRegistration meta={meta}>{content}</QuestionRegistration>;
 }
 
 const questionOptionsListClassName =
   "flex w-full flex-col gap-0.5 [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-2.5 [&>*+*]:before:left-2.5 [&>*+*]:before:z-10 [&>*+*]:before:h-px [&>*+*]:before:bg-border/20 [&>*+*]:before:content-['']";
 
 const questionRowClassName =
-  "group/row flex h-11 w-full items-center gap-2.5 rounded-lg bg-transparent px-2.5 text-left transition-all hover:bg-muted active:scale-99";
+  "group/row flex h-11 w-full items-center gap-2.5 rounded-lg bg-transparent px-2.5 text-left transition-all hover:bg-muted";
+
+const questionOptionRowClassName = cn(questionRowClassName, "active:scale-99");
 
 export type QuestionOptionsProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -862,15 +609,15 @@ function QuestionOption({
 
   const isSelected =
     question.type === "single"
-      ? answer?.type === "single" &&
-        answer.status === "answered" &&
-        answer.value === value
-      : answer?.type === "multiple" &&
-        answer.status === "answered" &&
-        answer.value.includes(value);
+      ? answer?.type === "single" && answer.value === value
+      : answer?.type === "multiple" && answer.value.includes(value);
 
   const handleSelect = () => {
     if (question.type === "single") {
+      if (isSelected) {
+        root.clearAnswer(question.id);
+        return;
+      }
       root.selectSingle(question.id, value);
       return;
     }
@@ -882,7 +629,7 @@ function QuestionOption({
       <label
         data-slot="question-option"
         className={cn(
-          questionRowClassName,
+          questionOptionRowClassName,
           "cursor-pointer",
           isSelected && "bg-muted",
           className,
@@ -907,7 +654,7 @@ function QuestionOption({
       aria-selected={isSelected}
       data-slot="question-option"
       className={cn(
-        questionRowClassName,
+        questionOptionRowClassName,
         "cursor-pointer",
         isSelected && "bg-muted",
         className,
@@ -953,15 +700,12 @@ function QuestionOption({
 export type QuestionOtherProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "value" | "onChange"
-> & {
-  optionIndex?: number;
-};
+>;
 
 function QuestionOther({
   className,
   placeholder = "Other...",
   onKeyDown,
-  optionIndex: _optionIndex,
   ...props
 }: QuestionOtherProps) {
   const question = useQuestion("QuestionOther");
@@ -969,24 +713,21 @@ function QuestionOther({
   const answer = root.answers[question.id];
 
   const otherValue =
-    answer?.status === "answered" && "other" in answer
+    answer?.type === "single" || answer?.type === "multiple"
       ? (answer.other ?? "")
       : "";
 
-  const isOtherSelected =
-    question.type === "single"
-      ? answer?.type === "single" &&
-        answer.status === "answered" &&
-        answer.value === QUESTION_OTHER_VALUE
-      : answer?.type === "multiple" &&
-        answer.status === "answered" &&
-        (answer.value.includes(QUESTION_OTHER_VALUE) ||
-          Boolean(answer.other?.trim()));
+  const isOtherSelected = isOtherAnswer(answer, question.type);
 
-  const handleSelect = () => {
+  const handleOtherToggle = () => {
     if (question.type === "single") {
       if (otherValue.trim()) {
-        root.selectSingle(question.id, QUESTION_OTHER_VALUE, otherValue.trim());
+        root.selectSingle(
+          question.id,
+          QUESTION_OTHER_VALUE,
+          otherValue.trim(),
+          { autoAdvance: false },
+        );
       }
       return;
     }
@@ -996,13 +737,13 @@ function QuestionOther({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const next = event.target.value;
     if (question.type === "single") {
-      if (next.trim()) {
-        root.selectSingle(question.id, QUESTION_OTHER_VALUE, next, {
-          autoAdvance: false,
-        });
-      } else {
-        root.markSkipped(question.id);
+      if (!next.trim()) {
+        root.clearAnswer(question.id);
+        return;
       }
+      root.selectSingle(question.id, QUESTION_OTHER_VALUE, next, {
+        autoAdvance: false,
+      });
       return;
     }
     root.setMultipleOther(question.id, next);
@@ -1019,7 +760,7 @@ function QuestionOther({
       >
         <Checkbox
           checked={isOtherSelected}
-          onCheckedChange={handleSelect}
+          onCheckedChange={handleOtherToggle}
           className="mx-1.25 size-4.5 shadow-none transition-colors group-hover/row:data-[state=unchecked]:border-ring/50"
         />
         <input
@@ -1038,13 +779,26 @@ function QuestionOther({
   return (
     <div
       data-slot="question-other"
-      className={cn(questionRowClassName, "cursor-text", className)}
+      className={cn(
+        questionRowClassName,
+        "cursor-text",
+        isOtherSelected && "bg-muted",
+        className,
+      )}
     >
-      <span className="relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-border/30 transition-all group-hover/row:bg-border/70">
+      <span
+        className={cn(
+          "relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-border/30 transition-all group-hover/row:bg-border/70",
+          isOtherSelected && "bg-border/70",
+        )}
+      >
         <HugeiconsIcon
           icon={Edit03Icon}
           strokeWidth={2.0}
-          className="size-4 text-muted-foreground transition-all group-hover/row:text-primary"
+          className={cn(
+            "size-4 text-muted-foreground transition-all group-hover/row:text-primary",
+            isOtherSelected && "text-primary",
+          )}
         />
       </span>
       <input
@@ -1053,7 +807,10 @@ function QuestionOther({
         placeholder={placeholder}
         onChange={handleChange}
         onKeyDown={onKeyDown}
-        className="text-primary h-full min-w-0 flex-1 truncate text-sm transition-all outline-none placeholder:text-ring"
+        className={cn(
+          "text-primary h-full min-w-0 flex-1 truncate text-sm transition-all outline-none placeholder:text-ring",
+          isOtherSelected && "text-primary",
+        )}
         {...props}
       />
     </div>
@@ -1136,7 +893,12 @@ function QuestionsFooter({ className, ...props }: QuestionsFooterProps) {
 export type QuestionsSkipProps = React.ComponentProps<typeof Button>;
 
 function QuestionsSkip({ className, disabled, onClick, ...props }: QuestionsSkipProps) {
-  const root = useQuestionsRoot("QuestionsSkip");
+  const { questions, index, answers, skip } = useQuestionsRoot("QuestionsSkip");
+  const current = questions[index];
+  const canSkip =
+    index < questions.length - 1 &&
+    Boolean(current) &&
+    !isBlockedByRequired(current, answers);
 
   return (
     <Button
@@ -1144,14 +906,14 @@ function QuestionsSkip({ className, disabled, onClick, ...props }: QuestionsSkip
       variant="ghost"
       size="sm"
       data-slot="questions-skip"
-      disabled={disabled ?? !root.canSkip}
+      disabled={disabled ?? !canSkip}
       className={cn(
         "text-muted-foreground hover:text-primary active:scale-99",
         className,
       )}
       onClick={(event) => {
         onClick?.(event);
-        root.skip();
+        skip();
       }}
       {...props}
     >
@@ -1160,16 +922,31 @@ function QuestionsSkip({ className, disabled, onClick, ...props }: QuestionsSkip
   );
 }
 
-export type QuestionsSubmitProps = React.ComponentProps<typeof Button>;
+export type QuestionsSubmitProps = React.ComponentProps<typeof Button> & {
+  showOnLastQuestion?: boolean;
+  disableUntilLastQuestion?: boolean;
+};
 
 function QuestionsSubmit({
   className,
   disabled,
   onClick,
   children = "Submit",
+  showOnLastQuestion = false,
+  disableUntilLastQuestion = false,
   ...props
 }: QuestionsSubmitProps) {
-  const root = useQuestionsRoot("QuestionsSubmit");
+  const { questions, index, answers, submit } = useQuestionsRoot("QuestionsSubmit");
+  const canSubmit = canSubmitQuestions(questions, answers);
+  const onLastQuestion = index >= questions.length - 1;
+
+  if (showOnLastQuestion && !onLastQuestion) {
+    return null;
+  }
+
+  const isDisabled =
+    disabled ??
+    (!canSubmit || (disableUntilLastQuestion && !onLastQuestion));
 
   return (
     <Button
@@ -1177,11 +954,11 @@ function QuestionsSubmit({
       variant="default"
       size="sm"
       data-slot="questions-submit"
-      disabled={disabled ?? !root.canSubmit}
+      disabled={isDisabled}
       className={cn("active:scale-99", className)}
       onClick={(event) => {
         onClick?.(event);
-        root.submit();
+        submit();
       }}
       {...props}
     >
@@ -1273,12 +1050,9 @@ function QuestionsCarouselContent({
 
 export type QuestionsCarouselItemProps = React.ComponentProps<
   typeof CarouselItem
-> & {
-  index: number;
-};
+>;
 
 function QuestionsCarouselItem({
-  index,
   className,
   children,
   ...props
@@ -1289,9 +1063,7 @@ function QuestionsCarouselItem({
       className={cn("w-full self-start p-0 pl-0", className)}
       {...props}
     >
-      <QuestionsSlideContext.Provider value={{ index }}>
-        {children}
-      </QuestionsSlideContext.Provider>
+      {children}
     </CarouselItem>
   );
 }
@@ -1322,15 +1094,15 @@ function QuestionsCarouselPrev({
   children,
   ...props
 }: QuestionsCarouselNavButtonProps) {
-  const root = useQuestionsRoot("QuestionsCarouselPrev");
+  const { index, goPrev } = useQuestionsRoot("QuestionsCarouselPrev");
 
   return (
     <button
       type="button"
       data-slot="questions-carousel-prev"
-      disabled={!root.canGoPrev}
+      disabled={index <= 0}
       className={cn(carouselNavClassName, className)}
-      onClick={() => root.goPrev()}
+      onClick={() => goPrev()}
       {...props}
     >
       {children ?? (
@@ -1345,15 +1117,21 @@ function QuestionsCarouselNext({
   children,
   ...props
 }: QuestionsCarouselNavButtonProps) {
-  const root = useQuestionsRoot("QuestionsCarouselNext");
+  const { questions, index, answers, goNext } =
+    useQuestionsRoot("QuestionsCarouselNext");
+  const current = questions[index];
+  const canGoNext =
+    index < questions.length - 1 &&
+    Boolean(current) &&
+    !isBlockedByRequired(current, answers);
 
   return (
     <button
       type="button"
       data-slot="questions-carousel-next"
-      disabled={!root.canGoNext}
+      disabled={!canGoNext}
       className={cn(carouselNavClassName, className)}
-      onClick={() => root.goNext()}
+      onClick={() => goNext()}
       {...props}
     >
       {children ?? (
@@ -1372,7 +1150,9 @@ function QuestionsCarouselIndex({
   format = "of",
   ...props
 }: QuestionsCarouselIndexProps) {
-  const root = useQuestionsRoot("QuestionsCarouselIndex");
+  const { questions, index } = useQuestionsRoot("QuestionsCarouselIndex");
+  const count = questions.length;
+  const current = count === 0 ? 0 : index + 1;
 
   return (
     <span
@@ -1383,9 +1163,7 @@ function QuestionsCarouselIndex({
       )}
       {...props}
     >
-      {format === "slash"
-        ? `${root.carouselCurrent}/${root.carouselCount}`
-        : `${root.carouselCurrent} of ${root.carouselCount}`}
+      {format === "slash" ? `${current}/${count}` : `${current} of ${count}`}
     </span>
   );
 }
