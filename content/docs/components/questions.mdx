@@ -12,7 +12,7 @@ import { Callout } from "@/components/callout";
 
 Composable card for **follow-up clarification questions** in chat—when the model (or your app) needs structured input before continuing. Pass **`items`** for synchronous question metadata (title, pagination, navigation), compose each slide with **`Question`**, **`QuestionOption`**, and optional **`QuestionOther`**, then handle **`onSubmit`** with a typed submission array.
 
-Single-choice answers **auto-advance** to the next question (except on the last slide, where **Submit** is required). Skipped questions are included in the submission with **`status: "skipped"`**.
+Single-choice answers **auto-advance** to the next question (except on the last slide, where **Submit** is required). **Skip** moves past optional unanswered questions without storing an answer. Skipped or unanswered optional questions are emitted with status **`skipped`** and answer **`[No Preference]`**. Only explicit selections are kept in internal state. **Submit** is disabled only while a **required** question is unanswered—hide it until the last slide in multi-question flows.
 
 <DemoWithCode src="components/nexus-ui/examples/questions/default.tsx">
   <QuestionsDefault />
@@ -121,7 +121,7 @@ const question: QuestionInput = {
     <QuestionsTitle />
   </QuestionsHeader>
 
-  <Question id={question.id} type={question.type} prompt={question.prompt} index={0}>
+  <Question id={question.id}>
     <QuestionOptions>
       {question.options.map((option) => (
         <QuestionOption key={option.value} value={option.value}>
@@ -138,13 +138,13 @@ const question: QuestionInput = {
 </Questions>
 ```
 
-Pass **`items`** so **`QuestionsTitle`** and carousel pagination have question metadata on the first paint. For a single question, compose **`Question`** directly; use **`QuestionsCarousel`** only when there are multiple slides.
+Pass **`items`** so **`QuestionsTitle`** and carousel pagination have question metadata on the first paint. For a single question, compose **`Question`** directly without **`QuestionsCarousel`**; use the carousel primitives when there are multiple slides.
 
 ## Examples
 
 ### Multiple choice
 
-Set **`type: "multiple"`** on the question (and matching **`Question`**) to render checkbox rows. Users select one or more options before submitting.
+Set **`type: "multiple"`** in **`items`** to render checkbox rows. Users select one or more options before submitting—multiple choice does not auto-advance.
 
 <DemoWithCode src="components/nexus-ui/examples/questions/multiple-choice.tsx">
   <QuestionsMultipleChoice />
@@ -152,7 +152,7 @@ Set **`type: "multiple"`** on the question (and matching **`Question`**) to rend
 
 ### Multiple questions
 
-For two or more prompts, wrap slides in **`QuestionsCarousel`**. Prev/next controls and pagination sync with answer state—unanswered non-required questions are marked **`skipped`** when the user moves forward.
+For two or more prompts, wrap slides in **`QuestionsCarousel`**. Prev/next controls and pagination stay in sync with the active index; required questions block forward navigation until answered. Use **`disableUntilLastQuestion`** on **`QuestionsSubmit`** to keep submit visible but disabled until the final slide (and required questions are answered).
 
 <DemoWithCode src="components/nexus-ui/examples/questions/multiple-questions.tsx"   previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start">
   <QuestionsMultipleQuestions />
@@ -160,15 +160,15 @@ For two or more prompts, wrap slides in **`QuestionsCarousel`**. Prev/next contr
 
 ### Required questions
 
-Set **`required: true`** on a question to block **Skip** and next navigation until it is answered. Omit **`QuestionsDismiss`** when you want a forced flow.
+Set **`required: true`** on every question in **`items`** to block forward navigation until each slide is answered. Omit **`QuestionsSkip`** when nothing is optional—skip only applies to unanswered optional questions. Omit **`QuestionsDismiss`** (and **`onDismiss`**) when you want a forced flow.
 
-<DemoWithCode src="components/nexus-ui/examples/questions/required.tsx">
+<DemoWithCode src="components/nexus-ui/examples/questions/required.tsx" previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start">
   <QuestionsRequired />
 </DemoWithCode>
 
 ### Fixed options
 
-Set **`allowOther: false`** on **`QuestionInput`** and **`Question`** to hide the free-text **Other** row—useful when the model should only offer a closed set of choices.
+Omit **`QuestionOther`** when the question should only accept predefined options.
 
 <DemoWithCode src="components/nexus-ui/examples/questions/fixed-options.tsx">
   <QuestionsFixedOptions />
@@ -212,7 +212,6 @@ const questionSchema = z.object({
   type: z.enum(["single", "multiple"]),
   prompt: z.string(),
   required: z.boolean().optional(),
-  allowOther: z.boolean().optional(),
   options: z.array(
     z.object({
       value: z.string(),
@@ -338,22 +337,16 @@ export default function ClarificationChatPage() {
         </QuestionsHeader>
 
         <QuestionsCarouselContent className="mx-0">
-          {items.map((question, index) => (
-            <QuestionsCarouselItem key={question.id} index={index}>
-              <Question
-                id={question.id}
-                type={question.type}
-                prompt={question.prompt}
-                required={question.required}
-                allowOther={question.allowOther}
-              >
+          {items.map((question) => (
+            <QuestionsCarouselItem key={question.id}>
+              <Question id={question.id}>
                 <QuestionOptions>
                   {question.options.map((option) => (
                     <QuestionOption key={option.value} value={option.value}>
                       {option.label}
                     </QuestionOption>
                   ))}
-                  {question.allowOther !== false ? <QuestionOther /> : null}
+                  <QuestionOther />
                 </QuestionOptions>
               </Question>
             </QuestionsCarouselItem>
@@ -363,7 +356,7 @@ export default function ClarificationChatPage() {
 
       <QuestionsFooter>
         {items.length > 1 ? <QuestionsSkip /> : null}
-        <QuestionsSubmit disabled={status !== "ready"} />
+        <QuestionsSubmit showOnLastQuestion disabled={status !== "ready"} />
       </QuestionsFooter>
     </Questions>
   );
@@ -382,9 +375,6 @@ import type { QuestionsSubmission } from "@/components/nexus-ui/questions";
 function formatAnswers(submission: QuestionsSubmission) {
   return submission
     .map((entry) => {
-      if (entry.status === "skipped") {
-        return `- ${entry.prompt}: skipped`;
-      }
       if (entry.type === "single") {
         return `- ${entry.prompt}: ${entry.answer.label}`;
       }
@@ -404,44 +394,25 @@ function formatAnswers(submission: QuestionsSubmission) {
 
 ### Questions
 
-Root card and state container. Manages answer state, active index, carousel sync, skip/submit rules, and submission building. Extends shadcn **[Card](https://ui.shadcn.com/docs/components/radix/card)**.
+Root card and state container. Manages answer state, active index, carousel sync, skip/submit rules, and typed submission payloads. Extends shadcn **[Card](https://ui.shadcn.com/docs/components/radix/card)**.
 
 <TypeTable
   type={{
     items: {
       type: "QuestionInput[]",
       description:
-        "Question metadata (id, type, prompt, required, allowOther). Keeps title and pagination in sync on first render. Map the same data into Question slides for options UI.",
+        "Required question metadata and options. Drives title, pagination, navigation, and submission labels. Map the same data into Question slides for options UI.",
     },
-    index: {
-      type: "number",
-      description: "Controlled active question index.",
-    },
-    defaultIndex: {
-      type: "number",
-      default: "0",
-      description: "Initial index in uncontrolled mode.",
-    },
-    onIndexChange: {
-      type: "(index: number) => void",
-      description: "Called when the active question changes.",
-    },
-    value: {
-      type: "Record<string, QuestionAnswerState>",
-      description: "Controlled answers map keyed by question id.",
-    },
-    defaultValue: {
-      type: "Record<string, QuestionAnswerState>",
-      description: "Initial answers in uncontrolled mode.",
-    },
-    onValueChange: {
-      type: "(value: Record<string, QuestionAnswerState>) => void",
-      description: "Called when any answer changes.",
+    autoAdvance: {
+      type: "boolean",
+      default: "true",
+      description:
+        "When true, single-choice option clicks advance to the next slide. Other input never auto-advances. No-op on the last question.",
     },
     onSubmit: {
       type: "(submission: QuestionsSubmission) => void",
       description:
-        "Fired when Submit is clicked and every question is answered. Receives the full submission array including skipped entries.",
+        "Fired when Submit is clicked and every required question is answered. Skipped or unanswered optional questions use answer label \"[No Preference]\". Clears selections and resets to the first question.",
     },
     onSkip: {
       type: "(questionId: string) => void",
@@ -451,12 +422,200 @@ Root card and state container. Manages answer state, active index, carousel sync
       type: "() => void",
       description: "Called when QuestionsDismiss is clicked.",
     },
+    className: {
+      type: "string",
+      description: "Merged with the default card shell styles.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Composition tree: header, carousel or question slides, and footer.",
+    },
+  }}
+/>
+
+### QuestionsHeader
+
+Top bar layout shell for title, pagination, and dismiss controls. Extends shadcn **`CardHeader`**.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default header row layout.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Typically QuestionsTitle, QuestionsCarouselPagination, and QuestionsDismiss.",
+    },
+  }}
+/>
+
+### QuestionsTitle
+
+Renders the active question prompt from **`items[root.index]`** in **`CardTitle`**, unless **`children`** override it. Extends shadcn **`CardTitle`**.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Optional override. Defaults to the prompt from items at the active index.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default title styles.",
+    },
+  }}
+/>
+
+### QuestionsDismiss
+
+Icon dismiss control. Invokes **`onDismiss`** on the root. Extends shadcn **`Button`**.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default dismiss button styles.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLButtonElement>",
+      description: "Optional click handler. Called before onDismiss runs.",
+    },
+  }}
+/>
+
+### QuestionsCarousel
+
+[**Carousel**](https://ui.shadcn.com/docs/components/radix/carousel) root for multi-question slides. Registers the Embla API on **`Questions`** for index sync and animated viewport height.
+
+<TypeTable
+  type={{
+    setApi: {
+      type: "(api: CarouselApi | undefined) => void",
+      description:
+        "Optional; invoked when the Embla instance is ready or cleared.",
+    },
+    className: {
+      type: "string",
+      description: "Classes on the carousel region wrapper.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Typically QuestionsHeader and QuestionsCarouselContent.",
+    },
+  }}
+/>
+
+### QuestionsCarouselPagination
+
+Flex row for prev / index / next controls.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default pagination row layout.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description:
+        "Typically QuestionsCarouselPrev, QuestionsCarouselIndex, and QuestionsCarouselNext.",
+    },
+  }}
+/>
+
+### QuestionsCarouselPrev
+
+Previous-slide button. Disabled on the first question.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Replace the default arrow icon.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default circular nav button styles.",
+    },
+  }}
+/>
+
+### QuestionsCarouselIndex
+
+Active slide indicator (**1-based** current). Renders a **`span`**.
+
+<TypeTable
+  type={{
+    format: {
+      type: '"of" | "slash"',
+      default: '"of"',
+      description: 'Display as "1 of 3" or "1/3".',
+    },
+    className: {
+      type: "string",
+      description: "Merged with default tabular-nums text styles.",
+    },
+  }}
+/>
+
+### QuestionsCarouselNext
+
+Next-slide button. Disabled on the last question or when the current required question is unanswered.
+
+<TypeTable
+  type={{
+    children: {
+      type: "React.ReactNode",
+      description: "Replace the default arrow icon.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default circular nav button styles.",
+    },
+  }}
+/>
+
+### QuestionsCarouselContent
+
+Carousel track wrapper. Animates viewport height to the active slide. Extends shadcn **`CarouselContent`**.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Classes on the flex track inside the overflow viewport.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "QuestionsCarouselItem slides.",
+    },
+  }}
+/>
+
+### QuestionsCarouselItem
+
+One carousel slide. Wrap **`Question`** inside.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default slide layout.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Typically a Question with QuestionOptions.",
+    },
   }}
 />
 
 ### Question
 
-One question scope for option components. Wraps children in **`CardContent`**. Provide **`id`**, **`type`**, and **`prompt`**; match **`items`** when using the items prop.
+One question scope for option components. Wraps children in **`CardContent`**. **`id`** must match an entry in **`Questions`** **`items`**.
 
 <TypeTable
   type={{
@@ -464,39 +623,33 @@ One question scope for option components. Wraps children in **`CardContent`**. P
       type: "string",
       description: "Stable question id; keys the answer in context.",
     },
-    type: {
-      type: '"single" | "multiple"',
-      description: "Single-select (listbox) or multi-select (checkboxes).",
-    },
-    prompt: {
+    children: {
       type: "React.ReactNode",
-      description: "Question text; also used by QuestionsTitle when items is set.",
-    },
-    required: {
-      type: "boolean",
-      default: "false",
-      description: "When true, blocks Skip and next navigation until answered.",
-    },
-    allowOther: {
-      type: "boolean",
-      default: "true",
-      description: "Whether QuestionOther is meaningful for this question.",
-    },
-    index: {
-      type: "number",
-      description:
-        "Slide index. Defaults to QuestionsCarouselItem index when inside the carousel.",
+      description: "Typically QuestionOptions with QuestionOption and optional QuestionOther.",
     },
   }}
 />
 
 ### QuestionOptions
 
-Vertical list wrapper for **`QuestionOption`** and **`QuestionOther`**. Injects **`optionIndex`** into children for numbered single-choice badges.
+Vertical list wrapper for **`QuestionOption`** and **`QuestionOther`**. Injects **`optionIndex`** into **`QuestionOption`** children for numbered single-choice badges.
+
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with the default options list layout.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "QuestionOption and QuestionOther rows.",
+    },
+  }}
+/>
 
 ### QuestionOption
 
-Selectable row. Single choice renders a numbered button with auto-advance; multiple choice renders a checkbox label.
+Selectable row. Single choice renders a numbered button; clicks advance to the next slide when **`Questions`** **`autoAdvance`** is enabled (default). Multiple choice renders a checkbox label.
 
 <TypeTable
   type={{
@@ -508,12 +661,25 @@ Selectable row. Single choice renders a numbered button with auto-advance; multi
       type: "number",
       description: "Optional; set automatically by QuestionOptions.",
     },
+    children: {
+      type: "React.ReactNode",
+      description: "Option label shown in the row.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default row styles.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLButtonElement>",
+      description:
+        "Optional click handler for single choice. Called before selection.",
+    },
   }}
 />
 
 ### QuestionOther
 
-Free-text **Other** row. Uses **`QUESTION_OTHER_VALUE`** (`"__other__"`) as the stored value when selected. Single choice selects on input; multiple choice pairs with a checkbox.
+Free-text **Other** row. Compose only when free-text answers are allowed. Uses **`QUESTION_OTHER_VALUE`** (`"__other__"`) as the stored value when selected. Typing selects **Other** (single and multiple); multiple choice also pairs with a checkbox.
 
 <TypeTable
   type={{
@@ -522,55 +688,109 @@ Free-text **Other** row. Uses **`QUESTION_OTHER_VALUE`** (`"__other__"`) as the 
       default: '"Other..."',
       description: "Input placeholder text.",
     },
+    className: {
+      type: "string",
+      description: "Merged with default row styles.",
+    },
+    onKeyDown: {
+      type: "React.KeyboardEventHandler<HTMLInputElement>",
+      description: "Forwarded to the text input.",
+    },
   }}
 />
 
-### QuestionsTitle
+### QuestionsFooter
 
-Renders the current question prompt in **`CardTitle`**. Pass **`children`** to override.
+Bottom bar layout shell for skip and submit actions. Extends shadcn **`CardFooter`**.
 
-### QuestionsHeader / QuestionsFooter
-
-Layout shells for the top bar (title, pagination, dismiss) and bottom actions (skip, submit).
+<TypeTable
+  type={{
+    className: {
+      type: "string",
+      description: "Merged with default footer layout.",
+    },
+    children: {
+      type: "React.ReactNode",
+      description: "Typically QuestionsSkip and QuestionsSubmit.",
+    },
+  }}
+/>
 
 ### QuestionsSkip
 
-Ghost **Skip** button. Disabled on the last question or when the current required question is unanswered.
+Ghost **Skip** button with a fixed **Skip** label. Disabled on the last question, when the current question is required and unanswered, or when there is no current question. Extends shadcn **`Button`**.
+
+<TypeTable
+  type={{
+    disabled: {
+      type: "boolean",
+      description:
+        "Optional override. Defaults to disabled when skip is not allowed.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default skip button styles.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLButtonElement>",
+      description: "Optional click handler. Called before skip runs.",
+    },
+  }}
+/>
 
 ### QuestionsSubmit
 
-Primary **Submit** button. Enabled only when **all** questions are answered.
+Primary **Submit** button. Disabled while any **required** question is unanswered; optional unanswered questions are allowed. Extends shadcn **`Button`**.
 
-### QuestionsDismiss
-
-Icon dismiss control. Invokes **`onDismiss`** on the root.
-
-### QuestionsCarousel
-
-[**Carousel**](https://ui.shadcn.com/docs/components/radix/carousel) root for multi-question slides. Registers the Embla API on **`Questions`** for index sync and animated viewport height.
-
-### QuestionsCarouselContent
-
-Carousel track wrapper. Animates viewport height to the active slide.
-
-### QuestionsCarouselItem
-
-One carousel slide. Pass **`index`** (zero-based) for carousel position and **`QuestionsSlideContext`**. Wrap **`Question`** inside—layout padding lives on **`Question`**, not the slide.
-
-### QuestionsCarouselPagination / Prev / Next / Index
-
-Pagination row and controls wired to root navigation state. **`QuestionsCarouselIndex`** supports **`format="of"`** (default) or **`format="slash"`**.
+<TypeTable
+  type={{
+    showOnLastQuestion: {
+      type: "boolean",
+      default: "false",
+      description:
+        "When true, renders nothing until the active slide is the last question.",
+    },
+    disableUntilLastQuestion: {
+      type: "boolean",
+      default: "false",
+      description:
+        "When true, keeps submit visible but disabled until the active slide is the last question. Still respects required-question validation via canSubmit.",
+    },
+    disabled: {
+      type: "boolean",
+      description:
+        "Optional override. Defaults to disabled while a required question is unanswered.",
+    },
+    className: {
+      type: "string",
+      description: "Merged with default submit button styles.",
+    },
+    onClick: {
+      type: "React.MouseEventHandler<HTMLButtonElement>",
+      description: "Optional click handler. Called before submit runs.",
+    },
+    children: {
+      type: "React.ReactNode",
+      default: '"Submit"',
+      description: "Button label.",
+    },
+  }}
+/>
 
 ### Types
 
 ```ts noCollapse
+export type QuestionOptionInput = {
+  value: string;
+  label: React.ReactNode;
+};
+
 export type QuestionInput = {
   id: string;
   type: "single" | "multiple";
   prompt: React.ReactNode;
   options: QuestionOptionInput[];
   required?: boolean;
-  allowOther?: boolean;
 };
 
 export type QuestionSubmissionAnswer = {
@@ -591,7 +811,7 @@ export type QuestionsSubmission = Array<
       prompt: React.ReactNode;
       type: "single";
       status: "skipped";
-      answer: null;
+      answer: QuestionSubmissionAnswer;
     }
   | {
       questionId: string;
@@ -605,9 +825,11 @@ export type QuestionsSubmission = Array<
       prompt: React.ReactNode;
       type: "multiple";
       status: "skipped";
-      answer: [];
+      answer: QuestionSubmissionAnswer[];
     }
 >;
 
 export const QUESTION_OTHER_VALUE = "__other__";
+export const QUESTION_NO_PREFERENCE_VALUE = "__no_preference__";
+export const QUESTION_NO_PREFERENCE_LABEL = "[No Preference]";
 ```
