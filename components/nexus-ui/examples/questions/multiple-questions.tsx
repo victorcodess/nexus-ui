@@ -21,6 +21,10 @@ import {
   QuestionsSubmit,
   QuestionsTitle,
 } from "@/components/nexus-ui/questions";
+import { Toaster } from "@/components/nexus-ui/toaster";
+import { toastSubmission } from "@/components/nexus-ui/examples/questions/submission-toast";
+
+const TOASTER_ID = "questions-multiple-questions";
 
 const QUESTIONS: QuestionInput[] = [
   {
@@ -61,9 +65,7 @@ function QuestionsMultipleQuestions() {
     <div className="w-full">
       <Questions
         items={QUESTIONS}
-        onSubmit={(answers) => {
-          console.log(answers);
-        }}
+        onSubmit={(submission) => toastSubmission(submission, TOASTER_ID)}
       >
         <QuestionsCarousel>
           <QuestionsHeader>
@@ -77,22 +79,16 @@ function QuestionsMultipleQuestions() {
           </QuestionsHeader>
 
           <QuestionsCarouselContent className="mx-0">
-            {QUESTIONS.map((question, index) => (
-              <QuestionsCarouselItem key={question.id} index={index}>
-                <Question
-                  id={question.id}
-                  type={question.type}
-                  prompt={question.prompt}
-                  required={question.required}
-                  allowOther={question.allowOther}
-                >
+            {QUESTIONS.map((question) => (
+              <QuestionsCarouselItem key={question.id}>
+                <Question id={question.id}>
                   <QuestionOptions>
                     {question.options.map((option) => (
                       <QuestionOption key={option.value} value={option.value}>
                         {option.label}
                       </QuestionOption>
                     ))}
-                    {question.allowOther !== false ? <QuestionOther /> : null}
+                    <QuestionOther />
                   </QuestionOptions>
                 </Question>
               </QuestionsCarouselItem>
@@ -102,9 +98,10 @@ function QuestionsMultipleQuestions() {
 
         <QuestionsFooter>
           <QuestionsSkip />
-          <QuestionsSubmit />
+          <QuestionsSubmit disableUntilLastQuestion />
         </QuestionsFooter>
       </Questions>
+      <Toaster id={TOASTER_ID} />
     </div>
   );
 }

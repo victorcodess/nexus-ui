@@ -11,12 +11,15 @@ import {
   QuestionsSubmit,
   QuestionsTitle,
 } from "@/components/nexus-ui/questions";
+import { Toaster } from "@/components/nexus-ui/toaster";
+import { toastSubmission } from "@/components/nexus-ui/examples/questions/submission-toast";
+
+const TOASTER_ID = "questions-fixed-options";
 
 const QUESTION: QuestionInput = {
   id: "tone",
   type: "single",
   prompt: "What tone should I use in the reply?",
-  allowOther: false,
   options: [
     { value: "professional", label: "Professional" },
     { value: "friendly", label: "Friendly" },
@@ -29,21 +32,13 @@ function QuestionsFixedOptions() {
     <div className="w-full">
       <Questions
         items={[QUESTION]}
-        onSubmit={(answers) => {
-          console.log(answers);
-        }}
+        onSubmit={(submission) => toastSubmission(submission, TOASTER_ID)}
       >
         <QuestionsHeader>
           <QuestionsTitle />
         </QuestionsHeader>
 
-        <Question
-          id={QUESTION.id}
-          type={QUESTION.type}
-          prompt={QUESTION.prompt}
-          allowOther={false}
-          index={0}
-        >
+        <Question id={QUESTION.id}>
           <QuestionOptions>
             {QUESTION.options.map((option) => (
               <QuestionOption key={option.value} value={option.value}>
@@ -57,6 +52,7 @@ function QuestionsFixedOptions() {
           <QuestionsSubmit />
         </QuestionsFooter>
       </Questions>
+      <Toaster id={TOASTER_ID} />
     </div>
   );
 }

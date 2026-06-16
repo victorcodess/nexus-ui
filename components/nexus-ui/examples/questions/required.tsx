@@ -4,6 +4,7 @@ import {
   Question,
   QuestionOption,
   QuestionOptions,
+  QuestionOther,
   type QuestionInput,
   Questions,
   QuestionsCarousel,
@@ -15,10 +16,13 @@ import {
   QuestionsCarouselPrev,
   QuestionsFooter,
   QuestionsHeader,
-  QuestionsSkip,
   QuestionsSubmit,
   QuestionsTitle,
 } from "@/components/nexus-ui/questions";
+import { Toaster } from "@/components/nexus-ui/toaster";
+import { toastSubmission } from "@/components/nexus-ui/examples/questions/submission-toast";
+
+const TOASTER_ID = "questions-required";
 
 const QUESTIONS: QuestionInput[] = [
   {
@@ -26,7 +30,6 @@ const QUESTIONS: QuestionInput[] = [
     type: "single",
     prompt: "What is your role on the project?",
     required: true,
-    allowOther: false,
     options: [
       { value: "engineer", label: "Engineer" },
       { value: "designer", label: "Designer" },
@@ -37,6 +40,7 @@ const QUESTIONS: QuestionInput[] = [
     id: "timeline",
     type: "single",
     prompt: "When do you need this shipped?",
+    required: true,
     options: [
       { value: "asap", label: "This week" },
       { value: "month", label: "This month" },
@@ -50,9 +54,7 @@ function QuestionsRequired() {
     <div className="w-full">
       <Questions
         items={QUESTIONS}
-        onSubmit={(answers) => {
-          console.log(answers);
-        }}
+        onSubmit={(submission) => toastSubmission(submission, TOASTER_ID)}
       >
         <QuestionsCarousel>
           <QuestionsHeader>
@@ -65,21 +67,16 @@ function QuestionsRequired() {
           </QuestionsHeader>
 
           <QuestionsCarouselContent className="mx-0">
-            {QUESTIONS.map((question, index) => (
-              <QuestionsCarouselItem key={question.id} index={index}>
-                <Question
-                  id={question.id}
-                  type={question.type}
-                  prompt={question.prompt}
-                  required={question.required}
-                  allowOther={question.allowOther}
-                >
+            {QUESTIONS.map((question) => (
+              <QuestionsCarouselItem key={question.id}>
+                <Question id={question.id}>
                   <QuestionOptions>
                     {question.options.map((option) => (
                       <QuestionOption key={option.value} value={option.value}>
                         {option.label}
                       </QuestionOption>
                     ))}
+                    {question.id !== "role" ? <QuestionOther /> : null}
                   </QuestionOptions>
                 </Question>
               </QuestionsCarouselItem>
@@ -88,10 +85,10 @@ function QuestionsRequired() {
         </QuestionsCarousel>
 
         <QuestionsFooter>
-          <QuestionsSkip />
-          <QuestionsSubmit />
+          <QuestionsSubmit disableUntilLastQuestion />
         </QuestionsFooter>
       </Questions>
+      <Toaster id={TOASTER_ID} />
     </div>
   );
 }

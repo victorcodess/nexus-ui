@@ -13,6 +13,10 @@ import {
   QuestionsSubmit,
   QuestionsTitle,
 } from "@/components/nexus-ui/questions";
+import { Toaster } from "@/components/nexus-ui/toaster";
+import { toastSubmission } from "@/components/nexus-ui/examples/questions/submission-toast";
+
+const TOASTER_ID = "questions-default";
 
 const QUESTION: QuestionInput = {
   id: "depth",
@@ -30,21 +34,14 @@ function QuestionsDefault() {
     <div className="w-full">
       <Questions
         items={[QUESTION]}
-        onSubmit={(answers) => {
-          console.log(answers);
-        }}
+        onSubmit={(submission) => toastSubmission(submission, TOASTER_ID)}
       >
         <QuestionsHeader>
           <QuestionsTitle />
           <QuestionsDismiss />
         </QuestionsHeader>
 
-        <Question
-          id={QUESTION.id}
-          type={QUESTION.type}
-          prompt={QUESTION.prompt}
-          index={0}
-        >
+        <Question id={QUESTION.id}>
           <QuestionOptions>
             {QUESTION.options.map((option) => (
               <QuestionOption key={option.value} value={option.value}>
@@ -59,6 +56,7 @@ function QuestionsDefault() {
           <QuestionsSubmit />
         </QuestionsFooter>
       </Questions>
+      <Toaster id={TOASTER_ID} />
     </div>
   );
 }
