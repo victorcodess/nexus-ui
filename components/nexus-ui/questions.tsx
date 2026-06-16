@@ -553,8 +553,22 @@ function Question({ id, children }: QuestionProps) {
   );
 }
 
-const questionOptionsListClassName =
-  "flex w-full flex-col gap-0.5 [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-2.5 [&>*+*]:before:left-2.5 [&>*+*]:before:z-10 [&>*+*]:before:h-px [&>*+*]:before:bg-border/20 [&>*+*]:before:content-['']";
+const questionOptionsListClassName = cn(
+  "flex w-full flex-col",
+  // Change gap here only — dividers stay centered in the spacing.
+  "[--question-options-gap:--spacing(0)] gap-[length:var(--question-options-gap)]",
+  "[&>*:not(:last-child)]:relative",
+  "[&>*:not(:last-child)]:after:pointer-events-none",
+  "[&>*:not(:last-child)]:after:absolute",
+  "[&>*:not(:last-child)]:after:top-[calc(100%+var(--question-options-gap)/2)]",
+  "[&>*:not(:last-child)]:after:-translate-y-1/2",
+  "[&>*:not(:last-child)]:after:right-2.5",
+  "[&>*:not(:last-child)]:after:left-2.5",
+  "[&>*:not(:last-child)]:after:z-10",
+  "[&>*:not(:last-child)]:after:h-px",
+  "[&>*:not(:last-child)]:after:bg-border/20",
+  "[&>*:not(:last-child)]:after:content-['']",
+);
 
 const questionRowClassName =
   "group/row flex h-11 w-full items-center gap-2.5 rounded-lg bg-transparent px-2.5 text-left transition-all hover:bg-muted";
@@ -638,9 +652,9 @@ function QuestionOption({
         <Checkbox
           checked={isSelected}
           onCheckedChange={handleSelect}
-          className="mx-1.25 size-4.5 shadow-none transition-colors group-hover/row:data-[state=unchecked]:border-ring/50"
+          className="mx-1.25 size-4.5 shadow-none transition-colors group-hover/row:data-[state=unchecked]:border-ring/50 cursor-pointer"
         />
-        <span className="min-w-0 flex-1 truncate text-sm text-ring transition-all group-hover/row:text-primary">
+        <span className={cn("min-w-0 flex-1 truncate text-sm text-ring transition-all group-hover/row:text-primary", isSelected && "text-primary")}>
           {children}
         </span>
       </label>
