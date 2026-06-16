@@ -291,7 +291,7 @@ export function CodeBlock({
           <div className="absolute inset-x-0 bottom-0 flex h-60 items-end justify-center bg-linear-to-t from-[#999999] from-3% via-[#999999]/20 to-transparent dark:from-gray-950 dark:via-gray-950/90">
             <Button
               onClick={() => setExpanded(true)}
-              className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-300"
+              className="mb-4 flex cursor-pointer items-center gap-1 rounded-full border-none bg-white tracking-tight px-3 py-1.5 text-sm font-medium text-gray-700 shadow-none transition-colors hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-300"
             >
               Show more
             </Button>
