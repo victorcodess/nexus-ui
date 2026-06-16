@@ -1,6 +1,6 @@
 ---
 name: nexus-ui
-description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, chain of thought, tool, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
+description: Install and compose Nexus UI components for AI chat UIs — prompt input, model selector, suggestions, attachments, message, thread, citation, reasoning, text shimmer, image, feedback bar, toaster, chain of thought, tool, questions, and AI SDK patterns. Activates for @nexus-ui registry usage or Nexus UI source under components/nexus-ui.
 user-invocable: false
 ---
 
@@ -43,6 +43,7 @@ npx shadcn@latest add @nexus-ui/feedback-bar
 npx shadcn@latest add @nexus-ui/toaster
 npx shadcn@latest add @nexus-ui/chain-of-thought
 npx shadcn@latest add @nexus-ui/tool
+npx shadcn@latest add @nexus-ui/questions
 ```
 
 Or install directly via URL (no registry config needed):
@@ -78,6 +79,7 @@ Components are installed to `components/nexus-ui/` by default.
 | Toaster | `toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
 | Chain of Thought | `chain-of-thought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
 | Tool | `tool` | State-aware tool call UI with JSON input/output codeblocks (`pending`, `ready`, `running`, `completed`, `error`) |
+| Questions | `questions` | Follow-up clarification questions with single or multiple choice, carousel navigation, and batch submission |
 
 ## Component APIs
 
@@ -855,6 +857,103 @@ import {
 </Tool>
 ```
 
+### Questions
+
+Card UI for **follow-up clarification** in chat: pass **`items`** metadata, compose **`Question`** slides with **`QuestionOption`** / **`QuestionOther`**, navigate with **`QuestionsCarousel*`**, and collect answers via **`onSubmit`**.
+
+**Import:**
+
+```tsx
+import {
+  Questions,
+  Question,
+  QuestionOptions,
+  QuestionOption,
+  QuestionOther,
+  QuestionsTitle,
+  QuestionsHeader,
+  QuestionsFooter,
+  QuestionsSkip,
+  QuestionsSubmit,
+  QuestionsDismiss,
+  QuestionsCarousel,
+  QuestionsCarouselContent,
+  QuestionsCarouselItem,
+  QuestionsCarouselPagination,
+  QuestionsCarouselPrev,
+  QuestionsCarouselNext,
+  QuestionsCarouselIndex,
+  type QuestionsSubmission,
+  type QuestionInput,
+} from "@/components/nexus-ui/questions";
+```
+
+**Parts:**
+
+| Part | Purpose |
+|------|---------|
+| `Questions` | Root **Card** + provider; required `items: QuestionInput[]`; optional `autoAdvance` (default `true`), `onSubmit`, `onSkip`, `onDismiss`. |
+| `QuestionsHeader` / `QuestionsTitle` / `QuestionsDismiss` | Top chrome and close control. |
+| `QuestionsCarousel*` | Shadcn **Carousel** wrapper for multi-question flows (`Prev` / `Next` / `Index` / `Pagination`). |
+| `Question` | One slide; registers `id`, `type` (`single` \| `multiple`), `prompt`, `required`. |
+| `QuestionOptions` | Layout wrapper for option rows. |
+| `QuestionOption` | Selectable row (radio or checkbox styling from question type). |
+| `QuestionOther` | Free-text “Other” option using `QUESTION_OTHER_VALUE`. |
+| `QuestionsFooter` / `QuestionsSkip` / `QuestionsSubmit` | Footer actions; submit disabled until required questions answered. |
+
+**Root props:** `Questions` — `items`, `autoAdvance`, `onSubmit(submission: QuestionsSubmission)`, `onSkip(questionId)`, `onDismiss()`. Skipped optional questions submit as `[No Preference]`.
+
+**Props & hooks:** Internal context only. Constants: `QUESTION_OTHER_VALUE`, `QUESTION_NO_PREFERENCE_VALUE`, `QUESTION_NO_PREFERENCE_LABEL`.
+
+**Usage notes:** Single choice auto-advances when `autoAdvance` is true. Hide or disable **Submit** until the last carousel slide in multi-question flows.
+
+**Example:**
+
+```tsx
+<Questions
+  items={[
+    {
+      id: "scope",
+      type: "single",
+      prompt: "What should we focus on?",
+      required: true,
+      options: [
+        { value: "perf", label: "Performance" },
+        { value: "ux", label: "UX" },
+      ],
+    },
+  ]}
+  onSubmit={(submission) => console.log(submission)}
+>
+  <QuestionsHeader>
+    <QuestionsTitle>Quick questions</QuestionsTitle>
+    <QuestionsDismiss />
+  </QuestionsHeader>
+  <QuestionsCarousel>
+    <QuestionsCarouselContent>
+      {items.map((item) => (
+        <QuestionsCarouselItem key={item.id}>
+          <Question {...item}>
+            <QuestionOptions>
+              {item.options.map((option) => (
+                <QuestionOption key={option.value} value={option.value}>
+                  {option.label}
+                </QuestionOption>
+              ))}
+              <QuestionOther />
+            </QuestionOptions>
+          </Question>
+        </QuestionsCarouselItem>
+      ))}
+    </QuestionsCarouselContent>
+  </QuestionsCarousel>
+  <QuestionsFooter>
+    <QuestionsSkip />
+    <QuestionsSubmit />
+  </QuestionsFooter>
+</Questions>
+```
+
 ## AI SDK integration
 
 Use the [Vercel AI SDK](https://sdk.vercel.ai) from **`@ai-sdk/react`**. The chat hook uses a **transport** (for example `DefaultChatTransport` pointing at your API route). Wire the textarea with **local state** (or your form library) and call **`sendMessage`** on submit.
@@ -956,7 +1055,8 @@ components/
 │   ├── toaster.tsx
 │   ├── chain-of-thought.tsx
 │   ├── codeblock-new.tsx
-│   └── tool.tsx
+│   ├── tool.tsx
+│   └── questions.tsx
 ├── ui/
 │   ├── button.tsx
 │   ├── textarea.tsx
@@ -983,11 +1083,12 @@ Registry items pull these in as needed (shadcn CLI installs registry dependencie
 - **Toaster:** `sonner`, `next-themes`, `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `button`, `@/lib/utils`
 - **Chain of Thought:** `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `collapsible`, `tw-shimmer` (registry CSS), `@/lib/use-on-change`, `@/lib/utils`
 - **Tool:** `@hugeicons/react`, `@hugeicons/core-free-icons`, `shiki`, `@react-symbols/icons`, shadcn `badge`, `collapsible`, registry `codeblock-new.tsx`, `lib/shiki/highlighter.ts`, `@/lib/utils`
+- **Questions:** `@hugeicons/react`, `@hugeicons/core-free-icons`, shadcn `carousel`, `button`, `card`, `checkbox`, `@/lib/utils`
 
 ## Documentation
 
-- Website: https://nexus-ui.dev
-- Docs: https://nexus-ui.dev/docs
-- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster) · [chain-of-thought](https://nexus-ui.dev/docs/components/chain-of-thought) · [tool](https://nexus-ui.dev/docs/components/tool)
-- GitHub: https://github.com/victorcodess/nexus-ui
-- LLM context: https://nexus-ui.dev/llms.txt
+- Website: <https://nexus-ui.dev>
+- Docs: <https://nexus-ui.dev/docs>
+- Components: [prompt-input](https://nexus-ui.dev/docs/components/prompt-input) · [model-selector](https://nexus-ui.dev/docs/components/model-selector) · [suggestions](https://nexus-ui.dev/docs/components/suggestions) · [attachments](https://nexus-ui.dev/docs/components/attachments) · [message](https://nexus-ui.dev/docs/components/message) · [thread](https://nexus-ui.dev/docs/components/thread) · [citation](https://nexus-ui.dev/docs/components/citation) · [reasoning](https://nexus-ui.dev/docs/components/reasoning) · [text-shimmer](https://nexus-ui.dev/docs/components/text-shimmer) · [image](https://nexus-ui.dev/docs/components/image) · [feedback-bar](https://nexus-ui.dev/docs/components/feedback-bar) · [toaster](https://nexus-ui.dev/docs/components/toaster) · [chain-of-thought](https://nexus-ui.dev/docs/components/chain-of-thought) · [tool](https://nexus-ui.dev/docs/components/tool) · [questions](https://nexus-ui.dev/docs/components/questions)
+- GitHub: <https://github.com/victorcodess/nexus-ui>
+- LLM context: <https://nexus-ui.dev/llms.txt>

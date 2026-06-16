@@ -33,6 +33,7 @@ Copy-paste components into your project. You own the code.
 | `Toaster` | Headless toast notifications powered by Sonner, with variant-aware styling and custom action/cancel controls |
 | `ChainOfThought` | Structured multi-step thought timeline with step status, optional expandable output, and auto-close when steps finish |
 | `Tool` | Status-aware tool call UI with JSON input/output codeblocks |
+| `Questions` | Follow-up clarification questions with single or multiple choice, carousel navigation, and batch submission |
 
 ## Quick Start
 

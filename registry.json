@@ -181,29 +181,6 @@
       ]
     },
     {
-      "name": "questions",
-      "type": "registry:ui",
-      "title": "Questions",
-      "description": "Follow-up clarification questions with single or multiple choice, carousel navigation, and batch submission",
-      "dependencies": [
-        "@hugeicons/react",
-        "@hugeicons/core-free-icons"
-      ],
-      "registryDependencies": [
-        "carousel",
-        "button",
-        "card",
-        "checkbox"
-      ],
-      "files": [
-        {
-          "path": "components/nexus-ui/questions.tsx",
-          "type": "registry:file",
-          "target": "~/components/nexus-ui/questions.tsx"
-        }
-      ]
-    },
-    {
       "name": "image",
       "type": "registry:ui",
       "title": "Image",
@@ -404,6 +381,29 @@
           "path": "lib/shiki/highlighter.ts",
           "type": "registry:file",
           "target": "~/lib/shiki/highlighter.ts"
+        }
+      ]
+    },
+    {
+      "name": "questions",
+      "type": "registry:ui",
+      "title": "Questions",
+      "description": "Follow-up clarification questions with single or multiple choice, carousel navigation, and batch submission",
+      "dependencies": [
+        "@hugeicons/react",
+        "@hugeicons/core-free-icons"
+      ],
+      "registryDependencies": [
+        "carousel",
+        "button",
+        "card",
+        "checkbox"
+      ],
+      "files": [
+        {
+          "path": "components/nexus-ui/questions.tsx",
+          "type": "registry:file",
+          "target": "~/components/nexus-ui/questions.tsx"
         }
       ]
     }
