@@ -10,9 +10,9 @@ import QuestionsRequired from "@/components/nexus-ui/examples/questions/required
 import QuestionsFixedOptions from "@/components/nexus-ui/examples/questions/fixed-options";
 import { Callout } from "@/components/callout";
 
-Composable card for **follow-up clarification questions** in chat—when the model (or your app) needs structured input before continuing. Pass **`items`** for synchronous question metadata (title, pagination, navigation), compose each slide with **`Question`**, **`QuestionOption`**, and optional **`QuestionOther`**, then handle **`onSubmit`** with a typed submission array.
+Composable card for **follow-up clarification questions** in chat. Pass **`items`** for metadata, compose with **`Question`**, **`QuestionOption`**, and **`QuestionOther`**, then handle **`onSubmit`**.
 
-Single-choice answers **auto-advance** to the next question (except on the last slide, where **Submit** is required). **Skip** moves past optional unanswered questions without storing an answer. Skipped or unanswered optional questions are emitted with status **`skipped`** and answer **`[No Preference]`**. Only explicit selections are kept in internal state. **Submit** is disabled only while a **required** question is unanswered—hide it until the last slide in multi-question flows.
+Single choice **auto-advances**; **Skip** passes optional questions. Unanswered optional questions submit as **`skipped`** with **`[No Preference]`**. **Submit** stays disabled until required questions are answered—in multi-question flows, keep it hidden or disabled until the last slide.
 
 <DemoWithCode src="components/nexus-ui/examples/questions/default.tsx">
   <QuestionsDefault />

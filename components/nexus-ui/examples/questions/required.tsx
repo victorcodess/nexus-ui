@@ -76,7 +76,7 @@ function QuestionsRequired() {
                         {option.label}
                       </QuestionOption>
                     ))}
-                    {question.id !== "role" ? <QuestionOther /> : null}
+                  <QuestionOther /> 
                   </QuestionOptions>
                 </Question>
               </QuestionsCarouselItem>
