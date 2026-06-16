@@ -4,10 +4,8 @@ import {
   Question,
   QuestionOption,
   QuestionOptions,
-  QuestionOther,
   type QuestionInput,
   Questions,
-  QuestionsDismiss,
   QuestionsFooter,
   QuestionsHeader,
   QuestionsSubmit,
@@ -15,17 +13,18 @@ import {
 } from "@/components/nexus-ui/questions";
 
 const QUESTION: QuestionInput = {
-  id: "depth",
+  id: "tone",
   type: "single",
-  prompt: "How detailed should the explanation be?",
+  prompt: "What tone should I use in the reply?",
+  allowOther: false,
   options: [
-    { value: "brief", label: "Brief overview" },
-    { value: "standard", label: "Standard depth" },
-    { value: "deep", label: "Deep dive with examples" },
+    { value: "professional", label: "Professional" },
+    { value: "friendly", label: "Friendly" },
+    { value: "concise", label: "Concise" },
   ],
 };
 
-function QuestionsDefault() {
+function QuestionsFixedOptions() {
   return (
     <div className="w-full">
       <Questions
@@ -36,13 +35,13 @@ function QuestionsDefault() {
       >
         <QuestionsHeader>
           <QuestionsTitle />
-          <QuestionsDismiss />
         </QuestionsHeader>
 
         <Question
           id={QUESTION.id}
           type={QUESTION.type}
           prompt={QUESTION.prompt}
+          allowOther={false}
           index={0}
         >
           <QuestionOptions>
@@ -51,7 +50,6 @@ function QuestionsDefault() {
                 {option.label}
               </QuestionOption>
             ))}
-            <QuestionOther />
           </QuestionOptions>
         </Question>
 
@@ -63,4 +61,4 @@ function QuestionsDefault() {
   );
 }
 
-export default QuestionsDefault;
+export default QuestionsFixedOptions;

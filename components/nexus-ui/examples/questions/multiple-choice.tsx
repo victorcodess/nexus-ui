@@ -15,17 +15,18 @@ import {
 } from "@/components/nexus-ui/questions";
 
 const QUESTION: QuestionInput = {
-  id: "depth",
-  type: "single",
-  prompt: "How detailed should the explanation be?",
+  id: "topics",
+  type: "multiple",
+  prompt: "Which topics should I cover in the answer?",
   options: [
-    { value: "brief", label: "Brief overview" },
-    { value: "standard", label: "Standard depth" },
-    { value: "deep", label: "Deep dive with examples" },
+    { value: "setup", label: "Project setup" },
+    { value: "routing", label: "Routing and layouts" },
+    { value: "data", label: "Data fetching" },
+    { value: "deployment", label: "Deployment" },
   ],
 };
 
-function QuestionsDefault() {
+function QuestionsMultipleChoice() {
   return (
     <div className="w-full">
       <Questions
@@ -51,7 +52,7 @@ function QuestionsDefault() {
                 {option.label}
               </QuestionOption>
             ))}
-            <QuestionOther />
+            <QuestionOther placeholder="Something else..." />
           </QuestionOptions>
         </Question>
 
@@ -63,4 +64,4 @@ function QuestionsDefault() {
   );
 }
 
-export default QuestionsDefault;
+export default QuestionsMultipleChoice;

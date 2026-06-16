@@ -51,6 +51,12 @@ export type RegisteredQuestion = {
   required?: boolean;
   allowOther?: boolean;
   index: number;
+  options?: QuestionOptionInput[];
+};
+
+export type QuestionSubmissionAnswer = {
+  value: string;
+  label: React.ReactNode;
 };
 
 export type SingleQuestionAnswerState =
@@ -68,20 +74,32 @@ export type QuestionAnswerState =
 export type QuestionsSubmission = Array<
   | {
       questionId: string;
+      prompt: React.ReactNode;
       type: "single";
       status: "answered";
-      value: string;
-      other?: string;
+      answer: QuestionSubmissionAnswer;
     }
-  | { questionId: string; type: "single"; status: "skipped"; value: null }
   | {
       questionId: string;
+      prompt: React.ReactNode;
+      type: "single";
+      status: "skipped";
+      answer: null;
+    }
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
       type: "multiple";
       status: "answered";
-      value: string[];
-      other?: string;
+      answer: QuestionSubmissionAnswer[];
     }
-  | { questionId: string; type: "multiple"; status: "skipped"; value: [] }
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
+      type: "multiple";
+      status: "skipped";
+      answer: [];
+    }
 >;
 
 function isQuestionAnswered(
@@ -100,21 +118,34 @@ function isQuestionAnswered(
   return answer.value.length > 0 || Boolean(answer.other?.trim());
 }
 
+function optionLabel(
+  question: RegisteredQuestion,
+  value: string,
+  other?: string,
+): React.ReactNode {
+  if (value === QUESTION_OTHER_VALUE) {
+    return other?.trim() || "Other";
+  }
+  return question.options?.find((option) => option.value === value)?.label ?? value;
+}
+
 function skippedSubmission(
   question: RegisteredQuestion,
 ): QuestionsSubmission[number] {
   return question.type === "single"
     ? {
         questionId: question.id,
+        prompt: question.prompt,
         type: "single",
         status: "skipped",
-        value: null,
+        answer: null,
       }
     : {
         questionId: question.id,
+        prompt: question.prompt,
         type: "multiple",
         status: "skipped",
-        value: [],
+        answer: [],
       };
 }
 
@@ -128,13 +159,50 @@ function buildSubmission(
       return skippedSubmission(question);
     }
 
+    if (
+      question.type === "single" &&
+      answer.type === "single" &&
+      answer.status === "answered"
+    ) {
+      return {
+        questionId: question.id,
+        prompt: question.prompt,
+        type: "single",
+        status: "answered",
+        answer: {
+          value: answer.value,
+          label: optionLabel(question, answer.value, answer.other),
+        },
+      };
+    }
+
+    if (
+      question.type !== "multiple" ||
+      answer.type !== "multiple" ||
+      answer.status !== "answered"
+    ) {
+      return skippedSubmission(question);
+    }
+
+    const submissionAnswers = answer.value.map((value) => ({
+      value,
+      label: optionLabel(question, value, answer.other),
+    }));
+
+    if (answer.other?.trim() && !answer.value.includes(QUESTION_OTHER_VALUE)) {
+      submissionAnswers.push({
+        value: QUESTION_OTHER_VALUE,
+        label: answer.other.trim(),
+      });
+    }
+
     return {
       questionId: question.id,
-      type: question.type,
+      prompt: question.prompt,
+      type: "multiple",
       status: "answered",
-      value: answer.value,
-      ...(answer.other ? { other: answer.other } : {}),
-    } as QuestionsSubmission[number];
+      answer: submissionAnswers,
+    };
   });
 }
 
@@ -146,6 +214,7 @@ function createQuestionsFromItems(items: QuestionInput[]): RegisteredQuestion[] 
     required: item.required ?? false,
     allowOther: item.allowOther ?? true,
     index,
+    options: item.options,
   }));
 }
 
@@ -159,7 +228,8 @@ function isSameRegisteredQuestion(
     a.prompt === b.prompt &&
     a.required === b.required &&
     a.allowOther === b.allowOther &&
-    a.index === b.index
+    a.index === b.index &&
+    a.options === b.options
   );
 }
 
@@ -535,7 +605,9 @@ function Questions({
     if (!allQuestionsAnswered) return;
 
     onSubmit?.(buildSubmission(questions, answers));
-  }, [answers, onSubmit, questions]);
+    setAnswers({});
+    goToIndex(0);
+  }, [answers, goToIndex, onSubmit, questions, setAnswers]);
 
   React.useEffect(() => {
     if (!carouselApi) return;
@@ -722,7 +794,11 @@ function Question({
   );
 
   const content = (
-    <QuestionContext.Provider value={meta}>{children}</QuestionContext.Provider>
+    <QuestionContext.Provider value={meta}>
+      <CardContent data-slot="question" className="w-full p-1.5">
+        {children}
+      </CardContent>
+    </QuestionContext.Provider>
   );
 
   if (usesItemsMetadata) {
@@ -733,7 +809,7 @@ function Question({
 }
 
 const questionOptionsListClassName =
-  "flex w-full flex-col gap-0 [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-2.5 [&>*+*]:before:left-2.5 [&>*+*]:before:z-10 [&>*+*]:before:h-px [&>*+*]:before:bg-border/20 [&>*+*]:before:content-['']";
+  "flex w-full flex-col gap-0.5 [&>*+*]:relative [&>*+*]:before:pointer-events-none [&>*+*]:before:absolute [&>*+*]:before:top-0 [&>*+*]:before:right-2.5 [&>*+*]:before:left-2.5 [&>*+*]:before:z-10 [&>*+*]:before:h-px [&>*+*]:before:bg-border/20 [&>*+*]:before:content-['']";
 
 const questionRowClassName =
   "group/row flex h-11 w-full items-center gap-2.5 rounded-lg bg-transparent px-2.5 text-left transition-all hover:bg-muted active:scale-99";
@@ -752,6 +828,7 @@ function QuestionOptions({ className, children, ...props }: QuestionOptionsProps
     >
       {React.Children.map(children, (child, optionIndex) => {
         if (!React.isValidElement(child)) return child;
+        if (child.type !== QuestionOption) return child;
         return React.cloneElement(
           child as React.ReactElement<{ optionIndex?: number }>,
           { optionIndex },
@@ -884,6 +961,7 @@ function QuestionOther({
   className,
   placeholder = "Other...",
   onKeyDown,
+  optionIndex: _optionIndex,
   ...props
 }: QuestionOtherProps) {
   const question = useQuestion("QuestionOther");
@@ -1212,7 +1290,7 @@ function QuestionsCarouselItem({
       {...props}
     >
       <QuestionsSlideContext.Provider value={{ index }}>
-        <CardContent className="w-full p-1.5">{children}</CardContent>
+        {children}
       </QuestionsSlideContext.Provider>
     </CarouselItem>
   );
