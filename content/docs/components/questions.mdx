@@ -1,0 +1,613 @@
+---
+title: Questions
+description: Follow-up clarification questions with single or multiple choice, carousel navigation, and batch submission
+---
+
+import QuestionsDefault from "@/components/nexus-ui/examples/questions/default";
+import QuestionsMultipleChoice from "@/components/nexus-ui/examples/questions/multiple-choice";
+import QuestionsMultipleQuestions from "@/components/nexus-ui/examples/questions/multiple-questions";
+import QuestionsRequired from "@/components/nexus-ui/examples/questions/required";
+import QuestionsFixedOptions from "@/components/nexus-ui/examples/questions/fixed-options";
+import { Callout } from "@/components/callout";
+
+Composable card for **follow-up clarification questions** in chat—when the model (or your app) needs structured input before continuing. Pass **`items`** for synchronous question metadata (title, pagination, navigation), compose each slide with **`Question`**, **`QuestionOption`**, and optional **`QuestionOther`**, then handle **`onSubmit`** with a typed submission array.
+
+Single-choice answers **auto-advance** to the next question (except on the last slide, where **Submit** is required). Skipped questions are included in the submission with **`status: "skipped"`**.
+
+<DemoWithCode src="components/nexus-ui/examples/questions/default.tsx">
+  <QuestionsDefault />
+</DemoWithCode>
+
+## Installation
+
+<Tabs items={["CLI", "Manual"]} framed={false}>
+<Tab value="CLI">
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add @nexus-ui/questions
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add @nexus-ui/questions
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add @nexus-ui/questions
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add @nexus-ui/questions
+```
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Manual">
+<Steps>
+<Step>
+<h3>Install the following dependencies:</h3>
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npx shadcn@latest add carousel button card checkbox && npm install @hugeicons/react @hugeicons/core-free-icons
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm dlx shadcn@latest add carousel button card checkbox && pnpm add @hugeicons/react @hugeicons/core-free-icons
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn dlx shadcn@latest add carousel button card checkbox && yarn add @hugeicons/react @hugeicons/core-free-icons
+```
+</Tab>
+<Tab value="bun">
+```bash
+bunx shadcn@latest add carousel button card checkbox && bun add @hugeicons/react @hugeicons/core-free-icons
+```
+</Tab>
+</Tabs>
+</Step>
+<Step>
+<h3>Copy and paste the following code into your project.</h3>
+
+<ComponentSource src="components/nexus-ui/questions.tsx" title="components/nexus-ui/questions.tsx" />
+</Step>
+<Step>
+<h3>Update import paths to match your project setup.</h3>
+</Step>
+</Steps>
+</Tab>
+</Tabs>
+
+## Usage
+
+```tsx keepBackground noCollapse
+import {
+  Question,
+  QuestionOption,
+  QuestionOptions,
+  QuestionOther,
+  Questions,
+  QuestionsFooter,
+  QuestionsHeader,
+  QuestionsSubmit,
+  QuestionsTitle,
+  type QuestionInput,
+} from "@/components/nexus-ui/questions";
+```
+
+```tsx keepBackground noCollapse
+const question: QuestionInput = {
+  id: "depth",
+  type: "single",
+  prompt: "How detailed should the explanation be?",
+  options: [
+    { value: "brief", label: "Brief overview" },
+    { value: "standard", label: "Standard depth" },
+  ],
+};
+
+<Questions
+  items={[question]}
+  onSubmit={(submission) => console.log(submission)}
+>
+  <QuestionsHeader>
+    <QuestionsTitle />
+  </QuestionsHeader>
+
+  <Question id={question.id} type={question.type} prompt={question.prompt} index={0}>
+    <QuestionOptions>
+      {question.options.map((option) => (
+        <QuestionOption key={option.value} value={option.value}>
+          {option.label}
+        </QuestionOption>
+      ))}
+      <QuestionOther />
+    </QuestionOptions>
+  </Question>
+
+  <QuestionsFooter>
+    <QuestionsSubmit />
+  </QuestionsFooter>
+</Questions>
+```
+
+Pass **`items`** so **`QuestionsTitle`** and carousel pagination have question metadata on the first paint. For a single question, compose **`Question`** directly; use **`QuestionsCarousel`** only when there are multiple slides.
+
+## Examples
+
+### Multiple choice
+
+Set **`type: "multiple"`** on the question (and matching **`Question`**) to render checkbox rows. Users select one or more options before submitting.
+
+<DemoWithCode src="components/nexus-ui/examples/questions/multiple-choice.tsx">
+  <QuestionsMultipleChoice />
+</DemoWithCode>
+
+### Multiple questions
+
+For two or more prompts, wrap slides in **`QuestionsCarousel`**. Prev/next controls and pagination sync with answer state—unanswered non-required questions are marked **`skipped`** when the user moves forward.
+
+<DemoWithCode src="components/nexus-ui/examples/questions/multiple-questions.tsx"   previewClassName="max-h-none! h-auto min-h-[420px] flex flex-col items-center py-30! justify-start">
+  <QuestionsMultipleQuestions />
+</DemoWithCode>
+
+### Required questions
+
+Set **`required: true`** on a question to block **Skip** and next navigation until it is answered. Omit **`QuestionsDismiss`** when you want a forced flow.
+
+<DemoWithCode src="components/nexus-ui/examples/questions/required.tsx">
+  <QuestionsRequired />
+</DemoWithCode>
+
+### Fixed options
+
+Set **`allowOther: false`** on **`QuestionInput`** and **`Question`** to hide the free-text **Other** row—useful when the model should only offer a closed set of choices.
+
+<DemoWithCode src="components/nexus-ui/examples/questions/fixed-options.tsx">
+  <QuestionsFixedOptions />
+</DemoWithCode>
+
+## Vercel AI SDK Integration
+
+Use **Questions** when an agent needs structured clarification before continuing—for example a **`askClarifyingQuestions`** tool that streams arguments to the client and waits for the user's answers.
+
+The usual pattern:
+
+1. Define a tool **without** **`execute`** so the model stops after emitting question definitions.
+2. Render **`Questions`** when the tool part reaches **`input-available`**.
+3. Call **`addToolOutput`** (or **`addToolResult`**) in **`onSubmit`** with the submission payload.
+4. Optionally use **`sendAutomaticallyWhen`** so the chat resumes after the tool output is added.
+
+<Callout type="info">
+This flow is client-side tool handling. The model proposes questions; your UI collects answers and returns them as the tool result so the agent can continue.
+</Callout>
+
+<Steps>
+<Step>
+<h3>Install the AI SDK</h3>
+
+```bash
+npm install ai @ai-sdk/react zod
+```
+
+</Step>
+<Step>
+<h3>Expose a clarification tool on your chat route</h3>
+
+Define a tool with a Zod schema that matches **`QuestionInput`**. Omit **`execute`** so the client must supply the result.
+
+```ts title="app/api/chat/route.ts"
+import { convertToModelMessages, streamText, tool, type UIMessage } from "ai";
+import { z } from "zod";
+
+const questionSchema = z.object({
+  id: z.string(),
+  type: z.enum(["single", "multiple"]),
+  prompt: z.string(),
+  required: z.boolean().optional(),
+  allowOther: z.boolean().optional(),
+  options: z.array(
+    z.object({
+      value: z.string(),
+      label: z.string(),
+    }),
+  ),
+});
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: "anthropic/claude-sonnet-4.5",
+    system:
+      "When the user's request is ambiguous, call askClarifyingQuestions before answering.",
+    messages: await convertToModelMessages(messages),
+    tools: {
+      askClarifyingQuestions: tool({
+        description:
+          "Ask the user one or more clarifying questions before continuing.",
+        inputSchema: z.object({
+          questions: z.array(questionSchema).min(1),
+        }),
+      }),
+    },
+  });
+
+  return result.toUIMessageStreamResponse();
+}
+```
+
+</Step>
+<Step>
+<h3>Render tool input as Questions and return answers with <code className="tracking-0!">addToolOutput</code></h3>
+
+Find the latest assistant message with an **`askClarifyingQuestions`** tool part in **`input-available`** state, map **`part.input.questions`** to **`items`**, and wire **`onSubmit`** to **`addToolOutput`**. Use **`sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls`** (or your own predicate) so the model continues after answers are submitted.
+
+```tsx title="app/clarification-chat/page.tsx"
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import {
+  DefaultChatTransport,
+  lastAssistantMessageIsCompleteWithToolCalls,
+  type UIMessage,
+} from "ai";
+import {
+  Question,
+  QuestionOption,
+  QuestionOptions,
+  QuestionOther,
+  Questions,
+  QuestionsCarousel,
+  QuestionsCarouselContent,
+  QuestionsCarouselIndex,
+  QuestionsCarouselItem,
+  QuestionsCarouselNext,
+  QuestionsCarouselPagination,
+  QuestionsCarouselPrev,
+  QuestionsFooter,
+  QuestionsHeader,
+  QuestionsSkip,
+  QuestionsSubmit,
+  QuestionsTitle,
+  type QuestionInput,
+  type QuestionsSubmission,
+} from "@/components/nexus-ui/questions";
+
+type ClarifyingQuestionsInput = {
+  questions: QuestionInput[];
+};
+
+type ClarifyingQuestionsToolPart = {
+  type: "tool-askClarifyingQuestions";
+  toolCallId: string;
+  state: "input-available" | "output-available" | "output-error";
+  input?: ClarifyingQuestionsInput;
+};
+
+function findPendingClarification(messages: UIMessage[]) {
+  const assistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (!assistant) return null;
+
+  return assistant.parts.find(
+    (part): part is ClarifyingQuestionsToolPart =>
+      part.type === "tool-askClarifyingQuestions" &&
+      part.state === "input-available" &&
+      Boolean((part as ClarifyingQuestionsToolPart).input?.questions?.length),
+  );
+}
+
+export default function ClarificationChatPage() {
+  const { messages, addToolOutput, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+  });
+
+  const pending = findPendingClarification(messages);
+  if (!pending?.input?.questions) return null;
+
+  const items = pending.input.questions;
+
+  function handleSubmit(submission: QuestionsSubmission) {
+    void addToolOutput({
+      tool: "askClarifyingQuestions",
+      toolCallId: pending.toolCallId,
+      output: { answers: submission },
+    });
+  }
+
+  return (
+    <Questions items={items} onSubmit={handleSubmit}>
+      <QuestionsCarousel>
+        <QuestionsHeader>
+          <QuestionsTitle />
+          {items.length > 1 ? (
+            <QuestionsCarouselPagination>
+              <QuestionsCarouselPrev />
+              <QuestionsCarouselIndex format="of" />
+              <QuestionsCarouselNext />
+            </QuestionsCarouselPagination>
+          ) : null}
+        </QuestionsHeader>
+
+        <QuestionsCarouselContent className="mx-0">
+          {items.map((question, index) => (
+            <QuestionsCarouselItem key={question.id} index={index}>
+              <Question
+                id={question.id}
+                type={question.type}
+                prompt={question.prompt}
+                required={question.required}
+                allowOther={question.allowOther}
+              >
+                <QuestionOptions>
+                  {question.options.map((option) => (
+                    <QuestionOption key={option.value} value={option.value}>
+                      {option.label}
+                    </QuestionOption>
+                  ))}
+                  {question.allowOther !== false ? <QuestionOther /> : null}
+                </QuestionOptions>
+              </Question>
+            </QuestionsCarouselItem>
+          ))}
+        </QuestionsCarouselContent>
+      </QuestionsCarousel>
+
+      <QuestionsFooter>
+        {items.length > 1 ? <QuestionsSkip /> : null}
+        <QuestionsSubmit disabled={status !== "ready"} />
+      </QuestionsFooter>
+    </Questions>
+  );
+}
+```
+
+</Step>
+<Step>
+<h3>Alternative: send answers as a user message</h3>
+
+If you are not using tools, format **`QuestionsSubmission`** and call **`sendMessage`** directly—useful for lightweight clarification UIs that do not participate in the tool loop.
+
+```tsx
+import type { QuestionsSubmission } from "@/components/nexus-ui/questions";
+
+function formatAnswers(submission: QuestionsSubmission) {
+  return submission
+    .map((entry) => {
+      if (entry.status === "skipped") {
+        return `- ${entry.prompt}: skipped`;
+      }
+      if (entry.type === "single") {
+        return `- ${entry.prompt}: ${entry.answer.label}`;
+      }
+      const labels = entry.answer.map((item) => item.label).join(", ");
+      return `- ${entry.prompt}: ${labels}`;
+    })
+    .join("\n");
+}
+
+// onSubmit={(submission) => sendMessage({ text: formatAnswers(submission) })}
+```
+
+</Step>
+</Steps>
+
+## API Reference
+
+### Questions
+
+Root card and state container. Manages answer state, active index, carousel sync, skip/submit rules, and submission building. Extends shadcn **[Card](https://ui.shadcn.com/docs/components/radix/card)**.
+
+<TypeTable
+  type={{
+    items: {
+      type: "QuestionInput[]",
+      description:
+        "Question metadata (id, type, prompt, required, allowOther). Keeps title and pagination in sync on first render. Map the same data into Question slides for options UI.",
+    },
+    index: {
+      type: "number",
+      description: "Controlled active question index.",
+    },
+    defaultIndex: {
+      type: "number",
+      default: "0",
+      description: "Initial index in uncontrolled mode.",
+    },
+    onIndexChange: {
+      type: "(index: number) => void",
+      description: "Called when the active question changes.",
+    },
+    value: {
+      type: "Record<string, QuestionAnswerState>",
+      description: "Controlled answers map keyed by question id.",
+    },
+    defaultValue: {
+      type: "Record<string, QuestionAnswerState>",
+      description: "Initial answers in uncontrolled mode.",
+    },
+    onValueChange: {
+      type: "(value: Record<string, QuestionAnswerState>) => void",
+      description: "Called when any answer changes.",
+    },
+    onSubmit: {
+      type: "(submission: QuestionsSubmission) => void",
+      description:
+        "Fired when Submit is clicked and every question is answered. Receives the full submission array including skipped entries.",
+    },
+    onSkip: {
+      type: "(questionId: string) => void",
+      description: "Called when Skip advances past the current question.",
+    },
+    onDismiss: {
+      type: "() => void",
+      description: "Called when QuestionsDismiss is clicked.",
+    },
+  }}
+/>
+
+### Question
+
+One question scope for option components. Wraps children in **`CardContent`**. Provide **`id`**, **`type`**, and **`prompt`**; match **`items`** when using the items prop.
+
+<TypeTable
+  type={{
+    id: {
+      type: "string",
+      description: "Stable question id; keys the answer in context.",
+    },
+    type: {
+      type: '"single" | "multiple"',
+      description: "Single-select (listbox) or multi-select (checkboxes).",
+    },
+    prompt: {
+      type: "React.ReactNode",
+      description: "Question text; also used by QuestionsTitle when items is set.",
+    },
+    required: {
+      type: "boolean",
+      default: "false",
+      description: "When true, blocks Skip and next navigation until answered.",
+    },
+    allowOther: {
+      type: "boolean",
+      default: "true",
+      description: "Whether QuestionOther is meaningful for this question.",
+    },
+    index: {
+      type: "number",
+      description:
+        "Slide index. Defaults to QuestionsCarouselItem index when inside the carousel.",
+    },
+  }}
+/>
+
+### QuestionOptions
+
+Vertical list wrapper for **`QuestionOption`** and **`QuestionOther`**. Injects **`optionIndex`** into children for numbered single-choice badges.
+
+### QuestionOption
+
+Selectable row. Single choice renders a numbered button with auto-advance; multiple choice renders a checkbox label.
+
+<TypeTable
+  type={{
+    value: {
+      type: "string",
+      description: "Answer value stored in submission.",
+    },
+    optionIndex: {
+      type: "number",
+      description: "Optional; set automatically by QuestionOptions.",
+    },
+  }}
+/>
+
+### QuestionOther
+
+Free-text **Other** row. Uses **`QUESTION_OTHER_VALUE`** (`"__other__"`) as the stored value when selected. Single choice selects on input; multiple choice pairs with a checkbox.
+
+<TypeTable
+  type={{
+    placeholder: {
+      type: "string",
+      default: '"Other..."',
+      description: "Input placeholder text.",
+    },
+  }}
+/>
+
+### QuestionsTitle
+
+Renders the current question prompt in **`CardTitle`**. Pass **`children`** to override.
+
+### QuestionsHeader / QuestionsFooter
+
+Layout shells for the top bar (title, pagination, dismiss) and bottom actions (skip, submit).
+
+### QuestionsSkip
+
+Ghost **Skip** button. Disabled on the last question or when the current required question is unanswered.
+
+### QuestionsSubmit
+
+Primary **Submit** button. Enabled only when **all** questions are answered.
+
+### QuestionsDismiss
+
+Icon dismiss control. Invokes **`onDismiss`** on the root.
+
+### QuestionsCarousel
+
+[**Carousel**](https://ui.shadcn.com/docs/components/radix/carousel) root for multi-question slides. Registers the Embla API on **`Questions`** for index sync and animated viewport height.
+
+### QuestionsCarouselContent
+
+Carousel track wrapper. Animates viewport height to the active slide.
+
+### QuestionsCarouselItem
+
+One carousel slide. Pass **`index`** (zero-based) for carousel position and **`QuestionsSlideContext`**. Wrap **`Question`** inside—layout padding lives on **`Question`**, not the slide.
+
+### QuestionsCarouselPagination / Prev / Next / Index
+
+Pagination row and controls wired to root navigation state. **`QuestionsCarouselIndex`** supports **`format="of"`** (default) or **`format="slash"`**.
+
+### Types
+
+```ts noCollapse
+export type QuestionInput = {
+  id: string;
+  type: "single" | "multiple";
+  prompt: React.ReactNode;
+  options: QuestionOptionInput[];
+  required?: boolean;
+  allowOther?: boolean;
+};
+
+export type QuestionSubmissionAnswer = {
+  value: string;
+  label: React.ReactNode;
+};
+
+export type QuestionsSubmission = Array<
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
+      type: "single";
+      status: "answered";
+      answer: QuestionSubmissionAnswer;
+    }
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
+      type: "single";
+      status: "skipped";
+      answer: null;
+    }
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
+      type: "multiple";
+      status: "answered";
+      answer: QuestionSubmissionAnswer[];
+    }
+  | {
+      questionId: string;
+      prompt: React.ReactNode;
+      type: "multiple";
+      status: "skipped";
+      answer: [];
+    }
+>;
+
+export const QUESTION_OTHER_VALUE = "__other__";
+```
